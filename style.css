@@ -51,16 +51,7 @@
     }
 
     nav.scrolled {
-      background: #1a1a1a;
-      color: #ffffff;
-    }
-
-    nav.scrolled .nav-center {
-      color: var(--accent-dark);
-    }
-
-    [data-theme="dark"] nav.scrolled {
-      background: #000000;
+      background: var(--white);
     }
 
     .nav-logo-wrap {
@@ -212,7 +203,7 @@
     }
 
     .hero h1 {
-      font-size: clamp(2.8rem, 9vw, 8.5rem);      line-height: 1;
+      font-size: clamp(2rem, 9vw, 8.5rem);      line-height: 1;
     }
 
     .hero h1 .name {
