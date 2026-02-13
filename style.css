@@ -3,8 +3,8 @@
       --white: #ffffff;
 
       --accent: var(--accent-light);
-      --accent-light: #c82852;
-      --accent-dark: #f0456a;
+      --accent-light: #7d4abf;
+      --accent-dark: #a878d8;
       --padding: clamp(1.5rem, 5vw, 4rem);
     }
 
