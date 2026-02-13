@@ -68,14 +68,18 @@
     // Default to current month
     applySeason(new Date().getMonth());
 
-    // Build dropdown
+    // Build dropdown (safe DOM — no innerHTML)
     (function() {
       var dropdown = document.getElementById('season-dropdown');
       var currentMonth = new Date().getMonth();
       seasons.forEach(function(s, i) {
         var btn = document.createElement('button');
         btn.className = 'season-option' + (i === currentMonth ? ' active' : '');
-        btn.innerHTML = '<span class="season-swatch" style="background:' + s.light + '"></span>' + monthNames[i] + ' — ' + s.name;
+        var swatch = document.createElement('span');
+        swatch.className = 'season-swatch';
+        swatch.style.background = s.light;
+        btn.appendChild(swatch);
+        btn.appendChild(document.createTextNode(monthNames[i] + ' \u2014 ' + s.name));
         btn.onclick = function(e) {
           e.stopPropagation();
           applySeason(i);
@@ -94,28 +98,62 @@
       document.getElementById('season-dropdown').classList.remove('open');
     });
 
-    // Local time
-    function updateTime() {
-      var now = new Date().toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: true });
-      document.getElementById('local-time').textContent = now + ' IST';
+    // Local time (pauses when tab is hidden)
+    (function() {
+      var timer;
+      function updateTime() {
+        var now = new Date().toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: true });
+        document.getElementById('local-time').textContent = now + ' IST';
+      }
+      function start() { updateTime(); timer = setInterval(updateTime, 60000); }
+      function stop() { clearInterval(timer); }
+      start();
+      document.addEventListener('visibilitychange', function() {
+        if (document.hidden) { stop(); } else { start(); }
+      });
+    })();
+
+    // Cached fetch helper (localStorage, 1h TTL)
+    function cachedFetch(key, url, parse, onSuccess, onError) {
+      var cached = localStorage.getItem(key);
+      var ts = localStorage.getItem(key + '_ts');
+      if (cached && ts && Date.now() - Number(ts) < 3600000) {
+        onSuccess(cached);
+        return;
+      }
+      fetch(url)
+        .then(parse)
+        .then(function(value) {
+          localStorage.setItem(key, value);
+          localStorage.setItem(key + '_ts', String(Date.now()));
+          onSuccess(value);
+        })
+        .catch(function() { onError(); });
     }
-    updateTime();
-    setInterval(updateTime, 60000);
 
-    // Temperature from wttr.in
-    fetch('https://wttr.in/Bengaluru?format=%t')
-      .then(function(r) { return r.text(); })
-      .then(function(t) { document.getElementById('temperature').textContent = t.trim(); })
-      .catch(function() { document.getElementById('temperature').textContent = '--'; });
+    // Temperature from wttr.in (cached 1h)
+    cachedFetch(
+      'weather_temp',
+      'https://wttr.in/Bengaluru?format=%t',
+      function(r) { return r.text().then(function(t) { return t.trim(); }); },
+      function(v) { document.getElementById('temperature').textContent = v; },
+      function() { document.getElementById('temperature').textContent = '--'; }
+    );
 
-    // AQI from waqi.info
-    fetch('https://api.waqi.info/feed/bengaluru/?token=demo')
-      .then(function(r) { return r.json(); })
-      .then(function(d) {
-        if (d.status === 'ok') {
-          var aqi = d.data.aqi;
-          var label = aqi <= 50 ? 'Good' : aqi <= 100 ? 'Moderate' : aqi <= 150 ? 'Unhealthy for some' : aqi <= 200 ? 'Unhealthy' : 'Poor';
-          document.getElementById('aqi').textContent = aqi + ' — ' + label;
-        }
-      })
-      .catch(function() { document.getElementById('aqi').textContent = '--'; });
+    // AQI from waqi.info (cached 1h)
+    cachedFetch(
+      'weather_aqi',
+      'https://api.waqi.info/feed/bengaluru/?token=demo',
+      function(r) {
+        return r.json().then(function(d) {
+          if (d.status === 'ok') {
+            var aqi = d.data.aqi;
+            var label = aqi <= 50 ? 'Good' : aqi <= 100 ? 'Moderate' : aqi <= 150 ? 'Unhealthy for some' : aqi <= 200 ? 'Unhealthy' : 'Poor';
+            return aqi + ' \u2014 ' + label;
+          }
+          return '--';
+        });
+      },
+      function(v) { document.getElementById('aqi').textContent = v; },
+      function() { document.getElementById('aqi').textContent = '--'; }
+    );

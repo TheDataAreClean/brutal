@@ -45,7 +45,8 @@
       justify-content: space-between;
       align-items: center;
       padding: 1.5rem var(--padding);
-      font-size: 0.8rem;      letter-spacing: 0.05em;
+      font-size: 0.8rem;
+      letter-spacing: 0.05em;
       color: var(--black);
       background: transparent;
     }
@@ -74,7 +75,8 @@
       margin-top: 8px;
       background: var(--black);
       color: var(--white);
-      font-size: 0.65rem;      letter-spacing: 0.05em;
+      font-size: 0.65rem;
+      letter-spacing: 0.05em;
       white-space: nowrap;
       z-index: 20;
     }
@@ -180,7 +182,8 @@
       background: var(--accent-light);
       color: #fff;
       font-family: 'Inter', sans-serif;
-      font-size: 0.8rem;      letter-spacing: 0.03em;
+      font-size: 0.8rem;
+      letter-spacing: 0.03em;
       padding: 0.75rem 1.5rem;
       border-radius: 0;
       opacity: 0;
@@ -205,7 +208,8 @@
     }
 
     .hero h1 {
-      font-size: clamp(2rem, 9vw, 8.5rem);      line-height: 1;
+      font-size: clamp(2rem, 9vw, 8.5rem);
+      line-height: 1;
     }
 
     .hero .name {
@@ -214,7 +218,8 @@
 
     .hero .tagline {
       margin-top: clamp(1.5rem, 3vw, 2.5rem);
-      font-size: clamp(1.1rem, 2.5vw, 1.65rem);      color: var(--black);
+      font-size: clamp(1.1rem, 2.5vw, 1.65rem);
+      color: var(--black);
       max-width: 700px;
       line-height: 1.5;
     }
@@ -233,18 +238,21 @@
     }
 
     .about-content h2 {
-      font-size: clamp(1.8rem, 4vw, 3.5rem);      line-height: 1.5;
+      font-size: clamp(1.8rem, 4vw, 3.5rem);
+      line-height: 1.5;
     }
 
     .about-content .highlight {
       color: var(--accent);
     }
 
-    .about-content h2 .thin {      display: block;
+    .about-content h2 .thin {
+      display: block;
     }
 
     .about-text {
-      font-size: clamp(1rem, 1.4vw, 1.15rem);      line-height: 1.5;
+      font-size: clamp(1rem, 1.4vw, 1.15rem);
+      line-height: 1.5;
       color: var(--black);
     }
 
@@ -276,7 +284,8 @@
     }
 
     .projects-title {
-      font-size: clamp(1.8rem, 4vw, 3.5rem);      line-height: 1.05;
+      font-size: clamp(1.8rem, 4vw, 3.5rem);
+      line-height: 1.05;
       margin-bottom: clamp(3rem, 6vw, 5rem);
       color: var(--black);
     }
@@ -312,16 +321,19 @@
     }
 
     .project-name {
-      font-size: clamp(1.5rem, 3vw, 2.2rem);    }
+      font-size: clamp(1.5rem, 3vw, 2.2rem);
+    }
 
     .project-role {
-      font-size: 0.8rem;      color: var(--black);
+      font-size: 0.8rem;
+      color: var(--black);
       letter-spacing: 0.05em;
       margin-bottom: 1rem;
     }
 
     .project-desc {
-      font-size: clamp(0.95rem, 1.3vw, 1.05rem);      line-height: 1.5;
+      font-size: clamp(0.95rem, 1.3vw, 1.05rem);
+      line-height: 1.5;
       color: var(--black);
     }
 
@@ -357,7 +369,8 @@
     }
 
     .footer-email > span {
-      font-size: 0.9rem;      color: var(--black);
+      font-size: 0.9rem;
+      color: var(--black);
     }
 
     .footer-email-copy {
@@ -384,7 +397,8 @@
       flex-direction: column;
       gap: 1rem;
       margin-bottom: clamp(4rem, 8vh, 8rem);
-      font-size: 0.8rem;      color: var(--black);
+      font-size: 0.8rem;
+      color: var(--black);
     }
 
     .footer-lately-item {
@@ -399,7 +413,8 @@
       color: var(--accent);
     }
 
-    .footer-lately-label {      font-size: 0.7rem;
+    .footer-lately-label {
+      font-size: 0.7rem;
       letter-spacing: 0.05em;
     }
 
@@ -411,7 +426,8 @@
       display: flex;
       flex-direction: column;
       gap: 0.5rem;
-      font-size: 0.8rem;      color: var(--black);
+      font-size: 0.8rem;
+      color: var(--black);
     }
 
     .footer-meta a {
@@ -428,7 +444,8 @@
       flex-direction: column;
       gap: 0.5rem;
       margin-top: clamp(3rem, 5vh, 4rem);
-      font-size: 0.8rem;      color: var(--black);
+      font-size: 0.8rem;
+      color: var(--black);
     }
 
     .footer-bottom a {

@@ -380,6 +380,28 @@ def render_footer(footer_md, lately_md):
     )
 
 
+def minify_css(css):
+    """Remove comments and collapse whitespace in CSS."""
+    css = re.sub(r'/\*.*?\*/', '', css, flags=re.DOTALL)
+    css = re.sub(r'\n\s*\n', '\n', css)
+    lines = []
+    for line in css.split('\n'):
+        stripped = line.rstrip()
+        if stripped:
+            lines.append(stripped)
+    return '\n'.join(lines) + '\n'
+
+
+def minify_js(js):
+    """Remove blank lines and trailing whitespace in JS."""
+    lines = []
+    for line in js.split('\n'):
+        stripped = line.rstrip()
+        if stripped:
+            lines.append(stripped)
+    return '\n'.join(lines) + '\n'
+
+
 def build():
     template = read(BASE / 'template.html')
     css = read(BASE / 'style.css')
@@ -407,23 +429,26 @@ def build():
     html = html.replace('{{projects}}', projects_html)
     html = html.replace('{{footer}}', footer_html)
 
-    # Inline CSS
+    # Inline minified CSS
     html = html.replace(
         '  <link rel="stylesheet" href="style.css">',
-        '  <style>\n' + css + '  </style>',
+        '  <style>\n' + minify_css(css) + '  </style>',
     )
 
-    # Inline JS
+    # Inline minified JS
     html = html.replace(
         '  <script src="script.js"></script>',
-        '  <script>\n' + js + '  </script>',
+        '  <script>\n' + minify_js(js) + '  </script>',
     )
 
     # Generate seasonal images
     month = datetime.now().month - 1  # 0-indexed
     accent = SEASON_COLORS[month]
-    generate_og_image(accent, hero_md, BASE / 'assets' / 'og-image.png')
-    generate_favicon(accent, BASE / 'assets' / 'favicon.png')
+    try:
+        generate_og_image(accent, hero_md, BASE / 'assets' / 'og-image.png')
+        generate_favicon(accent, BASE / 'assets' / 'favicon.png')
+    except Exception as e:
+        print(f'Warning: image generation failed ({e}), skipping.')
 
     # Write output
     DIST.mkdir(exist_ok=True)
