@@ -52,6 +52,7 @@ def render_hero(md):
 
     # **text** → <span class="name">text</span>
     heading = re.sub(r'\*\*(.+?)\*\*', r'<span class="name">\1</span>', heading)
+    tagline = re.sub(r'\*\*(.+?)\*\*', r'<span class="name">\1</span>', tagline)
 
     return (
         '  <!-- HERO -->\n'

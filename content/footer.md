@@ -1,6 +1,6 @@
 - email: hello@thedataareclean.com
 - location: Bengaluru, India
-- credit: Built with [Claude Code](https://claude.com/product/claude-code)
+- credit: built with [Claude Code](https://claude.com/product/claude-code)
 - license: [CC BY](https://creativecommons.org/licenses/by/4.0/)
 - handle: thedataareclean
 - year: 2026

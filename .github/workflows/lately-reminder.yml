@@ -1,0 +1,30 @@
+name: lately reminder
+
+on:
+  schedule:
+    - cron: '30 3 * * 0' # every Sunday at 9am IST (3:30am UTC)
+
+jobs:
+  remind:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: 'update lately',
+              body: [
+                'time to update `content/lately.md`',
+                '',
+                '```',
+                '- read: ...',
+                '- listened: ...',
+                '- watched: ...',
+                '```',
+                '',
+                'edit, run `python3 build.py`, commit and push.'
+              ].join('\n'),
+              labels: ['lately']
+            });

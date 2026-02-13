@@ -208,7 +208,7 @@
       font-size: clamp(2rem, 9vw, 8.5rem);      line-height: 1;
     }
 
-    .hero h1 .name {
+    .hero .name {
       color: var(--accent);
     }
 
@@ -233,7 +233,7 @@
     }
 
     .about-content h2 {
-      font-size: clamp(1.8rem, 4vw, 3.5rem);      line-height: 1.05;
+      font-size: clamp(1.8rem, 4vw, 3.5rem);      line-height: 1.5;
     }
 
     .about-content h2 .highlight {
@@ -316,7 +316,6 @@
 
     .project-role {
       font-size: 0.8rem;      color: var(--black);
-      text-transform: uppercase;
       letter-spacing: 0.05em;
       margin-bottom: 1rem;
     }
@@ -401,7 +400,6 @@
     }
 
     .footer-lately-label {      font-size: 0.7rem;
-      text-transform: uppercase;
       letter-spacing: 0.05em;
     }
 

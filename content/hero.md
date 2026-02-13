@@ -1,3 +1,3 @@
-# Hello, I am **Arpit** !
+# hello, i am **arpit** !
 
-I am a multi-disciplinary data communicator.
+i am a multi-disciplinary **data communicator**.
