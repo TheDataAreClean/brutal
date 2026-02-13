@@ -236,7 +236,7 @@
       font-size: clamp(1.8rem, 4vw, 3.5rem);      line-height: 1.5;
     }
 
-    .about-content h2 .highlight {
+    .about-content .highlight {
       color: var(--accent);
     }
 

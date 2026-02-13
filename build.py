@@ -100,11 +100,15 @@ def render_about(md):
     else:
         h2 = f'      <h2>{heading}</h2>'
 
+    highlighted = [
+        re.sub(r'\*\*(.+?)\*\*', r'<span class="highlight">\1</span>', p)
+        for p in paragraphs
+    ]
     paras = '\n'.join(
         f'        <p>\n'
         f'          {p}\n'
         f'        </p>'
-        for p in paragraphs
+        for p in highlighted
     )
 
     return (
