@@ -34,9 +34,8 @@ SEASON_COLORS = [
 ]
 
 
-def generate_og_png(color_hex, output_path):
-    """Generate a 1200x630 solid color PNG with no dependencies."""
-    width, height = 1200, 630
+def generate_png(color_hex, width, height, output_path):
+    """Generate a solid color PNG with no dependencies."""
     r = int(color_hex[1:3], 16)
     g = int(color_hex[3:5], 16)
     b = int(color_hex[5:7], 16)
@@ -360,10 +359,11 @@ def build():
         '  <script>\n' + js + '  </script>',
     )
 
-    # Generate seasonal OG image
+    # Generate seasonal images
     month = datetime.now().month - 1  # 0-indexed
     accent = SEASON_COLORS[month]
-    generate_og_png(accent, BASE / 'assets' / 'og-image.png')
+    generate_png(accent, 1200, 630, BASE / 'assets' / 'og-image.png')
+    generate_png(accent, 64, 64, BASE / 'assets' / 'favicon.png')
 
     # Write output
     DIST.mkdir(exist_ok=True)
