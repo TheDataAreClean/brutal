@@ -1,4 +1,4 @@
-- title: arpit — data communicator
+- title: arpit | data communicator | thedataareclean
 - description: i help people understand their data — through products, research and stories.
 - url: https://thedataareclean.github.io/brutal/
 - image: assets/og-image.png

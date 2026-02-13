@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Requires: pip install Pillow (for OG image + favicon generation)
 """Build script for portfolio site.
 
 Reads markdown content files, renders them into HTML,
@@ -9,8 +10,6 @@ Usage: python3 build.py
 
 import re
 import shutil
-import struct
-import zlib
 from datetime import datetime
 from pathlib import Path
 
@@ -34,31 +33,92 @@ SEASON_COLORS = [
 ]
 
 
-def generate_png(color_hex, width, height, output_path):
-    """Generate a solid color PNG with no dependencies."""
-    r = int(color_hex[1:3], 16)
-    g = int(color_hex[3:5], 16)
-    b = int(color_hex[5:7], 16)
+FONT_PATH = BASE / 'assets' / 'fonts' / 'Inter.ttf'
 
-    row = bytes([0] + [r, g, b] * width)
-    raw_data = row * height
-    compressed = zlib.compress(raw_data)
 
-    def chunk(ctype, data):
-        c = ctype + data
-        crc = struct.pack('>I', zlib.crc32(c) & 0xffffffff)
-        return struct.pack('>I', len(data)) + c + crc
+def parse_bold_segments(text):
+    """Split text into segments: [(string, is_bold), ...].
 
-    sig = b'\x89PNG\r\n\x1a\n'
-    ihdr = struct.pack('>IIBBBBB', width, height, 8, 2, 0, 0, 0)
+    **bold** markers indicate accent-colored text.
+    """
+    segments = []
+    parts = re.split(r'(\*\*.+?\*\*)', text)
+    for part in parts:
+        if part.startswith('**') and part.endswith('**'):
+            segments.append((part[2:-2], True))
+        else:
+            segments.append((part, False))
+    return segments
 
-    output_path = Path(output_path)
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(output_path, 'wb') as f:
-        f.write(sig)
-        f.write(chunk(b'IHDR', ihdr))
-        f.write(chunk(b'IDAT', compressed))
-        f.write(chunk(b'IEND', b''))
+
+def draw_segments(draw, x, y, segments, font, base_color, accent_color):
+    """Draw text segments with accent highlighting for bold parts."""
+    cursor_x = x
+    for text, is_bold in segments:
+        color = accent_color if is_bold else base_color
+        draw.text((cursor_x, y), text, fill=color, font=font)
+        bbox = draw.textbbox((0, 0), text, font=font)
+        cursor_x += bbox[2] - bbox[0]
+
+
+def generate_og_image(accent_hex, hero_md, output_path):
+    """Generate OG image with Inter font, matching hero section design."""
+    from PIL import Image, ImageDraw, ImageFont
+
+    width, height = 1200, 630
+    padding = 80
+
+    # Parse hero content (keep ** markers for segment parsing)
+    lines = [l.strip() for l in hero_md.strip().split('\n') if l.strip()]
+    heading_raw = ''
+    tagline_raw = ''
+    for line in lines:
+        if line.startswith('# '):
+            heading_raw = line[2:]
+        else:
+            tagline_raw = line
+
+    accent = tuple(int(accent_hex[i:i+2], 16) for i in (1, 3, 5))
+    black = (0x1a, 0x1a, 0x1a)
+
+    img = Image.new('RGB', (width, height), (255, 255, 255))
+    draw = ImageDraw.Draw(img)
+
+    # Load Inter at two sizes
+    font_lg = ImageFont.truetype(str(FONT_PATH), 72)
+    font_sm = ImageFont.truetype(str(FONT_PATH), 28)
+
+    # Strip ** for measurement
+    heading_plain = heading_raw.replace('**', '')
+    tagline_plain = tagline_raw.replace('**', '')
+
+    # Position: bottom-left aligned, like the hero section
+    h_bbox = draw.textbbox((0, 0), heading_plain, font=font_lg)
+    h_h = h_bbox[3] - h_bbox[1]
+    t_bbox = draw.textbbox((0, 0), tagline_plain, font=font_sm)
+    t_h = t_bbox[3] - t_bbox[1]
+
+    total_h = h_h + 24 + t_h
+    y_start = height - padding - total_h
+
+    # Draw heading and tagline with accent on **bold** segments
+    heading_segments = parse_bold_segments(heading_raw)
+    tagline_segments = parse_bold_segments(tagline_raw)
+
+    draw_segments(draw, padding, y_start, heading_segments, font_lg, black, accent)
+    draw_segments(draw, padding, y_start + h_h + 24, tagline_segments, font_sm, black, accent)
+
+    Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+    img.save(output_path)
+
+
+def generate_favicon(accent_hex, output_path):
+    """Generate a solid accent color favicon."""
+    from PIL import Image
+    accent = tuple(int(accent_hex[i:i+2], 16) for i in (1, 3, 5))
+    img = Image.new('RGB', (64, 64), accent)
+    Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+    img.save(output_path)
 
 
 def read(path):
@@ -362,8 +422,8 @@ def build():
     # Generate seasonal images
     month = datetime.now().month - 1  # 0-indexed
     accent = SEASON_COLORS[month]
-    generate_png(accent, 1200, 630, BASE / 'assets' / 'og-image.png')
-    generate_png(accent, 64, 64, BASE / 'assets' / 'favicon.png')
+    generate_og_image(accent, hero_md, BASE / 'assets' / 'og-image.png')
+    generate_favicon(accent, BASE / 'assets' / 'favicon.png')
 
     # Write output
     DIST.mkdir(exist_ok=True)
