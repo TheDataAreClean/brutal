@@ -33,7 +33,7 @@ SEASON_COLORS = [
 ]
 
 
-FONT_PATH = BASE / 'assets' / 'fonts' / 'Inter.ttf'
+FONT_PATH = BASE / 'assets' / 'fonts' / 'SchibstedGrotesk.ttf'
 
 
 def parse_bold_segments(text):
@@ -62,7 +62,7 @@ def draw_segments(draw, x, y, segments, font, base_color, accent_color):
 
 
 def generate_og_image(accent_hex, hero_md, output_path):
-    """Generate OG image with Inter font, matching hero section design."""
+    """Generate OG image with Schibsted Grotesk font, matching hero section design."""
     from PIL import Image, ImageDraw, ImageFont
 
     width, height = 1200, 630
@@ -84,7 +84,7 @@ def generate_og_image(accent_hex, hero_md, output_path):
     img = Image.new('RGB', (width, height), (255, 255, 255))
     draw = ImageDraw.Draw(img)
 
-    # Load Inter at two sizes
+    # Load Schibsted Grotesk at two sizes
     font_lg = ImageFont.truetype(str(FONT_PATH), 72)
     font_sm = ImageFont.truetype(str(FONT_PATH), 28)
 
