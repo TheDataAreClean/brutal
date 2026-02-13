@@ -8,11 +8,58 @@ Usage: python3 build.py
 """
 
 import re
+import shutil
+import struct
+import zlib
+from datetime import datetime
 from pathlib import Path
 
 BASE = Path(__file__).parent
 CONTENT = BASE / 'content'
 DIST = BASE / 'dist'
+
+SEASON_COLORS = [
+    '#c84520',  # Jan — Flame of Forest
+    '#7d4abf',  # Feb — Jacaranda
+    '#9870b0',  # Mar — Pongamia
+    '#b89010',  # Apr — Golden Shower
+    '#c83020',  # May — Gulmohar
+    '#a89018',  # Jun — Copper Pod
+    '#c84568',  # Jul — Oleander
+    '#c82852',  # Aug — Bougainvillea
+    '#8040a8',  # Sep — Purple Bauhinia
+    '#c85080',  # Oct — Tabebuia Rosea
+    '#b87878',  # Nov — Rain Tree
+    '#c02838',  # Dec — Poinsettia
+]
+
+
+def generate_og_png(color_hex, output_path):
+    """Generate a 1200x630 solid color PNG with no dependencies."""
+    width, height = 1200, 630
+    r = int(color_hex[1:3], 16)
+    g = int(color_hex[3:5], 16)
+    b = int(color_hex[5:7], 16)
+
+    row = bytes([0] + [r, g, b] * width)
+    raw_data = row * height
+    compressed = zlib.compress(raw_data)
+
+    def chunk(ctype, data):
+        c = ctype + data
+        crc = struct.pack('>I', zlib.crc32(c) & 0xffffffff)
+        return struct.pack('>I', len(data)) + c + crc
+
+    sig = b'\x89PNG\r\n\x1a\n'
+    ihdr = struct.pack('>IIBBBBB', width, height, 8, 2, 0, 0, 0)
+
+    output_path = Path(output_path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(output_path, 'wb') as f:
+        f.write(sig)
+        f.write(chunk(b'IHDR', ihdr))
+        f.write(chunk(b'IDAT', compressed))
+        f.write(chunk(b'IEND', b''))
 
 
 def read(path):
@@ -37,6 +84,35 @@ def parse_kv_list(text):
             key, _, value = line[2:].partition(':')
             items.append((key.strip(), value.strip()))
     return items
+
+
+def render_meta(md):
+    items = dict(parse_kv_list(md))
+    title = items.get('title', '')
+    desc = items.get('description', '')
+    url = items.get('url', '')
+    image = items.get('image', '')
+    twitter = items.get('twitter', '')
+    lang = items.get('lang', 'en')
+
+    favicon = items.get('favicon', '')
+    image_url = url.rstrip('/') + '/' + image if image and not image.startswith('http') else image
+
+    return (
+        f'  <title>{title}</title>\n'
+        + (f'  <link rel="icon" type="image/png" href="{favicon}">\n' if favicon else '')
+        + f'  <meta name="description" content="{desc}">\n'
+        f'  <meta property="og:type" content="website">\n'
+        f'  <meta property="og:title" content="{title}">\n'
+        f'  <meta property="og:description" content="{desc}">\n'
+        f'  <meta property="og:url" content="{url}">\n'
+        f'  <meta property="og:image" content="{image_url}">\n'
+        f'  <meta name="twitter:card" content="summary_large_image">\n'
+        f'  <meta name="twitter:title" content="{title}">\n'
+        f'  <meta name="twitter:description" content="{desc}">\n'
+        f'  <meta name="twitter:image" content="{image_url}">'
+        + (f'\n  <meta name="twitter:site" content="@{twitter}">' if twitter else '')
+    )
 
 
 def render_hero(md):
@@ -213,7 +289,7 @@ def render_footer(footer_md, lately_md):
     location = items.get('location', '')
     credit = parse_inline(items.get('credit', ''))
     license_text = parse_inline(items.get('license', ''))
-    handle = items.get('handle', '')
+    handle = parse_inline(items.get('handle', ''))
     year = items.get('year', '')
 
     lately = render_lately(lately_md)
@@ -239,8 +315,8 @@ def render_footer(footer_md, lately_md):
         '    </div>\n'
         '\n'
         '    <div class="footer-bottom">\n'
-        f'      <span>{credit}</span>\n'
         f'      <span>{license_text} \u00b7 {handle} \u00b7 {year}</span>\n'
+        f'      <span>{credit}</span>\n'
         '    </div>'
     )
 
@@ -250,6 +326,7 @@ def build():
     css = read(BASE / 'style.css')
     js = read(BASE / 'script.js')
 
+    meta_md = read(CONTENT / 'meta.md')
     hero_md = read(CONTENT / 'hero.md')
     about_md = read(CONTENT / 'about.md')
     projects_md = read(CONTENT / 'projects.md')
@@ -257,6 +334,7 @@ def build():
     footer_md = read(CONTENT / 'footer.md')
 
     # Render content sections
+    meta_html = render_meta(meta_md)
     hero_html = render_hero(hero_md)
     about_html = render_about(about_md)
     projects_html = render_projects(projects_md)
@@ -264,6 +342,7 @@ def build():
 
     # Assemble page
     html = template
+    html = html.replace('{{meta}}', meta_html)
     html = html.replace('{{hero}}', hero_html)
     html = html.replace('{{about}}', about_html)
     html = html.replace('{{projects}}', projects_html)
@@ -281,10 +360,24 @@ def build():
         '  <script>\n' + js + '  </script>',
     )
 
+    # Generate seasonal OG image
+    month = datetime.now().month - 1  # 0-indexed
+    accent = SEASON_COLORS[month]
+    generate_og_png(accent, BASE / 'assets' / 'og-image.png')
+
     # Write output
     DIST.mkdir(exist_ok=True)
     (DIST / 'index.html').write_text(html)
-    print(f'Built dist/index.html ({len(html)} bytes)')
+
+    # Copy assets
+    assets_src = BASE / 'assets'
+    if assets_src.is_dir():
+        assets_dst = DIST / 'assets'
+        if assets_dst.exists():
+            shutil.rmtree(assets_dst)
+        shutil.copytree(assets_src, assets_dst, ignore=shutil.ignore_patterns('README.md'))
+
+    print(f'Built dist/index.html ({len(html)} bytes) — og accent: {accent}')
 
 
 if __name__ == '__main__':

@@ -1,0 +1,6 @@
+- title: arpit — data communicator
+- description: i help people understand their data — through products, research and stories.
+- url: https://thedataareclean.github.io/brutal/
+- image: assets/og-image.png
+- favicon: assets/favicon.png
+- lang: en

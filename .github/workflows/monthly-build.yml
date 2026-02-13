@@ -1,0 +1,24 @@
+name: monthly build
+
+on:
+  schedule:
+    - cron: '0 0 1 * *' # 1st of every month at midnight UTC
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - run: python3 build.py
+
+      - run: cp dist/index.html index.html
+
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: 'monthly accent update'
+          file_pattern: 'index.html assets/og-image.png dist/'
