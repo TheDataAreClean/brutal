@@ -14,7 +14,9 @@
 <body>
 
   <div class="top-bar">
-    <div class="nav-logo-wrap" onclick="toggleSeasons(event)">
+    <div class="nav-logo-wrap">
+      <a class="nav-logo-home" href="{{nav_root}}"></a>
+      <button class="nav-logo-season" onclick="toggleSeasons(event)" aria-label="Change accent color"></button>
       <div class="season-dropdown" id="season-dropdown"></div>
     </div>
     <div class="top-bar-center">
@@ -35,15 +37,10 @@
   </div>
 
   <nav>
-    <div class="nav-start">
-      <a class="nav-link-box {{nav_work_active}}" href="{{nav_root}}work/">work</a>
-    </div>
-    <div class="nav-end">
-      <a class="nav-link-box {{nav_play_active}}" href="{{nav_root}}play/">play</a>
-    </div>
+    <a class="nav-link-box {{nav_work_active}}" href="{{nav_root}}work/">work</a>
+    <div class="toast" id="toast">email copied</div>
+    <a class="nav-link-box {{nav_play_active}}" href="{{nav_root}}play/">play</a>
   </nav>
-
-  <div class="toast" id="toast">email copied to clipboard</div>
 
   <div class="content-box">
 {{body}}

@@ -65,7 +65,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: var(--box-gap) var(--padding);
+      padding: 16px var(--padding) var(--box-gap);
       background: var(--white);
     }
     .top-bar-center {
@@ -78,10 +78,29 @@
       width: var(--bar-h);
       height: var(--bar-h);
       background: var(--accent);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    }
+    .nav-logo-home {
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 14px;
       cursor: pointer;
+    }
+    .nav-logo-season {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 14px;
+      height: 14px;
+      background: var(--black);
+      border: none;
+      cursor: pointer;
+      padding: 0;
+    }
+    .nav-logo-season:hover {
+      background: var(--white);
     }
     .bar-box {
       border: 1px solid var(--black);
@@ -163,7 +182,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: var(--box-gap) var(--padding);
+      padding: var(--box-gap) var(--padding) 16px;
       background: var(--white);
     }
     .nav-link-box {
@@ -176,7 +195,7 @@
       font-weight: 700;
       letter-spacing: 1px;
       text-decoration: none;
-      color: var(--black);
+      color: var(--accent);
     }
     .nav-link-box:hover,
     .nav-link-box.active {
@@ -187,8 +206,8 @@
     }
     .content-box {
       position: fixed;
-      top: calc(var(--bar-h) + 3 * var(--box-gap));
-      bottom: calc(var(--bar-h) + 3 * var(--box-gap));
+      top: calc(var(--bar-h) + 16px + 2 * var(--box-gap));
+      bottom: calc(var(--bar-h) + 16px + 2 * var(--box-gap));
       left: var(--padding);
       right: var(--padding);
       border: 1px solid var(--black);
@@ -200,26 +219,23 @@
       display: none;
     }
     .toast {
-      position: fixed;
-      bottom: calc(var(--bar-h) + 4 * var(--box-gap));
-      left: 50%;
-      transform: translateX(-50%) translateY(20px);
+      height: var(--bar-h);
+      display: flex;
+      align-items: center;
       background: var(--accent);
       color: #ffffff;
-      font-family: 'Schibsted Grotesk', sans-serif;
-      font-size: 13px;
-      letter-spacing: 0.5px;
-      padding: var(--box-pad);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 0 16px;
       opacity: 0;
       pointer-events: none;
-      z-index: 100;
     }
     .toast.visible {
       opacity: 1;
-      transform: translateX(-50%) translateY(0);
     }
     .hero {
-      min-height: calc(100vh - 2 * var(--bar-h) - 6 * var(--box-gap) - 2px);
+      min-height: calc(100vh - 2 * var(--bar-h) - 32px - 4 * var(--box-gap) - 2px);
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
@@ -481,7 +497,9 @@
 <body>
 
   <div class="top-bar">
-    <div class="nav-logo-wrap" onclick="toggleSeasons(event)">
+    <div class="nav-logo-wrap">
+      <a class="nav-logo-home" href="../"></a>
+      <button class="nav-logo-season" onclick="toggleSeasons(event)" aria-label="Change accent color"></button>
       <div class="season-dropdown" id="season-dropdown"></div>
     </div>
     <div class="top-bar-center">
@@ -502,15 +520,10 @@
   </div>
 
   <nav>
-    <div class="nav-start">
-      <a class="nav-link-box active" href="../work/">work</a>
-    </div>
-    <div class="nav-end">
-      <a class="nav-link-box " href="../play/">play</a>
-    </div>
+    <a class="nav-link-box active" href="../work/">work</a>
+    <div class="toast" id="toast">email copied</div>
+    <a class="nav-link-box " href="../play/">play</a>
   </nav>
-
-  <div class="toast" id="toast">email copied to clipboard</div>
 
   <div class="content-box">
   <section class="page-intro">
