@@ -20,22 +20,28 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: main
 
-      - name: Set deploy directory
-        id: config
+      - name: Checkout experiment
+        uses: actions/checkout@v4
+        with:
+          ref: experiment
+          path: experiment
+
+      - name: Combine sites
         run: |
-          if [ "${{ github.ref_name }}" = "experiment" ]; then
-            echo "dir=dist" >> "$GITHUB_OUTPUT"
-          else
-            echo "dir=." >> "$GITHUB_OUTPUT"
-          fi
+          mkdir -p main/exp
+          cp -r experiment/dist/* main/exp/
 
       - uses: actions/configure-pages@v5
 
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: ${{ steps.config.outputs.dir }}
+          path: main
 
       - uses: actions/deploy-pages@v4
         id: deployment
