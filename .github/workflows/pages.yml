@@ -1,0 +1,41 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main, experiment]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set deploy directory
+        id: config
+        run: |
+          if [ "${{ github.ref_name }}" = "experiment" ]; then
+            echo "dir=dist" >> "$GITHUB_OUTPUT"
+          else
+            echo "dir=." >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: ${{ steps.config.outputs.dir }}
+
+      - uses: actions/deploy-pages@v4
+        id: deployment
