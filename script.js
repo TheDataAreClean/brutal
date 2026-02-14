@@ -13,18 +13,6 @@
       });
     }
 
-    // Nav background on scroll
-    (function() {
-      var nav = document.querySelector('nav');
-      window.addEventListener('scroll', function() {
-        if (window.scrollY > 50) {
-          nav.classList.add('scrolled');
-        } else {
-          nav.classList.remove('scrolled');
-        }
-      });
-    })();
-
     // Match OS setting on load
     (function() {
       if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
