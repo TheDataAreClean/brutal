@@ -332,7 +332,7 @@ def render_lately(md):
         icon = icon_map[key]
         parts.append(
             '      <div class="lately-item">\n'
-            f'        <span class="material-symbols-sharp">{icon}</span>\n'
+            f'        <span class="lately-label"><span class="material-symbols-sharp">{icon}</span> {key}</span>\n'
             f'        <span class="lately-value">{value}</span>\n'
             '      </div>'
         )
@@ -448,11 +448,16 @@ def fetch_glass_photos():
         for post in posts:
             img_url = post.get('image1024x1024', '')
             desc = post.get('description', '')
+            created = post.get('created_at', '')
             if img_url:
                 photos.append({
                     'url': img_url,
                     'description': desc or '',
+                    'created': created,
                 })
+
+        # Newest first
+        photos.sort(key=lambda p: p['created'], reverse=True)
 
         print(f'Fetched {len(photos)} photos from Glass.photo')
         return photos
@@ -463,23 +468,23 @@ def fetch_glass_photos():
 
 
 def render_gallery(photos, num_cols=3):
-    """Render masonry gallery with round-robin column distribution for L-to-R chronological order."""
+    """Render masonry gallery with round-robin columns for desktop, order attrs for mobile."""
     if not photos:
         return ''
 
     # Distribute photos round-robin across columns
     cols = [[] for _ in range(num_cols)]
     for i, photo in enumerate(photos):
-        cols[i % num_cols].append(photo)
+        cols[i % num_cols].append((i, photo))
 
     col_parts = []
     for col in cols:
         items = []
-        for photo in col:
+        for idx, photo in col:
             desc = escape(photo['description'])
             caption = f'\n          <figcaption>{desc}</figcaption>' if desc else ''
             items.append(
-                f'        <figure class="gallery-item">\n'
+                f'        <figure class="gallery-item" style="order:{idx}">\n'
                 f'          <img src="{photo["url"]}" alt="{desc}" loading="lazy">{caption}\n'
                 f'        </figure>'
             )
@@ -525,20 +530,48 @@ def render_work_body(work_md, projects_md, about_md):
     return intro_html + '\n\n' + about_html + '\n\n' + work_html + '\n\n' + projects_html
 
 
-def render_play_body(lately_md, photos):
-    """Play page body: intro + lately + photo gallery."""
-    intro_html = render_page_intro('during play, i do whatever i want.')
+def render_interests(md):
+    """Parse interests.md into a tag list."""
+    lines = md.strip().split('\n')
+    tags = []
+    for line in lines:
+        stripped = line.strip()
+        if stripped.startswith('- '):
+            tags.append(stripped[2:].strip())
+
+    tag_html = '\n'.join(
+        f'      <span class="interest-tag">{t}</span>'
+        for t in tags
+    )
+
+    return (
+        '  <!-- INTERESTS -->\n'
+        '  <section>\n'
+        '    <h2 class="section-title"><span class="highlight">stuff</span></h2>\n'
+        '    <p class="section-subtitle">a list of things i find interesting, in no particular order.</p>\n'
+        '    <div class="interests">\n'
+        f'{tag_html}\n'
+        '    </div>\n'
+        '  </section>'
+    )
+
+
+def render_play_body(lately_md, interests_md, photos):
+    """Play page body: intro + interests + lately + photo gallery."""
+    intro_html = render_page_intro('during **play**, i do **whatever i want**.')
     lately_html = (
         '  <!-- LATELY -->\n'
-        '  <section class="lately-section">\n'
+        '  <section>\n'
         '    <h2 class="section-title"><span class="highlight">lately</span></h2>\n'
         + render_lately(lately_md) + '\n'
         + '  </section>'
     )
     gallery_html = render_gallery(photos)
+    interests_html = render_interests(interests_md)
     parts = [intro_html, lately_html]
     if gallery_html:
         parts.append(gallery_html)
+    parts.append(interests_html)
     return '\n\n'.join(parts)
 
 
@@ -614,6 +647,7 @@ def build():
     lately_md = read(CONTENT / 'lately.md')
     footer_md = read(CONTENT / 'footer.md')
     work_md = read(CONTENT / 'work.md')
+    interests_md = read(CONTENT / 'interests.md')
 
     # Shared pieces
     meta_html = render_meta(meta_md)
@@ -625,7 +659,7 @@ def build():
     # Page bodies
     home_body = render_home_body(hero_md)
     work_body = render_work_body(work_md, projects_md, about_md)
-    play_body = render_play_body(lately_md, photos)
+    play_body = render_play_body(lately_md, interests_md, photos)
 
     # Generate seasonal images
     month = datetime.now().month - 1  # 0-indexed

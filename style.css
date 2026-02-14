@@ -1,3 +1,31 @@
+    /*
+     * TYPE SCALE (minor-third ~1.2x)
+     *
+     *   --text-display : clamp(32px, 9vw, 136px)  — hero h1
+     *   --text-heading : clamp(24px, 4vw, 40px)   — page intros, section titles, about h2, project names
+     *   --text-subhead : clamp(18px, 2.5vw, 26px) — hero tagline
+     *   --text-body    : clamp(15px, 1.3vw, 17px) — descriptions, about text, boxes, subtitles
+     *   --text-small   : 13px                     — captions, footer, project role
+     *   --text-ui      : 11px                     — nav links, toast, labels, season picker
+     *
+     * Base values: 11 → 13 → 15 → 18 → 24 → 32
+     *
+     * SPACING
+     *
+     *   --padding : clamp(24px, 5vw, 64px) — horizontal page margin
+     *   --box-gap : 12px                   — gap between boxes
+     *   --box-pad : 12px 16px              — padding inside boxes
+     *   --bar-h   : 40px                   — height of all bar elements
+     *
+     * COLOUR
+     *
+     *   --black        : #1a1a1a           — text / borders (swaps in dark mode)
+     *   --white        : #ffffff           — background (swaps in dark mode)
+     *   --accent       : seasonal          — set by JS per month, light/dark variants
+     *   --accent-light : #7d4abf           — default (Feb / Jacaranda)
+     *   --accent-dark  : #a878d8           — dark mode variant
+     */
+
     :root {
       --black: #1a1a1a;
       --white: #ffffff;
@@ -9,6 +37,13 @@
       --box-gap: 12px;
       --box-pad: 12px 16px;
       --bar-h: 40px;
+
+      --text-display: clamp(32px, 9vw, 136px);
+      --text-heading: clamp(24px, 4vw, 40px);
+      --text-subhead: clamp(18px, 2.5vw, 26px);
+      --text-body: clamp(15px, 1.3vw, 17px);
+      --text-small: 13px;
+      --text-ui: 11px;
     }
 
     * {
@@ -91,8 +126,10 @@
       padding: 0;
     }
 
-    .nav-logo-season:hover {
-      background: var(--white);
+    @media (hover: hover) {
+      .nav-logo-season:hover {
+        background: var(--white);
+      }
     }
 
     .bar-box {
@@ -109,10 +146,12 @@
       font-family: inherit;
     }
 
-    .bar-box:hover {
-      background: var(--accent);
-      color: #ffffff;
-      border-color: var(--accent);
+    @media (hover: hover) {
+      .bar-box:hover {
+        background: var(--accent);
+        color: #ffffff;
+        border-color: var(--accent);
+      }
     }
 
     .bar-box .material-symbols-sharp {
@@ -141,7 +180,7 @@
       margin-top: 8px;
       background: var(--black);
       color: var(--white);
-      font-size: 10px;
+      font-size: var(--text-ui);
       letter-spacing: 0.5px;
       white-space: nowrap;
       z-index: 20;
@@ -166,10 +205,16 @@
       text-align: left;
     }
 
-    .season-option:hover,
     .season-option.active {
       background: var(--accent);
       color: #ffffff;
+    }
+
+    @media (hover: hover) {
+      .season-option:hover {
+        background: var(--accent);
+        color: #ffffff;
+      }
     }
 
     .season-swatch {
@@ -198,19 +243,27 @@
       display: inline-flex;
       align-items: center;
       padding: 0 16px;
-      font-size: 11px;
+      font-size: var(--text-ui);
       font-weight: 700;
       letter-spacing: 1px;
       text-decoration: none;
       color: var(--accent);
     }
 
-    .nav-link-box:hover,
     .nav-link-box.active {
       background: var(--accent);
       color: #ffffff;
       border-color: var(--accent);
       text-decoration: none;
+    }
+
+    @media (hover: hover) {
+      .nav-link-box:hover {
+        background: var(--accent);
+        color: #ffffff;
+        border-color: var(--accent);
+        text-decoration: none;
+      }
     }
 
     /* ---- CONTENT VIEWPORT ---- */
@@ -237,7 +290,7 @@
       align-items: center;
       background: var(--accent);
       color: #ffffff;
-      font-size: 11px;
+      font-size: var(--text-ui);
       font-weight: 700;
       letter-spacing: 1px;
       padding: 0 16px;
@@ -260,12 +313,12 @@
     }
 
     .hero h1 {
-      font-size: clamp(32px, 9vw, 136px);
+      font-size: var(--text-display);
       line-height: 1;
     }
 
     .tagline {
-      font-size: clamp(18px, 2.5vw, 26px);
+      font-size: var(--text-subhead);
       color: var(--black);
       max-width: 700px;
       line-height: 1.5;
@@ -282,7 +335,7 @@
     }
 
     .page-intro .tagline {
-      font-size: clamp(24px, 4vw, 40px);
+      font-size: var(--text-heading);
     }
 
     /* ---- SECTIONS ---- */
@@ -291,8 +344,16 @@
     }
 
     .section-title {
-      font-size: clamp(29px, 4vw, 56px);
+      font-size: var(--text-heading);
+      font-weight: 400;
       line-height: 1.05;
+      margin-bottom: clamp(48px, 6vw, 80px);
+    }
+
+    .section-subtitle {
+      font-size: var(--text-body);
+      line-height: 1.5;
+      margin-top: calc(-1 * clamp(48px, 6vw, 80px) + 24px);
       margin-bottom: clamp(48px, 6vw, 80px);
     }
 
@@ -305,7 +366,7 @@
     }
 
     .about-content h2 {
-      font-size: clamp(29px, 4vw, 56px);
+      font-size: var(--text-heading);
       line-height: 1.5;
     }
 
@@ -314,7 +375,7 @@
     }
 
     .about-text {
-      font-size: clamp(16px, 1.4vw, 18px);
+      font-size: var(--text-body);
       line-height: 1.5;
       border: 1px solid var(--black);
       padding: var(--box-pad);
@@ -363,22 +424,24 @@
       color: inherit;
     }
 
-    .project-header:hover {
-      color: var(--accent);
+    @media (hover: hover) {
+      .project-header:hover {
+        color: var(--accent);
+      }
     }
 
     .project-name {
-      font-size: clamp(24px, 3vw, 35px);
+      font-size: var(--text-heading);
     }
 
     .project-role {
-      font-size: 13px;
+      font-size: var(--text-small);
       letter-spacing: 0.5px;
       margin-bottom: 16px;
     }
 
     .project-desc {
-      font-size: clamp(15px, 1.3vw, 17px);
+      font-size: var(--text-body);
       line-height: 1.5;
     }
 
@@ -410,7 +473,7 @@
     .skill-box {
       border: 1px solid var(--black);
       padding: var(--box-pad);
-      font-size: clamp(15px, 1.3vw, 17px);
+      font-size: var(--text-body);
     }
 
     /* ---- SERVICES GRID ---- */
@@ -423,35 +486,55 @@
     .service-box {
       border: 1px solid var(--black);
       padding: var(--box-pad);
-      font-size: clamp(15px, 1.3vw, 17px);
+      font-size: var(--text-body);
     }
 
     /* ---- LATELY ---- */
-    .lately-section {
-      margin-bottom: clamp(48px, 6vw, 80px);
-    }
-
     .lately-list {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      font-size: 13px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--box-gap);
     }
 
     .lately-item {
+      border: 1px solid var(--black);
+      padding: var(--box-pad);
       display: flex;
-      align-items: center;
+      flex-direction: column;
       gap: 8px;
     }
 
-    .lately-item .material-symbols-sharp {
-      font-size: 18px;
-      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 18;
+    .lately-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: var(--text-ui);
+      font-weight: 700;
+      letter-spacing: 1px;
       color: var(--accent);
     }
 
+    .lately-label .material-symbols-sharp {
+      font-size: 16px;
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 16;
+    }
+
     .lately-value {
+      font-size: var(--text-body);
       line-height: 1.4;
+    }
+
+    /* ---- INTERESTS ---- */
+    .interests {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--box-gap);
+    }
+
+    .interest-tag {
+      border: 1px solid var(--black);
+      padding: var(--box-pad);
+      font-size: var(--text-body);
     }
 
     /* ---- GALLERY ---- */
@@ -479,7 +562,7 @@
 
     .gallery-item figcaption {
       padding: var(--box-pad);
-      font-size: 13px;
+      font-size: var(--text-small);
       line-height: 1.4;
     }
 
@@ -493,7 +576,7 @@
       display: flex;
       flex-wrap: wrap;
       gap: var(--box-gap);
-      font-size: 13px;
+      font-size: var(--text-small);
     }
 
     .footer-meta > span {
@@ -516,7 +599,7 @@
       flex-wrap: wrap;
       gap: var(--box-gap);
       margin-top: var(--box-gap);
-      font-size: 13px;
+      font-size: var(--text-small);
     }
 
     .footer-bottom > span {
@@ -546,7 +629,7 @@
       }
 
       .lately-list {
-        gap: 12px;
+        grid-template-columns: 1fr;
       }
 
       .footer-meta,
@@ -556,6 +639,10 @@
 
       .gallery {
         flex-direction: column;
+      }
+
+      .gallery-col {
+        display: contents;
       }
 
       .skills-grid {
