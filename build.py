@@ -95,15 +95,9 @@ def generate_og_image(accent_hex, hero_md, output_path):
     cube_size = bar_h
     draw.rectangle([margin, margin, margin + cube_size, margin + bar_h], fill=accent)
 
-    # Draw bottom bar: two small boxes (work / play placeholders)
-    nav_y = height - margin - bar_h
-    box_w = 60
-    draw.rectangle([margin, nav_y, margin + box_w, nav_y + bar_h], outline=black, width=1)
-    draw.rectangle([width - margin - box_w, nav_y, width - margin, nav_y + bar_h], outline=black, width=1)
-
     # Draw content viewport box
     box_top = margin + bar_h + bar_gap
-    box_bottom = nav_y - bar_gap
+    box_bottom = height - margin
     draw.rectangle([margin, box_top, width - margin, box_bottom], outline=black, width=1)
 
     # Load Schibsted Grotesk at two sizes
