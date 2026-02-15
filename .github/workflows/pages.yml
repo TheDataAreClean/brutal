@@ -3,8 +3,6 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
-  schedule:
-    - cron: '0 0 1 * *'  # Rebuild monthly for seasonal accent
 
 permissions:
   contents: read
@@ -16,20 +14,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-deploy:
+  deploy:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Build site
-        run: python3 build.py
 
       - uses: actions/configure-pages@v5
 

@@ -18,9 +18,7 @@ jobs:
 
       - run: python3 build.py
 
-      - run: cp dist/index.html index.html
-
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: 'monthly accent update'
-          file_pattern: 'index.html assets/og-image.png assets/favicon.png dist/'
+          file_pattern: 'dist/ assets/og-image.png assets/favicon.png'
