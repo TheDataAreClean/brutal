@@ -8,3 +8,4 @@
 - history
 - caste
 - nature
+- internet

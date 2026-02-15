@@ -326,11 +326,26 @@ def render_lately(md):
         'watched': ('movie', 'watching'),
         'cooked': ('skillet', 'cooking'),
         'explored': ('explore', 'exploring'),
+        'played': ('sports_esports', 'playing'),
+        'built': ('construction', 'building'),
+        'learned': ('school', 'learning'),
+        'ran': ('directions_run', 'running'),
+        'cycled': ('pedal_bike', 'cycling'),
+        'photographed': ('photo_camera', 'photographing'),
+        'drank': ('coffee', 'drinking'),
+        'visited': ('place', 'visiting'),
+        'wrote': ('edit_note', 'writing'),
     }
 
+    order = ('read', 'listened', 'watched', 'cooked', 'explored',
+             'played', 'built', 'learned', 'ran', 'cycled',
+             'photographed', 'drank', 'visited', 'wrote')
+
     parts = []
-    for key in ('read', 'listened', 'watched', 'cooked', 'explored'):
-        raw = items.get(key, '\u2014')
+    for key in order:
+        raw = items.get(key, '').strip()
+        if not raw or raw == '\u2014':
+            continue
         icon, label = label_map[key]
         # Extract URL and display text from [text](url), fall back to plain text
         m = re.match(r'\[(.+?)\]\((.+?)\)', raw)
@@ -562,7 +577,7 @@ def render_interests(md):
         '  <!-- INTERESTS -->\n'
         '  <section>\n'
         '    <h2 class="section-title">other <span class="highlight">stuff</span></h2>\n'
-        '    <p class="section-subtitle">that i find interesting, in no particular order.</p>\n'
+        '    <p class="section-subtitle">that i am curious about, in no particular order.</p>\n'
         '    <div class="interests">\n'
         f'{tag_html}\n'
         '    </div>\n'
