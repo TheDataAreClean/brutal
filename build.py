@@ -722,6 +722,11 @@ def build():
             shutil.rmtree(assets_dst)
         shutil.copytree(assets_src, assets_dst, ignore=shutil.ignore_patterns('README.md'))
 
+    # Copy CNAME for GitHub Pages
+    cname = BASE / 'CNAME'
+    if cname.exists():
+        shutil.copy2(cname, DIST / 'CNAME')
+
     print(f'Done — og accent: {accent}')
 
 
