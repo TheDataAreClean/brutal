@@ -3,6 +3,7 @@
       var current = html.getAttribute('data-theme');
       var next = current === 'dark' ? 'light' : 'dark';
       html.setAttribute('data-theme', next);
+      sessionStorage.setItem('theme', next);
     }
 
     function copyEmail() {
@@ -13,27 +14,14 @@
       });
     }
 
-    // Nav background on scroll
+    // Restore theme from session, else match OS
     (function() {
-      var nav = document.querySelector('nav');
-      window.addEventListener('scroll', function() {
-        if (window.scrollY > 50) {
-          nav.classList.add('scrolled');
-        } else {
-          nav.classList.remove('scrolled');
-        }
-      });
-    })();
-
-    // Match OS setting on load
-    (function() {
-      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      var saved = sessionStorage.getItem('theme');
+      if (saved) {
+        document.documentElement.setAttribute('data-theme', saved);
+      } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
         document.documentElement.setAttribute('data-theme', 'dark');
       }
-
-      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
-        document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
-      });
     })();
 
     // Seasonal accent — Bengaluru blooms
@@ -55,7 +43,7 @@
     var monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     var activeSeason = new Date().getMonth();
 
-    function applySeason(index) {
+    function applySeason(index, save) {
       activeSeason = index;
       document.documentElement.style.setProperty('--accent-light', seasons[index].light);
       document.documentElement.style.setProperty('--accent-dark', seasons[index].dark);
@@ -63,10 +51,12 @@
       btns.forEach(function(btn, i) {
         btn.classList.toggle('active', i === index);
       });
+      if (save) sessionStorage.setItem('season', index);
     }
 
-    // Default to current month
-    applySeason(new Date().getMonth());
+    // Restore season from session, else default to current month
+    var savedSeason = sessionStorage.getItem('season');
+    applySeason(savedSeason !== null ? Number(savedSeason) : new Date().getMonth());
 
     // Build dropdown (safe DOM — no innerHTML)
     (function() {
@@ -82,7 +72,7 @@
         btn.appendChild(document.createTextNode(monthNames[i] + ' \u2014 ' + s.name));
         btn.onclick = function(e) {
           e.stopPropagation();
-          applySeason(i);
+          applySeason(i, true);
           dropdown.classList.remove('open');
         };
         dropdown.appendChild(btn);

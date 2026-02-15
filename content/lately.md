@@ -1,3 +1,14 @@
-- read: —
-- listened: —
-- watched: —
+- read: [The Great Indian Brain Rot by Anurag Minus Verma](https://app.thestorygraph.com/books/13eb8e4c-f7a8-4fcc-b163-1760a687b1d4)
+- listened: [We Didn't Ask for This Internet, The Ezra Klein Show](https://youtu.be/Yepnhe1T-9U)
+- watched: [The World's Most Important Machine by Veritasium](https://youtu.be/MiUHjLxm3V0)
+- cooked:
+- explored:
+- played:
+- built:
+- learned:
+- ran:
+- cycled:
+- photographed:
+- drank:
+- visited:
+- wrote:
