@@ -5,11 +5,15 @@
      *   --text-heading : clamp(24px, 4vw, 36px)   — page intros, section titles, about h2
      *   --text-subhead : clamp(18px, 2.5vw, 24px) — hero tagline
      *   --text-body    : clamp(15px, 1.3vw, 17px) — about text, offering tags, project names, subtitles
-     *   --text-small   : 13px                     — project role, project desc, captions, footer
-     *   --text-ui      : 11px                     — nav links, toast, labels, season picker
+     *   --text-small   : 13px                     — project role, project desc, captions, footer, lately
+     *   --text-ui      : 11px                     — nav links, toast, season picker
      *
      * Mobile: 11 → 13 → 15 → 18 → 24 → 32  (minor-third ~1.2x)
      * Desktop: 11 → 13 → 17 → 24 → 36 → 128
+     *
+     * WEIGHT: 400 default, 500 headings (section-title, about h2), 700 bold (project name, lately value, nav, toast)
+     * LINE-HEIGHT: 1 display, 1.05 section titles, 1.4 --text-small, 1.5 --text-body and above
+     * LETTER-SPACING: 1px --text-ui, 0.5px --text-small labels
      *
      * SPACING
      *
@@ -362,7 +366,7 @@
 
     .section-title {
       font-size: var(--text-heading);
-      font-weight: 400;
+      font-weight: 500;
       line-height: 1.05;
       margin-bottom: var(--space-md);
     }
@@ -384,6 +388,7 @@
 
     .about-content h2 {
       font-size: var(--text-heading);
+      font-weight: 500;
       line-height: 1.5;
     }
 
@@ -468,7 +473,7 @@
 
     .project-desc {
       font-size: var(--text-small);
-      line-height: 1.5;
+      line-height: 1.4;
       overflow-wrap: break-word;
       word-break: break-word;
     }
@@ -512,7 +517,7 @@
       align-items: center;
       gap: 6px;
       font-size: var(--text-small);
-      letter-spacing: 1px;
+      letter-spacing: 0.5px;
       color: var(--accent);
     }
 
@@ -641,10 +646,6 @@
       .about-content {
         grid-template-columns: 1fr;
         gap: var(--space-md);
-      }
-
-      .project-arrow .material-symbols-sharp {
-        font-size: 18px;
       }
 
       .lately-list {

@@ -520,7 +520,7 @@ def render_gallery(photos, num_cols=3):
     return (
         '  <!-- GALLERY -->\n'
         '  <section>\n'
-        '    <h2 class="section-title">some personal <span class="highlight">clicks</span></h2>\n'
+        '    <h2 class="section-title">some personal <span class="highlight">clicks</span>..</h2>\n'
         '    <div class="gallery">\n'
         + '\n'.join(col_parts) + '\n'
         + '    </div>\n'
@@ -570,7 +570,7 @@ def render_interests(md):
     return (
         '  <!-- INTERESTS -->\n'
         '  <section>\n'
-        '    <h2 class="section-title">other <span class="highlight">stuff</span></h2>\n'
+        '    <h2 class="section-title">other <span class="highlight">stuff</span>..</h2>\n'
         '    <p class="section-subtitle">that i am curious about, in no particular order.</p>\n'
         '    <div class="interests">\n'
         f'{tag_html}\n'
