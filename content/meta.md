@@ -1,5 +1,5 @@
-- title: arpit | data communicator | thedataareclean
-- description: i help people understand their data — through products, research and stories.
+- title: arpit | curious about everything | thedataareclean
+- description: hello, i am arpit — i am curious about everything.
 - url: https://thedataareclean.com
 - image: assets/og-image.png
 - favicon: assets/favicon.png

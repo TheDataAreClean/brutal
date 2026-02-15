@@ -65,11 +65,14 @@ def draw_segments(draw, x, y, segments, font, base_color, accent_color):
 
 
 def generate_og_image(accent_hex, hero_md, output_path):
-    """Generate OG image with Schibsted Grotesk font, matching hero section design."""
+    """Generate OG image matching the site's viewport-box layout."""
     from PIL import Image, ImageDraw, ImageFont
 
     width, height = 1200, 630
-    padding = 80
+    margin = 40       # outer margin (viewport edge to box)
+    box_pad = 60      # padding inside the box
+    bar_h = 32        # top/bottom bar height
+    bar_gap = 8       # gap between bar and box
 
     # Parse hero content (keep ** markers for segment parsing)
     lines = [l.strip() for l in hero_md.strip().split('\n') if l.strip()]
@@ -83,33 +86,50 @@ def generate_og_image(accent_hex, hero_md, output_path):
 
     accent = tuple(int(accent_hex[i:i+2], 16) for i in (1, 3, 5))
     black = (0x1a, 0x1a, 0x1a)
+    white = (0xff, 0xff, 0xff)
 
-    img = Image.new('RGB', (width, height), (255, 255, 255))
+    img = Image.new('RGB', (width, height), white)
     draw = ImageDraw.Draw(img)
 
+    # Draw top bar: accent cube + thin line
+    cube_size = bar_h
+    draw.rectangle([margin, margin, margin + cube_size, margin + bar_h], fill=accent)
+
+    # Draw bottom bar: two small boxes (work / play placeholders)
+    nav_y = height - margin - bar_h
+    box_w = 60
+    draw.rectangle([margin, nav_y, margin + box_w, nav_y + bar_h], outline=black, width=1)
+    draw.rectangle([width - margin - box_w, nav_y, width - margin, nav_y + bar_h], outline=black, width=1)
+
+    # Draw content viewport box
+    box_top = margin + bar_h + bar_gap
+    box_bottom = nav_y - bar_gap
+    draw.rectangle([margin, box_top, width - margin, box_bottom], outline=black, width=1)
+
     # Load Schibsted Grotesk at two sizes
-    font_lg = ImageFont.truetype(str(FONT_PATH), 72)
-    font_sm = ImageFont.truetype(str(FONT_PATH), 28)
+    font_lg = ImageFont.truetype(str(FONT_PATH), 64)
+    font_sm = ImageFont.truetype(str(FONT_PATH), 24)
 
     # Strip ** for measurement
     heading_plain = heading_raw.replace('**', '')
     tagline_plain = tagline_raw.replace('**', '')
 
-    # Position: bottom-left aligned, like the hero section
+    # Position: bottom-left inside the content box
     h_bbox = draw.textbbox((0, 0), heading_plain, font=font_lg)
     h_h = h_bbox[3] - h_bbox[1]
     t_bbox = draw.textbbox((0, 0), tagline_plain, font=font_sm)
     t_h = t_bbox[3] - t_bbox[1]
 
-    total_h = h_h + 24 + t_h
-    y_start = height - padding - total_h
+    text_x = margin + box_pad
+    total_h = h_h + 20 + t_h
+    y_start = box_bottom - box_pad - total_h
 
     # Draw heading and tagline with accent on **bold** segments
     heading_segments = parse_bold_segments(heading_raw)
     tagline_segments = parse_bold_segments(tagline_raw)
 
-    draw_segments(draw, padding, y_start, heading_segments, font_lg, black, accent)
-    draw_segments(draw, padding, y_start + h_h + 24, tagline_segments, font_sm, black, accent)
+    draw_segments(draw, text_x, y_start, heading_segments, font_lg, black, accent)
+    draw_segments(draw, text_x, y_start + h_h + 20, tagline_segments, font_sm, black, accent)
 
     Path(output_path).parent.mkdir(parents=True, exist_ok=True)
     img.save(output_path)
