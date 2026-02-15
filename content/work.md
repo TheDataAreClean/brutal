@@ -1,13 +1,9 @@
-# skills
-- data visualisation
-- statistical analysis
-- product strategy
+#offerings
+- data visualisations
 - data storytelling
-- audience research
-- workshop facilitation
-
-# services
-- data communication strategy
-- dashboard & report design
-- data storytelling workshops
-- product analytics consulting
+- product strategy
+- data systems strategy
+- user research
+- data viz workshops
+- data capacity trainings
+- statistical analysis

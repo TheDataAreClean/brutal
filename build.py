@@ -307,8 +307,8 @@ def render_projects(md):
     for p in projects:
         desc = parse_inline(p['desc'])
         proj_parts.append(
-            '      <div class="project">\n'
-            f'        <a class="project-header" href="{p["url"]}" target="_blank" rel="noopener">\n'
+            f'      <div class="project">\n'
+            f'        <a class="project-top" href="{p["url"]}" target="_blank" rel="noopener">\n'
             f'          <span class="project-name">{p["name"]}</span>\n'
             '          <span class="project-arrow"><span class="material-symbols-sharp">arrow_outward</span></span>\n'
             '        </a>\n'
@@ -321,7 +321,7 @@ def render_projects(md):
 
     return (
         '  <!-- PROJECTS -->\n'
-        '  <section class="projects-section">\n'
+        '  <section>\n'
         '    <h2 class="section-title">\n'
         f'      {title}\n'
         '    </h2>\n'
@@ -411,46 +411,26 @@ def render_footer(footer_md):
 
 
 def render_work_section(md):
-    """Parse work.md into skills grid + services grid HTML."""
+    """Parse work.md into a single toolkit section."""
     lines = md.strip().split('\n')
-    current_section = None
-    skills = []
-    services = []
+    items = []
 
     for line in lines:
         stripped = line.strip()
-        if stripped.startswith('# '):
-            current_section = stripped[2:].strip().lower()
-        elif stripped.startswith('- ') and current_section:
-            value = stripped[2:].strip()
-            if current_section == 'skills':
-                skills.append(value)
-            elif current_section == 'services':
-                services.append(value)
+        if stripped.startswith('- '):
+            items.append(stripped[2:].strip())
 
-    skill_boxes = '\n'.join(
-        f'      <div class="skill-box">{s}</div>'
-        for s in skills
-    )
-    service_boxes = '\n'.join(
-        f'      <div class="service-box">{s}</div>'
-        for s in services
+    boxes = '\n'.join(
+        f'      <span class="offering-tag">{s}</span>'
+        for s in items
     )
 
     return (
-        '  <!-- SKILLS -->\n'
+        '  <!-- OFFERINGS -->\n'
         '  <section>\n'
-        '    <h2 class="section-title"><span class="highlight">skills</span></h2>\n'
-        '    <div class="skills-grid">\n'
-        f'{skill_boxes}\n'
-        '    </div>\n'
-        '  </section>\n'
-        '\n'
-        '  <!-- SERVICES -->\n'
-        '  <section>\n'
-        '    <h2 class="section-title"><span class="highlight">services</span></h2>\n'
-        '    <div class="services-grid">\n'
-        f'{service_boxes}\n'
+        '    <h2 class="section-title">my <span class="highlight">toolkit</span></h2>\n'
+        '    <div class="offerings">\n'
+        f'{boxes}\n'
         '    </div>\n'
         '  </section>'
     )

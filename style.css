@@ -2,10 +2,10 @@
      * TYPE SCALE (minor-third ~1.2x)
      *
      *   --text-display : clamp(32px, 9vw, 128px)  — hero h1
-     *   --text-heading : clamp(24px, 4vw, 36px)   — page intros, section titles, about h2, project names
+     *   --text-heading : clamp(24px, 4vw, 36px)   — page intros, section titles, about h2
      *   --text-subhead : clamp(18px, 2.5vw, 24px) — hero tagline
-     *   --text-body    : clamp(15px, 1.3vw, 17px) — descriptions, about text, boxes, subtitles
-     *   --text-small   : 13px                     — captions, footer, project role
+     *   --text-body    : clamp(15px, 1.3vw, 17px) — about text, offering tags, project names, subtitles
+     *   --text-small   : 13px                     — project role, project desc, captions, footer
      *   --text-ui      : 11px                     — nav links, toast, labels, season picker
      *
      * Mobile: 11 → 13 → 15 → 18 → 24 → 32  (minor-third ~1.2x)
@@ -402,56 +402,82 @@
       margin-top: var(--space-md);
     }
 
+    /* ---- OFFERINGS ---- */
+    .offerings {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--box-gap);
+    }
+
+    .offering-tag {
+      border: 1px solid var(--black);
+      padding: var(--box-pad);
+      font-size: var(--text-body);
+    }
+
     /* ---- PROJECTS ---- */
     .projects {
       display: flex;
-      flex-direction: column;
-      gap: var(--space-md);
+      flex-wrap: wrap;
+      gap: var(--box-gap);
     }
 
     .project {
+      border: 1px solid var(--black);
+      padding: var(--box-pad);
       display: flex;
       flex-direction: column;
-      padding: var(--space-md) 0;
-    }
-
-    .project-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 8px;
-      text-decoration: none;
+      gap: 8px;
       color: inherit;
+      min-width: 0;
+      flex: 1 1 280px;
+      max-width: 100%;
+      overflow: hidden;
+      position: relative;
     }
 
     @media (hover: hover) {
-      .project-header:hover {
+      .project:hover {
         color: var(--accent);
       }
     }
 
+    .project-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .project-top::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+    }
+
     .project-name {
-      font-size: var(--text-heading);
+      font-size: var(--text-body);
+      font-weight: 700;
     }
 
     .project-role {
       font-size: var(--text-small);
-      letter-spacing: 0.5px;
-      margin-bottom: 16px;
+      color: var(--accent);
     }
 
     .project-desc {
-      font-size: var(--text-body);
+      font-size: var(--text-small);
       line-height: 1.5;
+      overflow-wrap: break-word;
+      word-break: break-word;
     }
 
     .project-desc a {
       color: var(--accent);
       text-decoration: none;
-    }
-
-    .project-desc a:hover {
-      text-decoration: underline;
+      position: relative;
+      z-index: 1;
     }
 
     .project-arrow {
@@ -459,34 +485,8 @@
     }
 
     .project-arrow .material-symbols-sharp {
-      font-size: 24px;
-      font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 24;
-    }
-
-    /* ---- SKILLS ---- */
-    .skills-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--box-gap);
-    }
-
-    .skill-box {
-      border: 1px solid var(--black);
-      padding: var(--box-pad);
-      font-size: var(--text-small);
-    }
-
-    /* ---- SERVICES ---- */
-    .services-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--box-gap);
-    }
-
-    .service-box {
-      border: 1px solid var(--black);
-      padding: var(--box-pad);
-      font-size: var(--text-small);
+      font-size: 18px;
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 18;
     }
 
     /* ---- LATELY ---- */
@@ -644,7 +644,7 @@
       }
 
       .project-arrow .material-symbols-sharp {
-        font-size: 20px;
+        font-size: 18px;
       }
 
       .lately-list {
