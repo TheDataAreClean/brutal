@@ -320,22 +320,36 @@ def render_projects(md):
 
 def render_lately(md):
     items = dict(parse_kv_list(md))
-    icon_map = {
-        'read': 'menu_book',
-        'listened': 'headphones',
-        'watched': 'movie',
+    label_map = {
+        'read': ('menu_book', 'reading'),
+        'listened': ('headphones', 'listening to'),
+        'watched': ('movie', 'watching'),
+        'cooked': ('skillet', 'cooking'),
+        'explored': ('explore', 'exploring'),
     }
 
     parts = []
-    for key in ('read', 'listened', 'watched'):
-        value = items.get(key, '\u2014')
-        icon = icon_map[key]
-        parts.append(
-            '      <div class="lately-item">\n'
-            f'        <span class="lately-label"><span class="material-symbols-sharp">{icon}</span> {key}</span>\n'
-            f'        <span class="lately-value">{value}</span>\n'
-            '      </div>'
-        )
+    for key in ('read', 'listened', 'watched', 'cooked', 'explored'):
+        raw = items.get(key, '\u2014')
+        icon, label = label_map[key]
+        # Extract URL and display text from [text](url), fall back to plain text
+        m = re.match(r'\[(.+?)\]\((.+?)\)', raw)
+        if m:
+            display, url = m.group(1), m.group(2)
+            parts.append(
+                f'      <a class="lately-item" href="{url}" target="_blank" rel="noopener">\n'
+                f'        <span class="lately-label"><span class="material-symbols-sharp">{icon}</span> {label}</span>\n'
+                f'        <span class="lately-value">{display}</span>\n'
+                '        <span class="lately-arrow"><span class="material-symbols-sharp">arrow_outward</span></span>\n'
+                '      </a>'
+            )
+        else:
+            parts.append(
+                '      <div class="lately-item">\n'
+                f'        <span class="lately-label"><span class="material-symbols-sharp">{icon}</span> {label}</span>\n'
+                f'        <span class="lately-value">{raw}</span>\n'
+                '      </div>'
+            )
 
     return (
         '    <div class="lately-list">\n'
@@ -497,7 +511,7 @@ def render_gallery(photos, num_cols=3):
     return (
         '  <!-- GALLERY -->\n'
         '  <section>\n'
-        '    <h2 class="section-title"><span class="highlight">photos</span></h2>\n'
+        '    <h2 class="section-title">some personal <span class="highlight">clicks</span></h2>\n'
         '    <div class="gallery">\n'
         + '\n'.join(col_parts) + '\n'
         + '    </div>\n'
@@ -523,7 +537,7 @@ def render_page_intro(text):
 
 def render_work_body(work_md, projects_md, about_md):
     """Work page body: intro + about + skills + services + projects."""
-    intro_html = render_page_intro('at work, i am a multi-disciplinary **data communicator**.')
+    intro_html = render_page_intro('at work,<br>i am a multi-disciplinary **data communicator**.')
     about_html = render_about(about_md)
     work_html = render_work_section(work_md)
     projects_html = render_projects(projects_md)
@@ -547,8 +561,8 @@ def render_interests(md):
     return (
         '  <!-- INTERESTS -->\n'
         '  <section>\n'
-        '    <h2 class="section-title"><span class="highlight">stuff</span></h2>\n'
-        '    <p class="section-subtitle">a list of things i find interesting, in no particular order.</p>\n'
+        '    <h2 class="section-title">other <span class="highlight">stuff</span></h2>\n'
+        '    <p class="section-subtitle">that i find interesting, in no particular order.</p>\n'
         '    <div class="interests">\n'
         f'{tag_html}\n'
         '    </div>\n'
@@ -558,20 +572,19 @@ def render_interests(md):
 
 def render_play_body(lately_md, interests_md, photos):
     """Play page body: intro + interests + lately + photo gallery."""
-    intro_html = render_page_intro('during **play**, i do **whatever i want**.')
+    intro_html = render_page_intro('during **play**,<br>i do **whatever i want**.')
     lately_html = (
         '  <!-- LATELY -->\n'
         '  <section>\n'
-        '    <h2 class="section-title"><span class="highlight">lately</span></h2>\n'
+        '    <h2 class="section-title"><span class="highlight">lately</span>, i have been..</h2>\n'
         + render_lately(lately_md) + '\n'
         + '  </section>'
     )
     gallery_html = render_gallery(photos)
     interests_html = render_interests(interests_md)
-    parts = [intro_html, lately_html]
+    parts = [intro_html, lately_html, interests_html]
     if gallery_html:
         parts.append(gallery_html)
-    parts.append(interests_html)
     return '\n\n'.join(parts)
 
 

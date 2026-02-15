@@ -31,9 +31,9 @@
       --box-gap: 12px;
       --box-pad: 12px 16px;
       --bar-h: 40px;
-      --text-display: clamp(32px, 9vw, 136px);
-      --text-heading: clamp(24px, 4vw, 40px);
-      --text-subhead: clamp(18px, 2.5vw, 26px);
+      --text-display: clamp(32px, 9vw, 128px);
+      --text-heading: clamp(24px, 4vw, 36px);
+      --text-subhead: clamp(18px, 2.5vw, 24px);
       --text-body: clamp(15px, 1.3vw, 17px);
       --text-small: 13px;
       --text-ui: 11px;
@@ -405,23 +405,25 @@
       font-size: var(--text-body);
     }
     .lately-list {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      display: flex;
+      flex-direction: column;
       gap: var(--box-gap);
+      align-items: flex-start;
     }
     .lately-item {
       border: 1px solid var(--black);
       padding: var(--box-pad);
       display: flex;
-      flex-direction: column;
+      align-items: center;
       gap: 8px;
+      text-decoration: none;
+      color: inherit;
     }
     .lately-label {
       display: flex;
       align-items: center;
       gap: 6px;
-      font-size: var(--text-ui);
-      font-weight: 700;
+      font-size: var(--text-small);
       letter-spacing: 1px;
       color: var(--accent);
     }
@@ -430,8 +432,23 @@
       font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 16;
     }
     .lately-value {
-      font-size: var(--text-body);
+      font-size: var(--text-small);
+      font-weight: 700;
       line-height: 1.4;
+    }
+    .lately-arrow {
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+    }
+    .lately-arrow .material-symbols-sharp {
+      font-size: 16px;
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 16;
+    }
+    @media (hover: hover) {
+      .lately-item:hover {
+        color: var(--accent);
+      }
     }
     .interests {
       display: flex;
@@ -492,7 +509,7 @@
       display: flex;
       flex-wrap: wrap;
       gap: var(--box-gap);
-      margin-top: var(--box-gap);
+      margin-top: clamp(48px, 6vw, 64px);
       font-size: var(--text-small);
     }
     .footer-bottom > span {
@@ -514,9 +531,6 @@
       }
       .project-arrow .material-symbols-sharp {
         font-size: 20px;
-      }
-      .lately-list {
-        grid-template-columns: 1fr;
       }
       .footer-meta,
       .footer-bottom {
@@ -578,7 +592,7 @@
 
   <div class="content-box">
   <section class="page-intro">
-    <p class="tagline">at work, i am a multi-disciplinary <span class="name">data communicator</span>.</p>
+    <p class="tagline">at work,<br>i am a multi-disciplinary <span class="name">data communicator</span>.</p>
   </section>
 
   <!-- ABOUT -->
@@ -680,6 +694,7 @@
       var current = html.getAttribute('data-theme');
       var next = current === 'dark' ? 'light' : 'dark';
       html.setAttribute('data-theme', next);
+      sessionStorage.setItem('theme', next);
     }
     function copyEmail() {
       navigator.clipboard.writeText('hello@thedataareclean.com').then(function() {
@@ -688,14 +703,14 @@
         setTimeout(function() { toast.classList.remove('visible'); }, 2000);
       });
     }
-    // Match OS setting on load
+    // Restore theme from session, else match OS
     (function() {
-      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      var saved = sessionStorage.getItem('theme');
+      if (saved) {
+        document.documentElement.setAttribute('data-theme', saved);
+      } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
         document.documentElement.setAttribute('data-theme', 'dark');
       }
-      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
-        document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
-      });
     })();
     // Seasonal accent — Bengaluru blooms
     var seasons = [
@@ -714,7 +729,7 @@
     ];
     var monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     var activeSeason = new Date().getMonth();
-    function applySeason(index) {
+    function applySeason(index, save) {
       activeSeason = index;
       document.documentElement.style.setProperty('--accent-light', seasons[index].light);
       document.documentElement.style.setProperty('--accent-dark', seasons[index].dark);
@@ -722,9 +737,11 @@
       btns.forEach(function(btn, i) {
         btn.classList.toggle('active', i === index);
       });
+      if (save) sessionStorage.setItem('season', index);
     }
-    // Default to current month
-    applySeason(new Date().getMonth());
+    // Restore season from session, else default to current month
+    var savedSeason = sessionStorage.getItem('season');
+    applySeason(savedSeason !== null ? Number(savedSeason) : new Date().getMonth());
     // Build dropdown (safe DOM — no innerHTML)
     (function() {
       var dropdown = document.getElementById('season-dropdown');
@@ -739,7 +756,7 @@
         btn.appendChild(document.createTextNode(monthNames[i] + ' \u2014 ' + s.name));
         btn.onclick = function(e) {
           e.stopPropagation();
-          applySeason(i);
+          applySeason(i, true);
           dropdown.classList.remove('open');
         };
         dropdown.appendChild(btn);

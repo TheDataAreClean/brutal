@@ -1,3 +1,5 @@
-- read: —
-- listened: —
-- watched: —
+- read: [The Great Indian Brain Rot by Anurag Minus Verma](https://app.thestorygraph.com/books/13eb8e4c-f7a8-4fcc-b163-1760a687b1d4)
+- listened: [Khruangbin](https://open.spotify.com/artist/2mVVjNmdjXZZDvhgQWiakk)
+- watched: [Shogun](https://www.imdb.com/title/tt2788316/)
+- cooked: [Dal Makhani](https://en.wikipedia.org/wiki/Dal_makhani)
+- explored: [Hampi](https://en.wikipedia.org/wiki/Hampi)
