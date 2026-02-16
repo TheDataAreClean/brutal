@@ -3,6 +3,10 @@ name: lately reminder
 on:
   schedule:
     - cron: '30 3 * * 0' # every Sunday at 9am IST (3:30am UTC)
+  workflow_dispatch:
+
+permissions:
+  issues: write
 
 jobs:
   remind:

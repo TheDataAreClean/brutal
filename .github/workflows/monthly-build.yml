@@ -3,6 +3,10 @@ name: monthly build
 on:
   schedule:
     - cron: '0 0 1 * *' # 1st of every month at midnight UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
