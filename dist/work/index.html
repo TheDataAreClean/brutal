@@ -795,26 +795,23 @@
         })
         .catch(function() { onError(); });
     }
-    // Temperature from wttr.in (cached 1h)
+    // Temperature from Open-Meteo (cached 1h)
     cachedFetch(
       'weather_temp',
-      'https://wttr.in/Bengaluru?format=%t',
-      function(r) { return r.text().then(function(t) { return t.trim(); }); },
+      'https://api.open-meteo.com/v1/forecast?latitude=12.97&longitude=77.59&current=temperature_2m',
+      function(r) { return r.json().then(function(d) { return Math.round(d.current.temperature_2m) + '°C'; }); },
       function(v) { document.getElementById('temperature').textContent = v; },
       function() { document.getElementById('temperature').textContent = '--'; }
     );
-    // AQI from waqi.info (cached 1h)
+    // AQI from Open-Meteo (cached 1h)
     cachedFetch(
       'weather_aqi',
-      'https://api.waqi.info/feed/bengaluru/?token=demo',
+      'https://air-quality-api.open-meteo.com/v1/air-quality?latitude=12.97&longitude=77.59&current=us_aqi',
       function(r) {
         return r.json().then(function(d) {
-          if (d.status === 'ok') {
-            var aqi = d.data.aqi;
-            var label = aqi <= 50 ? 'Good' : aqi <= 100 ? 'Moderate' : aqi <= 150 ? 'Unhealthy for some' : aqi <= 200 ? 'Unhealthy' : 'Poor';
-            return aqi + ' \u2014 ' + label;
-          }
-          return '--';
+          var aqi = d.current.us_aqi;
+          var label = aqi <= 50 ? 'Good' : aqi <= 100 ? 'Moderate' : aqi <= 150 ? 'Unhealthy for some' : aqi <= 200 ? 'Unhealthy' : 'Poor';
+          return aqi + ' \u2014 ' + label;
         });
       },
       function(v) { document.getElementById('aqi').textContent = v; },
