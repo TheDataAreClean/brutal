@@ -11,6 +11,7 @@ content/              <- editable markdown content
   about.md            <- about section (work page)
   projects.md         <- project cards (work page)
   work.md             <- toolkit tags (work page)
+  articles.md         <- published writings with tags (work page)
   lately.md           <- activity tags with links (play page)
   interests.md        <- curiosity tags (play page)
   rolodex.md          <- things i like — random 5 shown per visit (play page)
@@ -29,7 +30,7 @@ CNAME                 <- custom domain
 ```
 dist/
   index.html          <- home (hero + tagline)
-  work/index.html     <- work (about + toolkit + projects)
+  work/index.html     <- work (about + toolkit + projects + articles)
   play/index.html     <- play (lately + interests + gallery + rolodex)
   assets/             <- copied from assets/
   CNAME               <- copied from root
@@ -38,7 +39,7 @@ dist/
 ## Pages
 
 - **/** — full-viewport hero with name + tagline
-- **/work** — about, toolkit (flex-wrap tags), project cards (bordered boxes with stretched links)
+- **/work** — about, toolkit (flex-wrap tags), project cards (bordered boxes with stretched links), published writings (article cards with publisher, date, tags)
 - **/play** — lately (linked activity tags), interests (curiosity tags), Glass.photo masonry gallery (9 at a time with show more), rolodex (5 random links per visit with shuffle button)
 
 ## Design system
@@ -50,9 +51,9 @@ dist/
 | `--text-display` | 32px | 128px | hero h1 |
 | `--text-heading` | 24px | 36px | page intros, section titles, about h2 |
 | `--text-subhead` | 18px | 24px | hero tagline |
-| `--text-body` | 15px | 17px | about text, toolkit tags, project names, subtitles |
-| `--text-small` | 13px | 13px | project role/desc, lately, captions, footer, rolodex |
-| `--text-ui` | 11px | 11px | nav links, toast, season picker |
+| `--text-body` | 15px | 17px | about text, toolkit/interest tags, project/article names, subtitles |
+| `--text-small` | 13px | 13px | project role/desc, article meta, lately, captions, footer, rolodex |
+| `--text-ui` | 11px | 11px | nav links, toast, season picker, article tags |
 
 ### Weight
 
@@ -60,16 +61,16 @@ dist/
 |---|---|
 | 400 | default — body, tags, descriptions, labels |
 | 500 | headings — section titles, about h2 |
-| 700 | emphasis — project name, lately value, nav, toast, rolodex name |
+| 700 | emphasis — project/article name, lately value, nav, toast, rolodex name |
 
 ### Line-height
 
 | Value | Use |
 |---|---|
 | 1 | `--text-display` (hero h1) |
-| 1.05 | `--text-heading` (section titles) |
-| 1.4 | `--text-small` (project desc, lately, captions) |
-| 1.5 | `--text-body` and above (about, subtitles, taglines) |
+| 1.05 | section titles |
+| 1.4 | `--text-small` (project role/desc, article meta, lately, captions, footer, rolodex) |
+| 1.5 | `--text-body` and above (about h2, about text, taglines, subtitles, toolkit/interest tags, project/article names) |
 
 ### Letter-spacing
 
@@ -139,6 +140,18 @@ In `projects.md`, each project is a `## Name` heading with `- role:`, `- url:`, 
 - role: your role
 - url: https://example.com
 - desc: description with [inline link](https://example.com).
+```
+
+### Articles
+
+In `articles.md`, each article is a `## Title` heading with `- publisher:`, `- date:`, `- tags:` (comma-separated, up to 3), and `- url:` fields. Articles are displayed in the order they appear in the file (reverse chronological):
+
+```
+## Article Title
+- publisher: Publisher Name
+- date: Mon YYYY
+- tags: topic, category, theme
+- url: https://example.com/article
 ```
 
 ## Live data

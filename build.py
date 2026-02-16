@@ -333,6 +333,67 @@ def render_projects(md):
     )
 
 
+def render_articles(md):
+    """Parse articles.md into a list of article cards."""
+    lines = md.strip().split('\n')
+    title = ''
+    articles = []
+    current = None
+
+    for line in lines:
+        stripped = line.strip()
+        if stripped.startswith('# '):
+            title = stripped[2:]
+        elif stripped.startswith('## '):
+            if current:
+                articles.append(current)
+            current = {'name': stripped[3:], 'publisher': '', 'date': '', 'tags': '', 'url': ''}
+        elif stripped.startswith('- ') and current:
+            key, _, value = stripped[2:].partition(':')
+            key = key.strip()
+            value = value.strip()
+            if key in ('publisher', 'date', 'tags', 'url'):
+                current[key] = value
+
+    if current:
+        articles.append(current)
+
+    title = re.sub(r'\*\*(.+?)\*\*', r'<span class="highlight">\1</span>', title)
+
+    parts = []
+    for a in articles:
+        date_html = f' <span class="article-date">{a["date"]}</span>' if a['date'] else ''
+        tags_html = ''
+        if a.get('tags'):
+            tag_spans = ''.join(
+                f'<span class="article-tag">{t.strip()}</span>'
+                for t in a['tags'].split(',')
+                if t.strip()
+            )
+            tags_html = f'\n        <span class="article-tags">{tag_spans}</span>'
+        parts.append(
+            f'      <a class="article" href="{a["url"]}" target="_blank" rel="noopener">\n'
+            f'        <span class="article-name">{a["name"]}</span>\n'
+            f'        <span class="article-meta"><span class="article-publisher">{a["publisher"]}</span>{date_html}</span>{tags_html}\n'
+            '        <span class="article-arrow"><span class="material-symbols-sharp">arrow_outward</span></span>\n'
+            '      </a>'
+        )
+
+    articles_inner = '\n'.join(parts)
+
+    return (
+        '  <!-- ARTICLES -->\n'
+        '  <section>\n'
+        '    <h2 class="section-title">\n'
+        f'      {title}\n'
+        '    </h2>\n'
+        '    <div class="articles">\n'
+        f'{articles_inner}\n'
+        '    </div>\n'
+        '  </section>'
+    )
+
+
 def render_lately(md):
     items = dict(parse_kv_list(md))
     label_map = {
@@ -559,13 +620,14 @@ def render_page_intro(text):
     )
 
 
-def render_work_body(work_md, projects_md, about_md):
-    """Work page body: intro + about + toolkit + projects."""
+def render_work_body(work_md, projects_md, articles_md, about_md):
+    """Work page body: intro + about + toolkit + projects + articles."""
     intro_html = render_page_intro('at work,<br>i am a multi-disciplinary **data communicator**.')
     about_html = render_about(about_md)
     work_html = render_work_section(work_md)
     projects_html = render_projects(projects_md)
-    return intro_html + '\n\n' + about_html + '\n\n' + work_html + '\n\n' + projects_html
+    articles_html = render_articles(articles_md)
+    return intro_html + '\n\n' + about_html + '\n\n' + work_html + '\n\n' + projects_html + '\n\n' + articles_html
 
 
 def render_interests(md):
@@ -726,6 +788,7 @@ def build():
     work_md = read(CONTENT / 'work.md')
     interests_md = read(CONTENT / 'interests.md')
     rolodex_md = read(CONTENT / 'rolodex.md')
+    articles_md = read(CONTENT / 'articles.md')
 
     # Shared pieces
     meta_html = render_meta(meta_md)
@@ -736,7 +799,7 @@ def build():
 
     # Page bodies
     home_body = render_home_body(hero_md)
-    work_body = render_work_body(work_md, projects_md, about_md)
+    work_body = render_work_body(work_md, projects_md, articles_md, about_md)
     play_body = render_play_body(lately_md, interests_md, rolodex_md, photos)
 
     # Generate seasonal images

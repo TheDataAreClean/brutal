@@ -1,9 +1,11 @@
 #offerings
-- data visualisations
+- data visualisation
 - data storytelling
+- data journalism
+- audience research
+- audience strategy
 - product strategy
-- data systems strategy
-- user research
+- community building
 - data viz workshops
 - data capacity trainings
-- statistical analysis
+- data systems strategy
