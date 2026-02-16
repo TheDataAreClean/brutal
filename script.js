@@ -77,6 +77,10 @@
         };
         dropdown.appendChild(btn);
       });
+      var info = document.createElement('div');
+      info.className = 'season-info';
+      info.textContent = 'colours from bengaluru\u2019s seasonal blooms';
+      dropdown.appendChild(info);
     })();
 
     function toggleSeasons(e) {

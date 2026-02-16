@@ -192,6 +192,11 @@
       height: 8px;
       flex-shrink: 0;
     }
+    .season-info {
+      padding: 8px 10px;
+      opacity: 0.5;
+      border-top: 1px solid currentColor;
+    }
     nav {
       position: fixed;
       bottom: 0;
@@ -1595,6 +1600,10 @@
         };
         dropdown.appendChild(btn);
       });
+      var info = document.createElement('div');
+      info.className = 'season-info';
+      info.textContent = 'colours from bengaluru\u2019s seasonal blooms';
+      dropdown.appendChild(info);
     })();
     function toggleSeasons(e) {
       e.stopPropagation();
