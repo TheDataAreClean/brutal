@@ -40,7 +40,7 @@ dist/
 
 - **/** — full-viewport hero with name + tagline
 - **/work** — about, toolkit (flex-wrap tags), project cards (bordered boxes with stretched links), published writings (article cards with publisher, date, tags)
-- **/play** — lately (linked activity tags), interests (curiosity tags), Glass.photo masonry gallery (9 at a time with show more), rolodex (5 random links per visit with shuffle button)
+- **/play** — lately (linked activity tags), interests (curiosity tags), Glass.photo masonry gallery (9 at a time with show more, EXIF info overlay per photo), rolodex (5 random links per visit with shuffle button)
 
 ## Design system
 
@@ -52,8 +52,8 @@ dist/
 | `--text-heading` | 24px | 36px | page intros, section titles, about h2 |
 | `--text-subhead` | 18px | 24px | hero tagline |
 | `--text-body` | 15px | 17px | about text, toolkit/interest tags, project/article names, subtitles |
-| `--text-small` | 13px | 13px | project role/desc, article meta, lately, captions, footer, rolodex |
-| `--text-ui` | 11px | 11px | nav links, toast, season picker, article tags |
+| `--text-small` | 13px | 13px | project role/desc, article meta, lately, footer, rolodex, gallery info title |
+| `--text-ui` | 11px | 11px | nav links, toast, season picker, article tags, gallery info overlay |
 
 ### Weight
 
@@ -61,7 +61,7 @@ dist/
 |---|---|
 | 400 | default — body, tags, descriptions, labels |
 | 500 | headings — section titles, about h2 |
-| 700 | emphasis — project/article name, lately value, nav, toast, rolodex name |
+| 700 | emphasis — project/article name, lately value, nav, toast, rolodex name, gallery info title/camera |
 
 ### Line-height
 
@@ -69,15 +69,15 @@ dist/
 |---|---|
 | 1 | `--text-display` (hero h1) |
 | 1.05 | section titles |
-| 1.4 | `--text-small` (project role/desc, article meta, lately, captions, footer, rolodex) |
+| 1.4 | `--text-small` and `--text-ui` (project role/desc, article meta, lately, footer, rolodex, gallery info) |
 | 1.5 | `--text-body` and above (about h2, about text, taglines, subtitles, toolkit/interest tags, project/article names) |
 
 ### Letter-spacing
 
 | Value | Use |
 |---|---|
-| 1px | `--text-ui` (nav, toast) |
-| 0.5px | `--text-small` labels (lately, footer, project role, season) |
+| 1px | `--text-ui` (nav, toast, season picker, article tags, gallery info overlay, show-more) |
+| 0.5px | `--text-small` labels (lately, footer, project role, article publisher/date) |
 
 ### Spacing
 

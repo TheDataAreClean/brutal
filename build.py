@@ -499,7 +499,7 @@ def render_work_section(md):
 
 
 def fetch_glass_photos():
-    """Fetch photos from Glass.photo profile, return list of {url, description}."""
+    """Fetch photos from Glass.photo profile with EXIF metadata."""
     try:
         url = 'https://glass.photo/thedataareclean'
         req = urllib.request.Request(url, headers={
@@ -534,11 +534,30 @@ def fetch_glass_photos():
             img_url = post.get('image1024x1024', '')
             desc = post.get('description', '')
             created = post.get('created_at', '')
+            exif = post.get('exif') or {}
+            camera_obj = post.get('camera') or {}
+
+            # Format date taken
+            date_str = ''
+            raw_date = exif.get('date_time_original', '')
+            if raw_date:
+                try:
+                    dt = datetime.fromisoformat(raw_date.replace('Z', '+00:00'))
+                    date_str = dt.strftime('%b %d, %Y').replace(' 0', ' ')
+                except (ValueError, TypeError):
+                    pass
+
             if img_url:
                 photos.append({
                     'url': img_url,
                     'description': desc or '',
                     'created': created,
+                    'camera': camera_obj.get('model', ''),
+                    'aperture': exif.get('aperture', ''),
+                    'shutter': exif.get('exposure_time', ''),
+                    'iso': exif.get('iso', ''),
+                    'focal': exif.get('focal_length', ''),
+                    'date': date_str,
                 })
 
         # Newest first
@@ -553,7 +572,7 @@ def fetch_glass_photos():
 
 
 def render_gallery(photos, num_cols=3, initial=9):
-    """Render masonry gallery with round-robin columns for desktop, order attrs for mobile."""
+    """Render masonry gallery with EXIF info overlays, show-more, and round-robin columns."""
     if not photos:
         return ''
 
@@ -567,11 +586,45 @@ def render_gallery(photos, num_cols=3, initial=9):
         items = []
         for idx, photo in col:
             desc = escape(photo['description'])
-            caption = f'\n          <figcaption>{desc}</figcaption>' if desc else ''
             hidden = ' gallery-hidden' if idx >= initial else ''
+
+            # Build info overlay
+            info_lines = []
+            if desc:
+                info_lines.append(f'<span class="gallery-info-title">{desc}</span>')
+            if photo.get('camera'):
+                info_lines.append(f'<span class="gallery-info-camera">{escape(photo["camera"])}</span>')
+            exif_parts = []
+            if photo.get('aperture'):
+                exif_parts.append(escape(photo['aperture']))
+            if photo.get('shutter'):
+                exif_parts.append(escape(photo['shutter']))
+            if photo.get('iso'):
+                exif_parts.append('ISO ' + escape(photo['iso']))
+            if exif_parts:
+                info_lines.append(f'<span>{" &middot; ".join(exif_parts)}</span>')
+            if photo.get('focal'):
+                info_lines.append(f'<span>{escape(photo["focal"])}</span>')
+            if photo.get('date'):
+                info_lines.append(f'<span>{escape(photo["date"])}</span>')
+
+            info_btn = ''
+            info_overlay = ''
+            if info_lines:
+                info_btn = (
+                    '\n            <button class="gallery-info-btn">'
+                    '<span class="material-symbols-sharp gallery-icon-info">info</span>'
+                    '<span class="material-symbols-sharp gallery-icon-close">close</span>'
+                    '</button>'
+                )
+                overlay_inner = ''.join(f'\n              {l}' for l in info_lines)
+                info_overlay = f'\n            <div class="gallery-info-overlay">{overlay_inner}\n            </div>'
+
             items.append(
                 f'        <figure class="gallery-item{hidden}" style="order:{idx}">\n'
-                f'          <img src="{photo["url"]}" alt="{desc}" loading="lazy">{caption}\n'
+                f'          <div class="gallery-img-wrap">\n'
+                f'            <img src="{photo["url"]}" alt="{desc}" loading="lazy">{info_btn}{info_overlay}\n'
+                f'          </div>\n'
                 f'        </figure>'
             )
         col_parts.append(
@@ -592,6 +645,16 @@ def render_gallery(photos, num_cols=3, initial=9):
         '});}();</script>\n'
     ) if has_more else ''
 
+    # Info toggle JS (event delegation)
+    info_js = (
+        '    <script>!function(){'
+        'var g=document.querySelector(".gallery");'
+        'if(g)g.addEventListener("click",function(e){'
+        'var btn=e.target.closest(".gallery-info-btn");'
+        'if(btn)btn.parentElement.classList.toggle("info-open");'
+        '});}();</script>\n'
+    )
+
     return (
         '  <!-- GALLERY -->\n'
         '  <section>\n'
@@ -600,6 +663,7 @@ def render_gallery(photos, num_cols=3, initial=9):
         + '\n'.join(col_parts) + '\n'
         + '    </div>\n'
         + show_more
+        + info_js
         + '  </section>'
     )
 
@@ -716,10 +780,7 @@ def render_play_body(lately_md, interests_md, rolodex_md, photos):
 
 def render_page(template, css, js, meta_html, footer_html, body_html, active_nav, depth=0):
     """Assemble a full HTML page with shared nav/footer, inlined CSS/JS."""
-    # Navigation root path (relative)
-    nav_root = '../' * depth if depth > 0 else ''
-    # Asset path prefix
-    asset_prefix = '../' * depth if depth > 0 else ''
+    prefix = '../' * depth if depth > 0 else ''
 
     html = template
     html = html.replace('{{meta}}', meta_html)
@@ -727,15 +788,15 @@ def render_page(template, css, js, meta_html, footer_html, body_html, active_nav
     html = html.replace('{{footer}}', footer_html)
 
     # Nav active states
-    html = html.replace('{{nav_root}}', nav_root)
+    html = html.replace('{{nav_root}}', prefix)
     html = html.replace('{{nav_work_active}}', 'active' if active_nav == 'work' else '')
     html = html.replace('{{nav_play_active}}', 'active' if active_nav == 'play' else '')
 
     # Fix asset paths for subpages
-    if asset_prefix:
-        html = html.replace('href="assets/', f'href="{asset_prefix}assets/')
-        html = html.replace('src="assets/', f'src="{asset_prefix}assets/')
-        html = html.replace('content="assets/', f'content="{asset_prefix}assets/')
+    if prefix:
+        html = html.replace('href="assets/', f'href="{prefix}assets/')
+        html = html.replace('src="assets/', f'src="{prefix}assets/')
+        html = html.replace('content="assets/', f'content="{prefix}assets/')
 
     # Inline minified CSS
     html = html.replace(
