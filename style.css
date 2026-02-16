@@ -562,6 +562,58 @@
       font-size: var(--text-body);
     }
 
+    /* ---- ROLODEX ---- */
+    .rolodex-header {
+      display: flex;
+      align-items: center;
+      gap: var(--box-gap);
+    }
+
+    .rolodex-header .section-title {
+      margin-bottom: 0;
+    }
+
+    .rolodex-header .bar-box {
+      flex-shrink: 0;
+    }
+
+    .rolodex {
+      margin-top: var(--space-md);
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--box-gap);
+    }
+
+    .rolodex-item {
+      border: 1px solid var(--black);
+      padding: var(--box-pad);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    @media (hover: hover) {
+      .rolodex-item:hover {
+        color: var(--accent);
+      }
+    }
+
+    .rolodex-name {
+      font-size: var(--text-small);
+      font-weight: 700;
+    }
+
+    .rolodex-arrow {
+      color: var(--accent);
+    }
+
+    .rolodex-arrow .material-symbols-sharp {
+      font-size: 16px;
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 16;
+    }
+
     /* ---- GALLERY ---- */
     .gallery {
       display: flex;
@@ -591,6 +643,25 @@
       line-height: 1.4;
     }
 
+    .gallery-hidden {
+      display: none;
+    }
+
+    .gallery-show-more.bar-box {
+      width: 100%;
+      height: var(--bar-h);
+      padding: 0 16px;
+      margin-top: var(--space-md);
+      font-size: var(--text-ui);
+      font-weight: 700;
+      letter-spacing: 1px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
     /* ---- FOOTER ---- */
     footer {
       padding: var(--space-lg) var(--padding);
@@ -614,8 +685,10 @@
       text-decoration: none;
     }
 
-    .footer-meta a:hover {
-      text-decoration: underline;
+    @media (hover: hover) {
+      .footer-meta a:hover {
+        text-decoration: underline;
+      }
     }
 
     .footer-bottom {
@@ -637,8 +710,10 @@
       text-decoration: none;
     }
 
-    .footer-bottom a:hover {
-      text-decoration: underline;
+    @media (hover: hover) {
+      .footer-bottom a:hover {
+        text-decoration: underline;
+      }
     }
 
     /* ---- RESPONSIVE ---- */

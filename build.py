@@ -72,7 +72,6 @@ def generate_og_image(accent_hex, hero_md, output_path):
     margin = 40       # outer margin (viewport edge to box)
     box_pad = 60      # padding inside the box
     bar_h = 32        # top/bottom bar height
-    bar_gap = 8       # gap between bar and box
 
     # Parse hero content (keep ** markers for segment parsing)
     lines = [l.strip() for l in hero_md.strip().split('\n') if l.strip()]
@@ -91,14 +90,16 @@ def generate_og_image(accent_hex, hero_md, output_path):
     img = Image.new('RGB', (width, height), white)
     draw = ImageDraw.Draw(img)
 
-    # Draw top bar: accent cube + thin line
-    cube_size = bar_h
-    draw.rectangle([margin, margin, margin + cube_size, margin + bar_h], fill=accent)
-
     # Draw content viewport box
-    box_top = margin + bar_h + bar_gap
+    box_top = margin
     box_bottom = height - margin
     draw.rectangle([margin, box_top, width - margin, box_bottom], outline=black, width=1)
+
+    # Draw accent cube inside viewport box, top-left
+    cube_size = bar_h
+    cube_x = margin + 1
+    cube_y = box_top + 1
+    draw.rectangle([cube_x, cube_y, cube_x + cube_size, cube_y + cube_size], fill=accent)
 
     # Load Schibsted Grotesk at two sizes
     font_lg = ImageFont.truetype(str(FONT_PATH), 64)
@@ -490,7 +491,7 @@ def fetch_glass_photos():
         return []
 
 
-def render_gallery(photos, num_cols=3):
+def render_gallery(photos, num_cols=3, initial=9):
     """Render masonry gallery with round-robin columns for desktop, order attrs for mobile."""
     if not photos:
         return ''
@@ -506,8 +507,9 @@ def render_gallery(photos, num_cols=3):
         for idx, photo in col:
             desc = escape(photo['description'])
             caption = f'\n          <figcaption>{desc}</figcaption>' if desc else ''
+            hidden = ' gallery-hidden' if idx >= initial else ''
             items.append(
-                f'        <figure class="gallery-item" style="order:{idx}">\n'
+                f'        <figure class="gallery-item{hidden}" style="order:{idx}">\n'
                 f'          <img src="{photo["url"]}" alt="{desc}" loading="lazy">{caption}\n'
                 f'        </figure>'
             )
@@ -517,6 +519,18 @@ def render_gallery(photos, num_cols=3):
             + '      </div>'
         )
 
+    has_more = len(photos) > initial
+    show_more = (
+        '    <button class="bar-box gallery-show-more" id="gallery-show-more">show more <span class="material-symbols-sharp">keyboard_arrow_down</span></button>\n'
+        '    <script>!function(){var batch=' + str(initial) + ';'
+        'document.getElementById("gallery-show-more").addEventListener("click",function(){'
+        'var hidden=Array.from(document.querySelectorAll(".gallery-hidden"));'
+        'hidden.sort(function(a,b){return(+a.style.order)-(+b.style.order);});'
+        'for(var i=0;i<batch&&i<hidden.length;i++){hidden[i].classList.remove("gallery-hidden");}'
+        'if(!document.querySelector(".gallery-hidden"))this.remove();'
+        '});}();</script>\n'
+    ) if has_more else ''
+
     return (
         '  <!-- GALLERY -->\n'
         '  <section>\n'
@@ -524,7 +538,8 @@ def render_gallery(photos, num_cols=3):
         '    <div class="gallery">\n'
         + '\n'.join(col_parts) + '\n'
         + '    </div>\n'
-        '  </section>'
+        + show_more
+        + '  </section>'
     )
 
 
@@ -545,7 +560,7 @@ def render_page_intro(text):
 
 
 def render_work_body(work_md, projects_md, about_md):
-    """Work page body: intro + about + skills + services + projects."""
+    """Work page body: intro + about + toolkit + projects."""
     intro_html = render_page_intro('at work,<br>i am a multi-disciplinary **data communicator**.')
     about_html = render_about(about_md)
     work_html = render_work_section(work_md)
@@ -579,8 +594,46 @@ def render_interests(md):
     )
 
 
-def render_play_body(lately_md, interests_md, photos):
-    """Play page body: intro + interests + lately + photo gallery."""
+def render_rolodex(md):
+    """Parse rolodex.md into a hidden list, JS picks 5 random on each load."""
+    items = []
+    for line in md.strip().split('\n'):
+        stripped = line.strip()
+        if stripped.startswith('- '):
+            m = re.match(r'\[(.+?)\]\((.+?)\)', stripped[2:].strip())
+            if m:
+                items.append({'name': m.group(1), 'url': m.group(2)})
+
+    items_json = json.dumps(items)
+
+    return (
+        '  <!-- ROLODEX -->\n'
+        '  <section>\n'
+        '    <div class="rolodex-header">\n'
+        '      <h2 class="section-title">things i <span class="highlight">like</span>..</h2>\n'
+        '      <button class="bar-box" id="rolodex-refresh" aria-label="Shuffle">'
+        '<span class="material-symbols-sharp">refresh</span></button>\n'
+        '    </div>\n'
+        '    <div class="rolodex" id="rolodex"></div>\n'
+        f'    <script>!function(){{var items={items_json};'
+        'function shuffle(){var el=document.getElementById("rolodex");el.innerHTML="";'
+        'var a=items.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}'
+        'a.slice(0,5).forEach(function(item){'
+        'var link=document.createElement("a");link.className="rolodex-item";'
+        'link.href=item.url;link.target="_blank";link.rel="noopener";'
+        'var name=document.createElement("span");name.className="rolodex-name";name.textContent=item.name;'
+        'var arrow=document.createElement("span");arrow.className="rolodex-arrow";'
+        'arrow.innerHTML=\'<span class="material-symbols-sharp">arrow_outward</span>\';'
+        'link.appendChild(name);link.appendChild(arrow);el.appendChild(link);'
+        '});}'
+        'shuffle();document.getElementById("rolodex-refresh").addEventListener("click",shuffle);'
+        '}();</script>\n'
+        '  </section>'
+    )
+
+
+def render_play_body(lately_md, interests_md, rolodex_md, photos):
+    """Play page body: intro + interests + lately + photo gallery + rolodex."""
     intro_html = render_page_intro('during **play**,<br>i do **whatever i want**.')
     lately_html = (
         '  <!-- LATELY -->\n'
@@ -591,9 +644,11 @@ def render_play_body(lately_md, interests_md, photos):
     )
     gallery_html = render_gallery(photos)
     interests_html = render_interests(interests_md)
+    rolodex_html = render_rolodex(rolodex_md)
     parts = [intro_html, lately_html, interests_html]
     if gallery_html:
         parts.append(gallery_html)
+    parts.append(rolodex_html)
     return '\n\n'.join(parts)
 
 
@@ -670,6 +725,7 @@ def build():
     footer_md = read(CONTENT / 'footer.md')
     work_md = read(CONTENT / 'work.md')
     interests_md = read(CONTENT / 'interests.md')
+    rolodex_md = read(CONTENT / 'rolodex.md')
 
     # Shared pieces
     meta_html = render_meta(meta_md)
@@ -681,7 +737,7 @@ def build():
     # Page bodies
     home_body = render_home_body(hero_md)
     work_body = render_work_body(work_md, projects_md, about_md)
-    play_body = render_play_body(lately_md, interests_md, photos)
+    play_body = render_play_body(lately_md, interests_md, rolodex_md, photos)
 
     # Generate seasonal images
     month = datetime.now().month - 1  # 0-indexed
