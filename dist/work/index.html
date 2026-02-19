@@ -341,7 +341,8 @@
       flex-wrap: wrap;
       gap: var(--box-gap);
     }
-    .offering-tag {
+    .offering-tag,
+    .interest-tag {
       border: 1px solid var(--black);
       padding: var(--box-pad);
       font-size: var(--text-body);
@@ -529,12 +530,6 @@
       flex-wrap: wrap;
       gap: var(--box-gap);
     }
-    .interest-tag {
-      border: 1px solid var(--black);
-      padding: var(--box-pad);
-      font-size: var(--text-body);
-      line-height: 1.5;
-    }
     .rolodex-header {
       display: flex;
       align-items: center;
@@ -685,18 +680,21 @@
       gap: var(--box-gap);
       font-size: var(--text-small);
     }
-    .footer-meta > span {
+    .footer-meta > span,
+    .footer-bottom > span {
       border: 1px solid var(--black);
       padding: var(--box-pad);
       line-height: 1.4;
       letter-spacing: 0.5px;
     }
-    .footer-meta a {
+    .footer-meta a,
+    .footer-bottom a {
       color: var(--accent);
       text-decoration: none;
     }
     @media (hover: hover) {
-      .footer-meta a:hover {
+      .footer-meta a:hover,
+      .footer-bottom a:hover {
         text-decoration: underline;
       }
     }
@@ -706,21 +704,6 @@
       gap: var(--box-gap);
       margin-top: var(--space-lg);
       font-size: var(--text-small);
-    }
-    .footer-bottom > span {
-      border: 1px solid var(--black);
-      padding: var(--box-pad);
-      line-height: 1.4;
-      letter-spacing: 0.5px;
-    }
-    .footer-bottom a {
-      color: var(--accent);
-      text-decoration: none;
-    }
-    @media (hover: hover) {
-      .footer-bottom a:hover {
-        text-decoration: underline;
-      }
     }
     @media (max-width: 768px) {
       .about-content {
@@ -1017,10 +1000,9 @@
     // Build dropdown (safe DOM — no innerHTML)
     (function() {
       var dropdown = document.getElementById('season-dropdown');
-      var currentMonth = new Date().getMonth();
       seasons.forEach(function(s, i) {
         var btn = document.createElement('button');
-        btn.className = 'season-option' + (i === currentMonth ? ' active' : '');
+        btn.className = 'season-option' + (i === activeSeason ? ' active' : '');
         var swatch = document.createElement('span');
         swatch.className = 'season-swatch';
         swatch.style.background = s.light;
