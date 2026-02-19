@@ -420,7 +420,7 @@ def render_lately(md):
     parts = []
     for key in order:
         raw = items.get(key, '').strip()
-        if not raw or raw == '\u2014':
+        if not raw:
             continue
         icon, label = label_map[key]
         # Extract URL and display text from [text](url), fall back to plain text

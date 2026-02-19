@@ -61,10 +61,9 @@
     // Build dropdown (safe DOM — no innerHTML)
     (function() {
       var dropdown = document.getElementById('season-dropdown');
-      var currentMonth = new Date().getMonth();
       seasons.forEach(function(s, i) {
         var btn = document.createElement('button');
-        btn.className = 'season-option' + (i === currentMonth ? ' active' : '');
+        btn.className = 'season-option' + (i === activeSeason ? ' active' : '');
         var swatch = document.createElement('span');
         swatch.className = 'season-swatch';
         swatch.style.background = s.light;

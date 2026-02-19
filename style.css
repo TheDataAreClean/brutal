@@ -420,7 +420,8 @@
       gap: var(--box-gap);
     }
 
-    .offering-tag {
+    .offering-tag,
+    .interest-tag {
       border: 1px solid var(--black);
       padding: var(--box-pad);
       font-size: var(--text-body);
@@ -644,13 +645,6 @@
       gap: var(--box-gap);
     }
 
-    .interest-tag {
-      border: 1px solid var(--black);
-      padding: var(--box-pad);
-      font-size: var(--text-body);
-      line-height: 1.5;
-    }
-
     /* ---- ROLODEX ---- */
     .rolodex-header {
       display: flex;
@@ -830,20 +824,23 @@
       font-size: var(--text-small);
     }
 
-    .footer-meta > span {
+    .footer-meta > span,
+    .footer-bottom > span {
       border: 1px solid var(--black);
       padding: var(--box-pad);
       line-height: 1.4;
       letter-spacing: 0.5px;
     }
 
-    .footer-meta a {
+    .footer-meta a,
+    .footer-bottom a {
       color: var(--accent);
       text-decoration: none;
     }
 
     @media (hover: hover) {
-      .footer-meta a:hover {
+      .footer-meta a:hover,
+      .footer-bottom a:hover {
         text-decoration: underline;
       }
     }
@@ -854,24 +851,6 @@
       gap: var(--box-gap);
       margin-top: var(--space-lg);
       font-size: var(--text-small);
-    }
-
-    .footer-bottom > span {
-      border: 1px solid var(--black);
-      padding: var(--box-pad);
-      line-height: 1.4;
-      letter-spacing: 0.5px;
-    }
-
-    .footer-bottom a {
-      color: var(--accent);
-      text-decoration: none;
-    }
-
-    @media (hover: hover) {
-      .footer-bottom a:hover {
-        text-decoration: underline;
-      }
     }
 
     /* ---- RESPONSIVE ---- */

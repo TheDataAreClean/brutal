@@ -1,4 +1,3 @@
-# interests
 - walking
 - coffee
 - cycling

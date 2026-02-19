@@ -1,4 +1,3 @@
-#offerings
 - data visualisation
 - data storytelling
 - data journalism

@@ -3,4 +3,3 @@
 - url: https://thedataareclean.com
 - image: assets/og-image.png
 - favicon: assets/favicon.png
-- lang: en
