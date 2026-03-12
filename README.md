@@ -20,8 +20,11 @@ template.html         <- shared HTML shell with {{placeholders}}
 style.css             <- all styling with design tokens
 script.js             <- theme, seasons, live data (Open-Meteo)
 build.py              <- assembles dist/ (Python 3)
+requirements.txt      <- Python dependencies (Pillow)
 assets/               <- fonts, og-image, favicon
-  fonts/SchibstedGrotesk.ttf
+  fonts/
+    SchibstedGrotesk.ttf          <- used by Pillow for OG image generation
+    MaterialSymbolsSharp.woff2    <- self-hosted icon font (downloaded by build.py)
 CNAME                 <- custom domain
 ```
 
@@ -91,7 +94,9 @@ dist/
 ### Colour
 
 - `--black` / `--white` — swap in dark mode
+- `--on-accent` — always `#ffffff`; used for text on accent-coloured backgrounds (does not swap in dark mode)
 - `--accent` — seasonal, set by JS per month (12 Bengaluru bloom colours)
+- `--gallery-overlay-bg`, `--gallery-btn-*` — fixed semi-transparent values for photo overlays (do not swap in dark mode)
 - Theme and accent persist within a session via `sessionStorage`, reset on new visit
 
 ## Build
@@ -100,7 +105,24 @@ dist/
 python3 build.py
 ```
 
-Reads markdown content, fetches photos from Glass.photo, renders HTML, inlines CSS/JS, generates OG image + favicon (requires `pip install Pillow`), and writes to `dist/`.
+Or with image generation (OG image + favicon):
+
+```
+# First time setup
+python3 -m venv .venv
+.venv/bin/pip install -r requirements.txt
+
+# Build
+.venv/bin/python3 build.py
+```
+
+Each build:
+1. Downloads a subsetted `MaterialSymbolsSharp.woff2` (~25KB, 22 icons) from the Google Fonts icon_names API
+2. Fetches up to 50 photos from Glass.photo with EXIF metadata
+3. Renders all three pages from markdown content
+4. Inlines minified CSS + JS into each HTML file
+5. Generates seasonal OG image + favicon using Pillow (skipped if Pillow not installed)
+6. Writes output to `dist/`, copies assets
 
 ## Edit content
 
@@ -154,6 +176,10 @@ In `articles.md`, each article is a `## Title` heading with `- publisher:`, `- d
 - url: https://example.com/article
 ```
 
+### Adding a new icon
+
+If you add a new Material Symbols Sharp icon name anywhere in `build.py` (in a render function) or `template.html`, also add it to the `ICON_NAMES` list in `build.py`. The next build will download an updated subset font automatically.
+
 ## Live data
 
 The footer shows live data for Bengaluru via [Open-Meteo](https://open-meteo.com/) (free, no API key):
@@ -168,9 +194,11 @@ Three GitHub Actions workflows:
 
 | Workflow | Trigger | What it does |
 |---|---|---|
-| `pages.yml` | push to main | Deploys `dist/` to GitHub Pages |
-| `monthly-build.yml` | 1st of every month | Rebuilds with Pillow for seasonal accent, commits dist + assets |
-| `lately-reminder.yml` | every Sunday 9am IST | Creates a GitHub issue to update `content/lately.md` |
+| `pages.yml` | push to main | Runs `build.py`, deploys fresh `dist/` to GitHub Pages |
+| `monthly-build.yml` | 1st of every month | Runs `build.py` (with Pillow), commits updated `dist/` + seasonal `assets/og-image.png` + `assets/favicon.png` |
+| `lately-reminder.yml` | every Sunday 9am IST | Creates a GitHub issue to update `content/lately.md` (skips if one is already open) |
+
+All CI workflows install dependencies from `requirements.txt` with pip caching.
 
 ## Live
 

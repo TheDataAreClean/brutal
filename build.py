@@ -37,6 +37,15 @@ SEASON_COLORS = [
 
 
 FONT_PATH = BASE / 'assets' / 'fonts' / 'SchibstedGrotesk.ttf'
+ICON_FONT_PATH = BASE / 'assets' / 'fonts' / 'MaterialSymbolsSharp.woff2'
+
+ICON_NAMES = [
+    'arrow_outward', 'close', 'coffee', 'construction', 'dark_mode',
+    'directions_run', 'edit_note', 'explore', 'headphones', 'info',
+    'keyboard_arrow_down', 'light_mode', 'mail', 'menu_book', 'movie',
+    'pedal_bike', 'photo_camera', 'place', 'refresh', 'school',
+    'skillet', 'sports_esports',
+]
 
 
 def parse_bold_segments(text):
@@ -498,6 +507,35 @@ def render_work_section(md):
     )
 
 
+def fetch_icon_font():
+    """Download a subsetted Material Symbols Sharp woff2 via Google Fonts icon_names API."""
+    icons = ','.join(sorted(ICON_NAMES))
+    css_url = (
+        'https://fonts.googleapis.com/css2?'
+        'family=Material+Symbols+Sharp:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200'
+        f'&icon_names={icons}&display=swap'
+    )
+    try:
+        req = urllib.request.Request(css_url, headers={
+            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120.0 Safari/537.36',
+        })
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            css = resp.read().decode('utf-8')
+
+        m = re.search(r"src:\s*url\(([^)]+)\)\s*format\('woff2'\)", css)
+        if not m:
+            print('Warning: could not find woff2 URL in icon font CSS, skipping.')
+            return
+
+        woff2_url = m.group(1).strip("'\"")
+        ICON_FONT_PATH.parent.mkdir(parents=True, exist_ok=True)
+        urllib.request.urlretrieve(woff2_url, ICON_FONT_PATH)
+        print(f'Downloaded icon font ({ICON_FONT_PATH.stat().st_size:,} bytes)')
+
+    except Exception as e:
+        print(f'Warning: icon font download failed ({e}), keeping existing file.')
+
+
 def fetch_glass_photos():
     """Fetch photos from Glass.photo profile with EXIF metadata."""
     try:
@@ -505,7 +543,7 @@ def fetch_glass_photos():
         req = urllib.request.Request(url, headers={
             'User-Agent': 'Mozilla/5.0 (compatible; portfolio-build/1.0)',
         })
-        with urllib.request.urlopen(req, timeout=15) as resp:
+        with urllib.request.urlopen(req, timeout=5) as resp:
             html = resp.read().decode('utf-8')
 
         # Extract __NEXT_DATA__ JSON
@@ -612,7 +650,7 @@ def render_gallery(photos, num_cols=3, initial=9):
             info_overlay = ''
             if info_lines:
                 info_btn = (
-                    '\n            <button class="gallery-info-btn">'
+                    '\n            <button class="gallery-info-btn" aria-label="Toggle photo info">'
                     '<span class="material-symbols-sharp gallery-icon-info">info</span>'
                     '<span class="material-symbols-sharp gallery-icon-close">close</span>'
                     '</button>'
@@ -623,7 +661,7 @@ def render_gallery(photos, num_cols=3, initial=9):
             items.append(
                 f'        <figure class="gallery-item{hidden}" style="order:{idx}">\n'
                 f'          <div class="gallery-img-wrap">\n'
-                f'            <img src="{photo["url"]}" alt="{desc}" loading="lazy">{info_btn}{info_overlay}\n'
+                f'            <img src="{photo["url"]}" alt="{desc or f"Photo {idx + 1}"}" loading="lazy">{info_btn}{info_overlay}\n'
                 f'          </div>\n'
                 f'        </figure>'
             )
@@ -742,7 +780,7 @@ def render_rolodex(md):
         '    </div>\n'
         '    <div class="rolodex" id="rolodex"></div>\n'
         f'    <script>!function(){{var items={items_json};'
-        'function shuffle(){var el=document.getElementById("rolodex");el.innerHTML="";'
+        'function shuffle(){var el=document.getElementById("rolodex");el.textContent="";'
         'var a=items.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}'
         'a.slice(0,5).forEach(function(item){'
         'var link=document.createElement("a");link.className="rolodex-item";'
@@ -798,10 +836,13 @@ def render_page(template, css, js, meta_html, footer_html, body_html, active_nav
         html = html.replace('src="assets/', f'src="{prefix}assets/')
         html = html.replace('content="assets/', f'content="{prefix}assets/')
 
-    # Inline minified CSS
+    # Inline minified CSS (rewrite url(assets/...) for subpages)
+    minified_css = minify_css(css)
+    if prefix:
+        minified_css = minified_css.replace('url(assets/', f'url({prefix}assets/')
     html = html.replace(
         '  <link rel="stylesheet" href="style.css">',
-        '  <style>\n' + minify_css(css) + '  </style>',
+        '  <style>\n' + minified_css + '  </style>',
     )
 
     # Inline minified JS
@@ -854,6 +895,9 @@ def build():
     # Shared pieces
     meta_html = render_meta(meta_md)
     footer_html = render_footer(footer_md)
+
+    # Download subsetted icon font
+    fetch_icon_font()
 
     # Fetch Glass.photo images
     photos = fetch_glass_photos()

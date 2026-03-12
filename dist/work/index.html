@@ -19,11 +19,40 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700&display=swap" as="style">
   <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
   <style>
+    @font-face {
+      font-family: 'Material Symbols Sharp';
+      font-style: normal;
+      font-weight: 100 700;
+      font-display: block;
+      src: url(../assets/fonts/MaterialSymbolsSharp.woff2) format('woff2');
+    }
+    .material-symbols-sharp {
+      font-family: 'Material Symbols Sharp';
+      font-weight: normal;
+      font-style: normal;
+      font-size: 24px;
+      line-height: 1;
+      letter-spacing: normal;
+      text-transform: none;
+      display: inline-block;
+      white-space: nowrap;
+      word-wrap: normal;
+      direction: ltr;
+      font-feature-settings: 'liga';
+      -webkit-font-feature-settings: 'liga';
+      -webkit-font-smoothing: antialiased;
+    }
     :root {
       --black: #1a1a1a;
       --white: #ffffff;
+      --on-accent: #ffffff;
+      --gallery-overlay-bg: rgba(0,0,0,0.75);
+      --gallery-btn-bg: rgba(0,0,0,0.3);
+      --gallery-btn-bg-hover: rgba(0,0,0,0.6);
+      --gallery-btn-border: rgba(255,255,255,0.5);
+      --gallery-btn-border-hover: rgba(255,255,255,0.8);
+      --gallery-btn-color: rgba(255,255,255,0.8);
       --accent: var(--accent-light);
       --accent-light: #7d4abf;
       --accent-dark: #a878d8;
@@ -65,6 +94,22 @@
       --black: #ffffff;
       --white: #000000;
       --accent: var(--accent-dark);
+    }
+    .skip-to-content {
+      position: absolute;
+      top: -100%;
+      left: var(--padding);
+      background: var(--accent);
+      color: var(--on-accent);
+      padding: var(--box-pad);
+      font-size: var(--text-ui);
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-decoration: none;
+      z-index: 100;
+    }
+    .skip-to-content:focus {
+      top: 0;
     }
     .top-bar {
       position: fixed;
@@ -130,7 +175,7 @@
     @media (hover: hover) {
       .bar-box:hover {
         background: var(--accent);
-        color: #ffffff;
+        color: var(--on-accent);
         border-color: var(--accent);
       }
     }
@@ -179,12 +224,12 @@
     }
     .season-option.active {
       background: var(--accent);
-      color: #ffffff;
+      color: var(--on-accent);
     }
     @media (hover: hover) {
       .season-option:hover {
         background: var(--accent);
-        color: #ffffff;
+        color: var(--on-accent);
       }
     }
     .season-swatch {
@@ -223,14 +268,14 @@
     }
     .nav-link-box.active {
       background: var(--accent);
-      color: #ffffff;
+      color: var(--on-accent);
       border-color: var(--accent);
       text-decoration: none;
     }
     @media (hover: hover) {
       .nav-link-box:hover {
         background: var(--accent);
-        color: #ffffff;
+        color: var(--on-accent);
         border-color: var(--accent);
         text-decoration: none;
       }
@@ -254,7 +299,7 @@
       display: flex;
       align-items: center;
       background: var(--accent);
-      color: #ffffff;
+      color: var(--on-accent);
       font-size: var(--text-ui);
       font-weight: 700;
       letter-spacing: 1px;
@@ -600,9 +645,9 @@
       right: 8px;
       width: 28px;
       height: 28px;
-      border: 1px solid rgba(255,255,255,0.5);
-      background: rgba(0,0,0,0.3);
-      color: rgba(255,255,255,0.8);
+      border: 1px solid var(--gallery-btn-border);
+      background: var(--gallery-btn-bg);
+      color: var(--gallery-btn-color);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -616,9 +661,9 @@
     }
     @media (hover: hover) {
       .gallery-info-btn:hover {
-        background: rgba(0,0,0,0.6);
-        border-color: rgba(255,255,255,0.8);
-        color: #ffffff;
+        background: var(--gallery-btn-bg-hover);
+        border-color: var(--gallery-btn-border-hover);
+        color: var(--on-accent);
       }
     }
     .gallery-icon-close { display: none; }
@@ -630,8 +675,8 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(0,0,0,0.75);
-      color: #ffffff;
+      background: var(--gallery-overlay-bg);
+      color: var(--on-accent);
       display: none;
       flex-direction: column;
       justify-content: flex-end;
@@ -748,6 +793,8 @@
 </head>
 <body>
 
+  <a class="skip-to-content" href="#main-content">Skip to content</a>
+
   <div class="top-bar">
     <div class="nav-logo-wrap">
       <a class="nav-logo-home" href="../"></a>
@@ -777,7 +824,7 @@
     <a class="nav-link-box " href="../play/">play</a>
   </nav>
 
-  <div class="content-box">
+  <div class="content-box" id="main-content">
   <section class="page-intro">
     <p class="tagline">at work,<br>i am a multi-disciplinary <span class="name">data communicator</span>.</p>
   </section>
