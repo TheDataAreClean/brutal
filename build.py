@@ -536,17 +536,50 @@ def fetch_icon_font():
         print(f'Warning: icon font download failed ({e}), keeping existing file.')
 
 
+def _parse_glass_post(post):
+    """Extract photo dict from a Glass.photo post object."""
+    img_url = post.get('image1024x1024', '')
+    if not img_url:
+        return None
+    exif = post.get('exif') or {}
+    camera_obj = post.get('camera') or {}
+    date_str = ''
+    raw_date = exif.get('date_time_original', '')
+    if raw_date:
+        try:
+            dt = datetime.fromisoformat(raw_date.replace('Z', '+00:00'))
+            date_str = dt.strftime('%b %d, %Y').replace(' 0', ' ')
+        except (ValueError, TypeError):
+            pass
+    return {
+        'url': img_url,
+        'description': post.get('description') or '',
+        'created': post.get('created_at', ''),
+        'camera': camera_obj.get('model', ''),
+        'aperture': exif.get('aperture', ''),
+        'shutter': exif.get('exposure_time', ''),
+        'iso': exif.get('iso', ''),
+        'focal': exif.get('focal_length', ''),
+        'date': date_str,
+    }
+
+
 def fetch_glass_photos():
-    """Fetch photos from Glass.photo profile with EXIF metadata."""
+    """Fetch all photos from Glass.photo profile with EXIF metadata."""
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (compatible; portfolio-build/1.0)',
+        'Accept': 'application/json',
+        'Referer': 'https://glass.photo/thedataareclean',
+    }
+
     try:
-        url = 'https://glass.photo/thedataareclean'
-        req = urllib.request.Request(url, headers={
-            'User-Agent': 'Mozilla/5.0 (compatible; portfolio-build/1.0)',
+        # Page 1: parse __NEXT_DATA__ from the profile HTML
+        req = urllib.request.Request('https://glass.photo/thedataareclean', headers={
+            'User-Agent': headers['User-Agent'],
         })
-        with urllib.request.urlopen(req, timeout=5) as resp:
+        with urllib.request.urlopen(req, timeout=10) as resp:
             html = resp.read().decode('utf-8')
 
-        # Extract __NEXT_DATA__ JSON
         match = re.search(
             r'<script\s+id="__NEXT_DATA__"\s+type="application/json">\s*({.+?})\s*</script>',
             html,
@@ -557,46 +590,31 @@ def fetch_glass_photos():
             return []
 
         data = json.loads(match.group(1))
-
-        # Navigate to posts array: props.pageProps.fallbackData.posts.data
-        posts = (
+        posts_obj = (
             data.get('props', {})
             .get('pageProps', {})
             .get('fallbackData', {})
             .get('posts', {})
-            .get('data', [])
         )
+        all_posts = list(posts_obj.get('data', []))
+        cursor = posts_obj.get('nextCursor')
 
-        photos = []
-        for post in posts:
-            img_url = post.get('image1024x1024', '')
-            desc = post.get('description', '')
-            created = post.get('created_at', '')
-            exif = post.get('exif') or {}
-            camera_obj = post.get('camera') or {}
+        # Subsequent pages: Glass API v3 returns a plain list
+        while cursor:
+            api_url = (
+                f'https://glass.photo/api/v3/users/thedataareclean/posts'
+                f'?cursor={cursor}&limit=50'
+            )
+            req = urllib.request.Request(api_url, headers=headers)
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                page = json.loads(resp.read().decode('utf-8'))
+            if not page:
+                break
+            all_posts.extend(page)
+            # v3 returns a plain list with no cursor; stop when fewer than limit
+            cursor = None if len(page) < 50 else cursor
 
-            # Format date taken
-            date_str = ''
-            raw_date = exif.get('date_time_original', '')
-            if raw_date:
-                try:
-                    dt = datetime.fromisoformat(raw_date.replace('Z', '+00:00'))
-                    date_str = dt.strftime('%b %d, %Y').replace(' 0', ' ')
-                except (ValueError, TypeError):
-                    pass
-
-            if img_url:
-                photos.append({
-                    'url': img_url,
-                    'description': desc or '',
-                    'created': created,
-                    'camera': camera_obj.get('model', ''),
-                    'aperture': exif.get('aperture', ''),
-                    'shutter': exif.get('exposure_time', ''),
-                    'iso': exif.get('iso', ''),
-                    'focal': exif.get('focal_length', ''),
-                    'date': date_str,
-                })
+        photos = [p for post in all_posts if (p := _parse_glass_post(post))]
 
         # Newest first
         photos.sort(key=lambda p: p['created'], reverse=True)
@@ -626,10 +644,12 @@ def render_gallery(photos, num_cols=3, initial=9):
             desc = escape(photo['description'])
             hidden = ' gallery-hidden' if idx >= initial else ''
 
-            # Build info overlay
+            # Build info overlay: name, date, then everything else
             info_lines = []
             if desc:
                 info_lines.append(f'<span class="gallery-info-title">{desc}</span>')
+            if photo.get('date'):
+                info_lines.append(f'<span>{escape(photo["date"])}</span>')
             if photo.get('camera'):
                 info_lines.append(f'<span class="gallery-info-camera">{escape(photo["camera"])}</span>')
             exif_parts = []
@@ -643,8 +663,6 @@ def render_gallery(photos, num_cols=3, initial=9):
                 info_lines.append(f'<span>{" &middot; ".join(exif_parts)}</span>')
             if photo.get('focal'):
                 info_lines.append(f'<span>{escape(photo["focal"])}</span>')
-            if photo.get('date'):
-                info_lines.append(f'<span>{escape(photo["date"])}</span>')
 
             info_btn = ''
             info_overlay = ''
@@ -774,7 +792,7 @@ def render_rolodex(md):
         '  <!-- ROLODEX -->\n'
         '  <section>\n'
         '    <div class="rolodex-header">\n'
-        '      <h2 class="section-title">things i <span class="highlight">like</span>..</h2>\n'
+        '      <h2 class="section-title">ideas i <span class="highlight">like</span>..</h2>\n'
         '      <button class="bar-box" id="rolodex-refresh" aria-label="Shuffle">'
         '<span class="material-symbols-sharp">refresh</span></button>\n'
         '    </div>\n'
@@ -809,10 +827,11 @@ def render_play_body(lately_md, interests_md, rolodex_md, photos):
     gallery_html = render_gallery(photos)
     interests_html = render_interests(interests_md)
     rolodex_html = render_rolodex(rolodex_md)
-    parts = [intro_html, lately_html, interests_html]
+    parts = [intro_html, lately_html]
     if gallery_html:
         parts.append(gallery_html)
     parts.append(rolodex_html)
+    parts.append(interests_html)
     return '\n\n'.join(parts)
 
 

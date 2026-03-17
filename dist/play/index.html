@@ -19,11 +19,40 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700&display=swap" as="style">
   <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
   <style>
+    @font-face {
+      font-family: 'Material Symbols Sharp';
+      font-style: normal;
+      font-weight: 100 700;
+      font-display: block;
+      src: url(../assets/fonts/MaterialSymbolsSharp.woff2) format('woff2');
+    }
+    .material-symbols-sharp {
+      font-family: 'Material Symbols Sharp';
+      font-weight: normal;
+      font-style: normal;
+      font-size: 24px;
+      line-height: 1;
+      letter-spacing: normal;
+      text-transform: none;
+      display: inline-block;
+      white-space: nowrap;
+      word-wrap: normal;
+      direction: ltr;
+      font-feature-settings: 'liga';
+      -webkit-font-feature-settings: 'liga';
+      -webkit-font-smoothing: antialiased;
+    }
     :root {
       --black: #1a1a1a;
       --white: #ffffff;
+      --on-accent: #ffffff;
+      --gallery-overlay-bg: rgba(0,0,0,0.75);
+      --gallery-btn-bg: rgba(0,0,0,0.3);
+      --gallery-btn-bg-hover: rgba(0,0,0,0.6);
+      --gallery-btn-border: rgba(255,255,255,0.5);
+      --gallery-btn-border-hover: rgba(255,255,255,0.8);
+      --gallery-btn-color: rgba(255,255,255,0.8);
       --accent: var(--accent-light);
       --accent-light: #7d4abf;
       --accent-dark: #a878d8;
@@ -65,6 +94,22 @@
       --black: #ffffff;
       --white: #000000;
       --accent: var(--accent-dark);
+    }
+    .skip-to-content {
+      position: absolute;
+      top: -100%;
+      left: var(--padding);
+      background: var(--accent);
+      color: var(--on-accent);
+      padding: var(--box-pad);
+      font-size: var(--text-ui);
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-decoration: none;
+      z-index: 100;
+    }
+    .skip-to-content:focus {
+      top: 0;
     }
     .top-bar {
       position: fixed;
@@ -130,7 +175,7 @@
     @media (hover: hover) {
       .bar-box:hover {
         background: var(--accent);
-        color: #ffffff;
+        color: var(--on-accent);
         border-color: var(--accent);
       }
     }
@@ -179,12 +224,12 @@
     }
     .season-option.active {
       background: var(--accent);
-      color: #ffffff;
+      color: var(--on-accent);
     }
     @media (hover: hover) {
       .season-option:hover {
         background: var(--accent);
-        color: #ffffff;
+        color: var(--on-accent);
       }
     }
     .season-swatch {
@@ -223,14 +268,14 @@
     }
     .nav-link-box.active {
       background: var(--accent);
-      color: #ffffff;
+      color: var(--on-accent);
       border-color: var(--accent);
       text-decoration: none;
     }
     @media (hover: hover) {
       .nav-link-box:hover {
         background: var(--accent);
-        color: #ffffff;
+        color: var(--on-accent);
         border-color: var(--accent);
         text-decoration: none;
       }
@@ -254,7 +299,7 @@
       display: flex;
       align-items: center;
       background: var(--accent);
-      color: #ffffff;
+      color: var(--on-accent);
       font-size: var(--text-ui);
       font-weight: 700;
       letter-spacing: 1px;
@@ -345,7 +390,7 @@
     .interest-tag {
       border: 1px solid var(--black);
       padding: var(--box-pad);
-      font-size: var(--text-body);
+      font-size: var(--text-small);
       line-height: 1.5;
     }
     .projects {
@@ -600,9 +645,9 @@
       right: 8px;
       width: 28px;
       height: 28px;
-      border: 1px solid rgba(255,255,255,0.5);
-      background: rgba(0,0,0,0.3);
-      color: rgba(255,255,255,0.8);
+      border: 1px solid var(--gallery-btn-border);
+      background: var(--gallery-btn-bg);
+      color: var(--gallery-btn-color);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -616,9 +661,9 @@
     }
     @media (hover: hover) {
       .gallery-info-btn:hover {
-        background: rgba(0,0,0,0.6);
-        border-color: rgba(255,255,255,0.8);
-        color: #ffffff;
+        background: var(--gallery-btn-bg-hover);
+        border-color: var(--gallery-btn-border-hover);
+        color: var(--on-accent);
       }
     }
     .gallery-icon-close { display: none; }
@@ -630,8 +675,8 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(0,0,0,0.75);
-      color: #ffffff;
+      background: var(--gallery-overlay-bg);
+      color: var(--on-accent);
       display: none;
       flex-direction: column;
       justify-content: flex-end;
@@ -748,6 +793,8 @@
 </head>
 <body>
 
+  <a class="skip-to-content" href="#main-content">Skip to content</a>
+
   <div class="top-bar">
     <div class="nav-logo-wrap">
       <a class="nav-logo-home" href="../"></a>
@@ -777,7 +824,7 @@
     <a class="nav-link-box active" href="../play/">play</a>
   </nav>
 
-  <div class="content-box">
+  <div class="content-box" id="main-content">
   <section class="page-intro">
     <p class="tagline">during <span class="name">play</span>,<br>i do <span class="name">whatever i want</span>.</p>
   </section>
@@ -786,22 +833,1079 @@
   <section>
     <h2 class="section-title"><span class="highlight">lately</span>, i have been..</h2>
     <div class="lately-list">
-      <a class="lately-item" href="https://app.thestorygraph.com/books/13eb8e4c-f7a8-4fcc-b163-1760a687b1d4" target="_blank" rel="noopener">
+      <a class="lately-item" href="https://seagullbooks.org/products/the-present-colonizes-the-past" target="_blank" rel="noopener">
         <span class="lately-label"><span class="material-symbols-sharp">menu_book</span> reading</span>
-        <span class="lately-value">The Great Indian Brain Rot by Anurag Minus Verma</span>
+        <span class="lately-value">The Present Colonizes the Past by Romila Thapar</span>
         <span class="lately-arrow"><span class="material-symbols-sharp">arrow_outward</span></span>
       </a>
-      <a class="lately-item" href="https://youtu.be/Yepnhe1T-9U" target="_blank" rel="noopener">
+      <a class="lately-item" href="https://youtu.be/714IB4avhWg" target="_blank" rel="noopener">
         <span class="lately-label"><span class="material-symbols-sharp">headphones</span> listening to</span>
-        <span class="lately-value">We Didn't Ask for This Internet, The Ezra Klein Show</span>
+        <span class="lately-value">Is Your Social Life Missing Something? This Conversation Is for You, The Ezra Klein Show</span>
         <span class="lately-arrow"><span class="material-symbols-sharp">arrow_outward</span></span>
       </a>
-      <a class="lately-item" href="https://youtu.be/MiUHjLxm3V0" target="_blank" rel="noopener">
+      <a class="lately-item" href="https://en.wikipedia.org/wiki/Formula_1:_Drive_to_Survive" target="_blank" rel="noopener">
         <span class="lately-label"><span class="material-symbols-sharp">movie</span> watching</span>
-        <span class="lately-value">The World's Most Important Machine by Veritasium</span>
+        <span class="lately-value">Drive to Survive on Netflix</span>
         <span class="lately-arrow"><span class="material-symbols-sharp">arrow_outward</span></span>
       </a>
     </div>
+  </section>
+
+  <!-- GALLERY -->
+  <section>
+    <h2 class="section-title">some personal <span class="highlight">clicks</span>..</h2>
+    <div class="gallery">
+      <div class="gallery-col">
+        <figure class="gallery-item" style="order:0">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/2C7abkREdgaDmk0GdzrOnCMjfO4GNFZLX9kaSV1dW-c/rs:fit:1024:1024:0/q:90/L3Bvc3QvYWM3OTQyOWMtNDgwMi00YzdmLTg0NzgtMmE3NGU2OTQ4ZDg5L3Bob3Rv" alt="friend." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">friend.</span>
+              <span>Mar 14, 2026</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/2.8 &middot; 1/640s &middot; ISO 64</span>
+              <span>16mm (120mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item" style="order:3">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/1bvISouPiqlTigwu7shT_BcAdIuD6UzXZuQSoFeJwkc/rs:fit:1024:1024:0/q:90/L3Bvc3QvYTlkZjk5Y2UtZGY5Mi00NTYwLThmMDgtMjRmMTUxNjllOWE3L3Bob3Rv" alt="bougainvillea." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">bougainvillea.</span>
+              <span>Mar 9, 2026</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/1.8 &middot; 1/3000s &middot; ISO 80</span>
+              <span>7mm (24mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item" style="order:6">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/HMiC3TbCBe-LmGsCkmd8XmUh1IJndKXh-jtQmPPm2sU/rs:fit:1024:1024:0/q:90/L3Bvc3QvMDYyMzE2MzUtNWY5MS00ZDE2LWEyM2QtNGU4NTczZWRhZWYxL3Bob3Rv" alt="spill." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">spill.</span>
+              <span>Feb 19, 2026</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/2.8 &middot; 1/11111s &middot; ISO 32</span>
+              <span>16mm (120mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:9">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/u20JjOBm2asjVqjN3VzWymBP41kGl9Sbb3FFjqyHA-E/rs:fit:1024:1024:0/q:90/L3Bvc3QvZGUzN2FkYTEtNTdmOC00MGQ4LWIyM2QtN2NlNDFiZjI0OTcyL3Bob3Rv" alt="band." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">band.</span>
+              <span>Feb 3, 2026</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/1.8 &middot; 1/74s &middot; ISO 125</span>
+              <span>7mm (24mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:12">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/9Mv4_R_lPkRrLe3JIftHC_272nPv8Oo3BUT7QjlZ_Vc/rs:fit:1024:1024:0/q:90/L3Bvc3QvYzJlZTI5ZWEtZThkZi00Y2I3LWJhNjUtZDhmMTMxNzE0MDUwL3Bob3Rv" alt="floating." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">floating.</span>
+              <span>Jan 25, 2026</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/2.8 &middot; 1/714s &middot; ISO 32</span>
+              <span>16mm (120mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:15">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/xmYv_lrKzYXYtDGDUOl_xAs20dsSTMo9hRiCwuY2NLY/rs:fit:1024:1024:0/q:90/L3Bvc3QvMjlmNzg5ZTktNTQyYS00MTQ1LWE5NzUtMGQ3N2FmZDVhNmQ3L3Bob3Rv" alt="fleeting." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">fleeting.</span>
+              <span>Jan 4, 2026</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/1.8 &middot; 1/1408s &middot; ISO 50</span>
+              <span>7mm (24mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:18">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/Q1q4YTLRaZRZ-0H-Awm5FaPLXvgiyVftEGm7EHSgWxg/rs:fit:1024:1024:0/q:90/L3Bvc3QvMDEyNmMxMjItY2NhMC00YjBmLTgyZTItYTJiZjBmZjJjNjQwL3Bob3Rv" alt="reach." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">reach.</span>
+              <span>Nov 27, 2025</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/2.8 &middot; 1/244s &middot; ISO 200</span>
+              <span>16mm (120mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:21">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/0W8oEUcBwwsakpM-aXRWRuT9s6EMfJr1T-kGRb9_wxE/rs:fit:1024:1024:0/q:90/L3Bvc3QvYWQ1NjZmMjQtNWJmMS00YTNiLTk4YmEtYTEwMGQ2OWYzMDg0L3Bob3Rv" alt="slow." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">slow.</span>
+              <span>Nov 19, 2025</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/2.8 &middot; 1/483s &middot; ISO 80</span>
+              <span>16mm (120mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:24">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/9zwcFUe1eCNuc_YB8QotbRlALi5AYi8BbzGbvesnxxg/rs:fit:1024:1024:0/q:90/L3Bvc3QvYWNjZTRlM2UtOTBlYS00MzkzLWFlMzAtNjg2MzdhNGE5Y2RkL3Bob3Rv" alt="Photo 25" loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span>Nov 16, 2025</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/1.8 &middot; 1/1085s &middot; ISO 50</span>
+              <span>7mm (24mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:27">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/IeHzy1-NsW1kimegfj-TyS4dxgAc_hWCKKHJzh7_E-g/rs:fit:1024:1024:0/q:90/L3Bvc3QvOTRhZThmNDktZDg1ZS00YWE3LWIzZDQtYTYzZjQ1MTYxZGNlL3Bob3Rv" alt="games." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">games.</span>
+              <span>Nov 5, 2025</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/2.8 &middot; 1/644s &middot; ISO 32</span>
+              <span>16mm (120mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:30">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/WPRxwN6qY2iKlF_9YoIA8MJ7vkh2inzq9rR_9s4DwQE/rs:fit:1024:1024:0/q:90/L3Bvc3QvOTU1NjIwNmEtOGRjZS00M2MxLTk4ZmItZmRkY2ZiYWZiM2U1L3Bob3Rv" alt="nap." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">nap.</span>
+              <span>Oct 24, 2025</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/2.8 &middot; 1/40s &middot; ISO 1000</span>
+              <span>16mm (120mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:33">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/GByNaaUPmoqQAA4t_-wb2q1lT_lCiQTAMKzc3LpMvrI/rs:fit:1024:1024:0/q:90/L3Bvc3QvOTUzYzVmM2UtMWI3OS00ZTEzLThhNTItY2M3NDgyZDg3NTJjL3Bob3Rv" alt="clipped." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">clipped.</span>
+              <span>Nov 1, 2025</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/1.8 &middot; 1/4762s &middot; ISO 50</span>
+              <span>7mm (24mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:36">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/70rfAQzDj3-tDZkpykVAz_IzpqVK8EluhAIaxdLNeL0/rs:fit:1024:1024:0/q:90/L3Bvc3QvZjJiMjg4YzMtZTJkZi00Nzg3LWE4OGEtYjYxYzJmZGY3NmM5L3Bob3Rv" alt="guard." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">guard.</span>
+              <span>Oct 29, 2025</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/2.8 &middot; 1/151s &middot; ISO 125</span>
+              <span>16mm (120mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:39">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/vdikRSkrTt2WZ_-M4Sw9_4XL4sOhXfyulcmw7BJI5MI/rs:fit:1024:1024:0/q:90/L3Bvc3QvNDRiY2Q1ZDYtNWEyNC00YWI2LWIxMmYtYjlhMjExZDUyZmE0L3Bob3Rv" alt="reset." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">reset.</span>
+              <span>Oct 22, 2025</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/1.8 &middot; 1/50s &middot; ISO 125</span>
+              <span>7mm (123mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:42">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/Uge4y1RggL7JpPML4Uhc5RPWM5ZguB5NZdMvegrldcU/rs:fit:1024:1024:0/q:90/L3Bvc3QvNjkzZTg3MDEtZDNjNS00YTg5LWE1NWItNjViOWIzOTA2YjIxL3Bob3Rv" alt="sneaky." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">sneaky.</span>
+              <span>Oct 22, 2025</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/2.8 &middot; 1/99s &middot; ISO 80</span>
+              <span>16mm (120mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:45">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/XnNzGsv8hMUoSjWCPivMGmgB3J4_P_Yt8MfMw2SSwgM/rs:fit:1024:1024:0/q:90/L3Bvc3QvZjMwZTMyOGYtYTAwYy00OGRmLWFjMjItYWEyNTQ5ODBjZjAxL3Bob3Rv" alt="pour." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">pour.</span>
+              <span>Oct 21, 2025</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/2.8 &middot; 1/111s &middot; ISO 320</span>
+              <span>16mm (120mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:48">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/5qnDvCwXZxZQPOPhli4prCh5zIKeO6knObJgMKHp7FI/rs:fit:1024:1024:0/q:90/L3Bvc3QvZWZjY2NkMTEtOTVlMy00NzViLWI0MjAtMmRjMjM2OTEyNDE0L3Bob3Rv" alt="memories." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">memories.</span>
+              <span>Mar 23, 2025</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/2.8 &middot; 1/60s &middot; ISO 500</span>
+              <span>16mm (120mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:51">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/vvZR0ybQXI7e6Khd5EB1Y1poMUVKRFmWRTwC5-m4UGI/rs:fit:1024:1024:0/q:90/L3Bvc3QvYTI4NTc1ZDAtNDE4Mi00ZDYwLTkyN2MtZWIwMjkwMjEwYWZkL3Bob3Rv" alt="sip." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">sip.</span>
+              <span>Sep 12, 2025</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/2.8 &middot; 1/537s &middot; ISO 50</span>
+              <span>16mm (120mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:54">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/vkeiWNABE53jGopl3WMXdk3A6i64Zx9CfurmPhGiEBU/rs:fit:1024:1024:0/q:90/L3Bvc3QvZmNjOGE5YjQtZTAwNi00NDI3LWEyNDYtMjdlODFhN2E4MjZmL3Bob3Rv" alt="ride." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">ride.</span>
+              <span>Nov 6, 2022</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:57">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/s0kTKy03CY52MhWsRIa7h_ai5IcTf5xNf1FmrL1_nFg/rs:fit:1024:1024:0/q:90/L3Bvc3QvOWI4OThmMmEtZmI1OC00MjA3LWJhNWMtOGFhMjE2OWQ1YjQ5L3Bob3Rv" alt="tower." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">tower.</span>
+              <span>Dec 1, 2024</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/1.8 &middot; 1/4950s &middot; ISO 80</span>
+              <span>7mm (35mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:60">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/vc0Y13H95n_Vija4sMR8BRAAyHdF5WYCWcp0ovYiDMM/rs:fit:1024:1024:0/q:90/L3Bvc3QvOWNlZTg2NTQtMjIyNS00NzNiLWFmZDEtNGIxOGM3MTgxMmEzL3Bob3Rv" alt="Photo 61" loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span>Aug 15, 2024</span>
+              <span class="gallery-info-camera">iPhone 14 Plus</span>
+              <span>ƒ/1.5 &middot; 1/3460s &middot; ISO 50</span>
+              <span>6mm (38mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:63">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/ITy7m_9Zsn5UfFyE8yrmBn5S3O7g08yiyTT02BKwhoY/rs:fit:1024:1024:0/q:90/L3Bvc3QvMTc4M2FmZTEtNTQ1Yi00MjcxLThhMDktODk2M2QyMWE3Y2U1L3Bob3Rv" alt="heart." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">heart.</span>
+              <span>Aug 15, 2024</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/1.8 &middot; 1/100s &middot; ISO 64</span>
+              <span>7mm (24mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:66">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/F8GTIxjUpE7g8Zn-hXrSEtDYUb6LvlvT6X0UhSEfNts/rs:fit:1024:1024:0/q:90/L3Bvc3QvOTY2OTkwMzAtMmRhNC00ODI4LThhYTQtMTlhMWJlMDNlMzZkL3Bob3Rv" alt="friend." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">friend.</span>
+              <span>Jun 27, 2019</span>
+              <span class="gallery-info-camera">iPhone XS</span>
+              <span>ƒ/2.4 &middot; 1/122s &middot; ISO 16</span>
+              <span>6mm (52mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:69">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/7QkqqOmdOsAZttLE0KIodK_ORD2dUeoo3TCamMNrvDI/rs:fit:1024:1024:0/q:90/L3Bvc3QvMTFhOTA1ODMtOTU2NC00MjI3LTk3MjEtZWE0N2RkYjZlOWQ3L3Bob3Rv" alt="all." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">all.</span>
+              <span>Sep 28, 2025</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/1.8 &middot; 1/267s &middot; ISO 64</span>
+              <span>7mm (48mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:72">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/VDcsjG3fQdj8n8vo8W5TNBkrXejhTFANxkncPa7KeEk/rs:fit:1024:1024:0/q:90/L3Bvc3QvZTExZjBkY2UtYjllYy00ZmYyLTlhNWUtOWEzNTAyNTk2OTZkL3Bob3Rv" alt="retreat." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">retreat.</span>
+              <span>May 5, 2024</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/2.8 &middot; 1/85s &middot; ISO 200</span>
+              <span>16mm (120mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:75">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/w2QApMHfm5hsnxckcWepU1wZJZ1ToZyjLhntcIWW_do/rs:fit:1024:1024:0/q:90/L3Bvc3QvNjdmYzg0MGYtMjAzZi00M2E5LWI1ZDMtM2Q1YmY5YTEzODJlL3Bob3Rv" alt="Photo 76" loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span>Apr 26, 2024</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/1.8 &middot; 1/68s &middot; ISO 100</span>
+              <span>7mm (48mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:78">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/XLdB7jCv5ERBMQW4kllWYBJ-t6jdTbBpdmwFzECDUXs/rs:fit:1024:1024:0/q:90/L3Bvc3QvMjQzZGZlOTktMmU0Ny00M2I2LWFkZTUtNWY1NTgwZjA4NjYwL3Bob3Rv" alt="wait." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">wait.</span>
+              <span>Sep 21, 2025</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/1.8 &middot; 1/100s &middot; ISO 250</span>
+              <span>7mm (48mm)</span>
+            </div>
+          </div>
+        </figure>
+      </div>
+      <div class="gallery-col">
+        <figure class="gallery-item" style="order:1">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/WOJR6OZ4nurHqbkq5EeSgE8rw_9M0c8mUsNOlUpI4BM/rs:fit:1024:1024:0/q:90/L3Bvc3QvMzBlYjliZDktMmVjMi00MTljLWJkOTYtNzdiNDcwNjU2NzdjL3Bob3Rv" alt="still." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">still.</span>
+              <span>Mar 14, 2026</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/2.8 &middot; 1/263s &middot; ISO 160</span>
+              <span>16mm (120mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item" style="order:4">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/m4I6yCVyxTGFryzrgu_fehpyZIh2mN7z7GlTUnz-Qtw/rs:fit:1024:1024:0/q:90/L3Bvc3QvZGIwOGVmMjctYzNhZC00NTE1LWJiNGUtMmFiNjMwZTgwZWI0L3Bob3Rv" alt="locked." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">locked.</span>
+              <span>Feb 24, 2026</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/2.8 &middot; 1/258s &middot; ISO 32</span>
+              <span>16mm (120mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item" style="order:7">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/lWTqii9HY7d3LFbwl_W9u1xL4fXlqo8YGGxGcmJR1wo/rs:fit:1024:1024:0/q:90/L3Bvc3QvZDRmNjRkY2MtOWEwYi00OTkzLThhYTMtNDY4NTQ0YTE2MDhiL3Bob3Rv" alt="progress?" loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">progress?</span>
+              <span>Feb 6, 2026</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/2.8 &middot; 1/3344s &middot; ISO 32</span>
+              <span>16mm (120mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:10">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/WAIjXGJzOKkUx3YbMCu9hilPyOy_3UjRqq2wWMDM68U/rs:fit:1024:1024:0/q:90/L3Bvc3QvMTM5M2JiNTEtOTIyYi00MDhjLWFiYWItY2E4ZGY3NjNmZTJjL3Bob3Rv" alt="intensity." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">intensity.</span>
+              <span>Feb 3, 2026</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/1.8 &middot; 1/163s &middot; ISO 50</span>
+              <span>7mm (24mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:13">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/7ILIPwMzI-znVlbxFg2RaebdQPotJpzQSHWjTfRueZo/rs:fit:1024:1024:0/q:90/L3Bvc3QvNDJiY2E0YjItYjI1Yy00NjMwLWI4MzYtYjUyZTQ2YTM4OWZmL3Bob3Rv" alt="wither." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">wither.</span>
+              <span>Jan 22, 2026</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/2.8 &middot; 1/209s &middot; ISO 100</span>
+              <span>16mm (120mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:16">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/4exY_jMrGQbFa6ULdb_IWRVfXbC7RMdWVZz8AIs-UzU/rs:fit:1024:1024:0/q:90/L3Bvc3QvMzc3MjM5ZjAtMTA3My00MmNmLWI4M2YtM2ZlYWM5OGY2MTFjL3Bob3Rv" alt="pretty." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">pretty.</span>
+              <span>Jan 4, 2026</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/1.8 &middot; 1/1248s &middot; ISO 50</span>
+              <span>7mm (24mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:19">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/I3EIGK6doY0l4fshwSv16Zvmp-7NDM95FSpBBc7NOfo/rs:fit:1024:1024:0/q:90/L3Bvc3QvMTg4ZmE5OGYtYTNjOS00MTc1LTlkMTAtMmQyMTliOWU1YjVjL3Bob3Rv" alt="signal." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">signal.</span>
+              <span>Nov 22, 2025</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/2.8 &middot; 1/60s &middot; ISO 500</span>
+              <span>16mm (120mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:22">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/xEdysV4_-pVvv-f2RgGP79oO49QxpfjnFF4fPpa6oBU/rs:fit:1024:1024:0/q:90/L3Bvc3QvM2MxNmI5ZjctNWVmMi00Njg3LWIwYWYtMjYyZWJkZWI5MjJjL3Bob3Rv" alt="curiousity." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">curiousity.</span>
+              <span>Nov 19, 2025</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/2.8 &middot; 1/112s &middot; ISO 160</span>
+              <span>16mm (120mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:25">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/_bpa5FMGnfz_1E0dkSM4H5V45u4qXqzqh67Ut1-2hag/rs:fit:1024:1024:0/q:90/L3Bvc3QvZWM1MTQ2NjItYjlmYi00NmM2LWJmYzAtNjNkYTMxYTlkMzM0L3Bob3Rv" alt="looking." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">looking.</span>
+              <span>Nov 6, 2025</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/1.8 &middot; 1/30s &middot; ISO 2000</span>
+              <span>7mm (24mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:28">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/syJ6wa_QUqbgv5rC6ucHZH_hIgJe1fjuT9eMHP--PeY/rs:fit:1024:1024:0/q:90/L3Bvc3QvMjg4NjdjZjktMjVkYy00ZGM2LWE1YzYtNzhiYTY3NjVhNjFkL3Bob3Rv" alt="rise." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">rise.</span>
+              <span>Nov 6, 2025</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/1.8 &middot; 1/35714s &middot; ISO 50</span>
+              <span>7mm (24mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:31">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/-WlQZMGqa-xegR74B1RKWSHLibEJingwrfHzuAF8x8E/rs:fit:1024:1024:0/q:90/L3Bvc3QvYjVlNDEyOTctNDdmZC00MDM5LWJhNmYtNWI3N2QzNTVlM2IwL3Bob3Rv" alt="weekly." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">weekly.</span>
+              <span>Nov 2, 2025</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/2.8 &middot; 1/244s &middot; ISO 80</span>
+              <span>16mm (120mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:34">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/5wmTKbXbW3vjM3vY5J77T0EyZhUPlU49N8WoK80pq2o/rs:fit:1024:1024:0/q:90/L3Bvc3QvNTYxNjU3ZGMtMzI4MS00NTgxLThhOGUtZTAyMzcwOWNjMWE4L3Bob3Rv" alt="distant." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">distant.</span>
+              <span>Oct 24, 2025</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/2.8 &middot; 1/146s &middot; ISO 125</span>
+              <span>16mm (120mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:37">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/OWXGoNNnchgrHLP9A4DBRtEYifN0rAlqA4WCtBzUMc4/rs:fit:1024:1024:0/q:90/L3Bvc3QvZWMzNWU5NzktYjcyZC00N2JkLTk1MjItOThlODM1NTQ1OWY3L3Bob3Rv" alt="lead." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">lead.</span>
+              <span>Oct 18, 2025</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/2.8 &middot; 1/387s &middot; ISO 50</span>
+              <span>16mm (120mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:40">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/slHTcMW3lH_N2afugrs5Q-q7a-2akY0Jr4KRfVWsOio/rs:fit:1024:1024:0/q:90/L3Bvc3QvMGFmYjdjOTItNzk4MC00NTZjLTljNTUtYjgzYzdjNTg4MWM5L3Bob3Rv" alt="above." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">above.</span>
+              <span>Oct 21, 2025</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/1.8 &middot; 1/33s &middot; ISO 200</span>
+              <span>7mm (123mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:43">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/emzTJn3zmuRn4N7M0UDgVAvo04UeiFaoO_AM02WIGa4/rs:fit:1024:1024:0/q:90/L3Bvc3QvY2M4ZDQwNGUtMDA1ZC00YWMxLThkZGItNDQwY2UzZDc3NDEzL3Bob3Rv" alt="festive." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">festive.</span>
+              <span>Oct 22, 2025</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/2.8 &middot; 1/73s &middot; ISO 250</span>
+              <span>16mm (120mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:46">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/SWFPehyzEf538c4yABAA0b5yuYPsi4D9DhaS10wmvNM/rs:fit:1024:1024:0/q:90/L3Bvc3QvNWM0ODYzMDctY2JjYy00MTM4LWIzMDEtMmQyYzdiMTI0ZTBlL3Bob3Rv" alt="locks." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">locks.</span>
+              <span>Oct 20, 2025</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/2.8 &middot; 1/22s &middot; ISO 800</span>
+              <span>16mm (120mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:49">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/YlncAaerEGhysYIRx9nOSRIUkMYtoNX9aYs8bHT0Zpg/rs:fit:1024:1024:0/q:90/L3Bvc3QvY2ExYjc5YWEtM2YwZS00YzkxLThiOTYtZDZiOGYxN2E2OTNjL3Bob3Rv" alt="locked." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">locked.</span>
+              <span>May 12, 2023</span>
+              <span class="gallery-info-camera">iPhone 12 Mini</span>
+              <span>ƒ/1.6 &middot; 1/121s &middot; ISO 100</span>
+              <span>4mm (26mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:52">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/Xlqqhmpz1wBZfeBsWpwwZkvufPRo0fc1txJZ8k5sp8M/rs:fit:1024:1024:0/q:90/L3Bvc3QvNWVhOGNkMGYtZmMzNi00MTNkLThkN2UtNjMzMmNjYjZkYzAxL3Bob3Rv" alt="frolic." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">frolic.</span>
+              <span>Mar 19, 2022</span>
+              <span class="gallery-info-camera">iPhone 12 Mini</span>
+              <span>ƒ/1.6 &middot; 1/4464s &middot; ISO 32</span>
+              <span>4mm (26mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:55">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/UJIbWdjTpjYRg-MLRwdca8Yky57xVR7vIs-Mb0XcdJ4/rs:fit:1024:1024:0/q:90/L3Bvc3QvZDk2ZWIzMzUtN2FiMy00NjQ2LTlkMDYtNmJlOTgxMTlmMTMxL3Bob3Rv" alt="snapshot." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">snapshot.</span>
+              <span>Nov 27, 2024</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/2.8 &middot; 1/707s &middot; ISO 50</span>
+              <span>16mm (120mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:58">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/az0gwAzR0GNVTtf2n9MdqUweG6A_zqBtq6tYTpcoRyI/rs:fit:1024:1024:0/q:90/L3Bvc3QvNTU4ZTY3YjQtMTZmOS00ZmUwLWFkOWEtNTc0ZTY5YjA0NWI4L3Bob3Rv" alt="afterlife." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">afterlife.</span>
+              <span>May 3, 2025</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/1.8 &middot; 1/5814s &middot; ISO 80</span>
+              <span>7mm (24mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:61">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/ku3rlAfSl0fyHVm-YYewl3TfhYhiy2mQK_g16vIhXkU/rs:fit:1024:1024:0/q:90/L3Bvc3QvMmU4ZjkzODktOTFhMi00ZDc0LWJiZWUtNjNkMGU3YjNiMjc1L3Bob3Rv" alt="dance." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">dance.</span>
+              <span>May 5, 2025</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/2.2 &middot; 1/370s &middot; ISO 40</span>
+              <span>2mm (14mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:64">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/Bovsp-Z6IjuSn60d4SN3SDejpuEQtZbx0LJY3XFYfZE/rs:fit:1024:1024:0/q:90/L3Bvc3QvNDMzZjM5YjgtODNlMS00Mzk3LTkwNzMtNjcyODVmMTU0NzIzL3Bob3Rv" alt="beyond." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">beyond.</span>
+              <span>Aug 15, 2024</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/1.8 &middot; 1/20000s &middot; ISO 50</span>
+              <span>7mm (48mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:67">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/14v0TOTunRmkLtJx7koWi6PHAtGtHMNBWIwR6T0yUaI/rs:fit:1024:1024:0/q:90/L3Bvc3QvODAyYTk5ODktNzUzZS00MGEyLWIxN2QtNmYzNTY2YzU5NWM1L3Bob3Rv" alt="curve." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">curve.</span>
+              <span>Dec 1, 2024</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/2.2 &middot; 1/270s &middot; ISO 40</span>
+              <span>2mm (14mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:70">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/5y9wQALfA_vLHyJT6AkTVVjgXTvt_aGQ7Inxa0iiCPM/rs:fit:1024:1024:0/q:90/L3Bvc3QvZTQ5MTAzNGYtYzBkOS00ZjdiLWEyNjQtNmFjMDc3NTFiMjUwL3Bob3Rv" alt="creation." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">creation.</span>
+              <span>Mar 8, 2025</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/2.8 &middot; 1/5780s &middot; ISO 40</span>
+              <span>16mm (120mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:73">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/d8fnMU67ERwFkP7kSFQzJWrXeL9YjD2lyPUYUnx3oE8/rs:fit:1024:1024:0/q:90/L3Bvc3QvYTdmYzYzZWMtZDMyMC00NzUwLWJiNTEtMTY2ZThhMzY4OGI1L3Bob3Rv" alt="visitor." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">visitor.</span>
+              <span>Apr 14, 2025</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/2.8 &middot; 1/395s &middot; ISO 50</span>
+              <span>16mm (120mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:76">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/cRYnDFLlamgWz2kEJUzeTWw9UJ4S2sEoiFa0VupKZ8s/rs:fit:1024:1024:0/q:90/L3Bvc3QvNTc0MDgyNjQtM2E1MS00NGE4LTg1YjQtNmNhOWVkYTA2MWNiL3Bob3Rv" alt="spill." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">spill.</span>
+              <span>Mar 1, 2025</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/1.8 &middot; 1/33s &middot; ISO 500</span>
+              <span>7mm (48mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:79">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/N7YDG-vjf8QFmkHAPWcRl2UpQbGL8bRsL_H31353yNk/rs:fit:1024:1024:0/q:90/L3Bvc3QvNWZkODZhMTktYjEyNC00NzBjLTgwNDktZTRhM2M2ZjNhOWI0L3Bob3Rv" alt="morning." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">morning.</span>
+              <span>Sep 21, 2025</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/2.8 &middot; 1/121s &middot; ISO 80</span>
+              <span>16mm (120mm)</span>
+            </div>
+          </div>
+        </figure>
+      </div>
+      <div class="gallery-col">
+        <figure class="gallery-item" style="order:2">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/qrHTnkVWjZLKbU2EaiPMnjlTn52fF1sOAGcmLjgLnrQ/rs:fit:1024:1024:0/q:90/L3Bvc3QvOWIwNmE4YjgtNjY3OC00MTRjLTg4NDYtYjQxNmM1NmMxMzFiL3Bob3Rv" alt="ride." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">ride.</span>
+              <span>Mar 14, 2026</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/1.8 &middot; 1/959s &middot; ISO 50</span>
+              <span>7mm (24mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item" style="order:5">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/H6dKerHuWrb-GNh29xw_BqbQHVG4rwg33fVAfUtUMlk/rs:fit:1024:1024:0/q:90/L3Bvc3QvNzk1ODQ4OTItZTMxYy00MjExLWEyNTYtMGU0MzFkZmExNjkxL3Bob3Rv" alt="draw." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">draw.</span>
+              <span>Feb 21, 2026</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/1.8 &middot; 1/183s &middot; ISO 50</span>
+              <span>7mm (24mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item" style="order:8">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/nefGpqoqv1W1-QV951VBZn0uC_4HiPz1li4HEou8sPw/rs:fit:1024:1024:0/q:90/L3Bvc3QvYmYzNDBkY2UtNDZhNy00MmI0LWI0YmYtNDBjY2JmZjQ2N2Q0L3Bob3Rv" alt="landing." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">landing.</span>
+              <span>Feb 7, 2026</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/2.8 &middot; 1/50000s &middot; ISO 32</span>
+              <span>16mm (120mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:11">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/9fIsGGdiTI-EX0cESwqOC6oQPqWSJMl6DuJm3MPTXAc/rs:fit:1024:1024:0/q:90/L3Bvc3QvMmM0Y2UwNTItM2EwNi00ODkyLTkwMDAtNjU0NDMzMjM1ZGE2L3Bob3Rv" alt="mini." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">mini.</span>
+              <span>Feb 2, 2026</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/2.8 &middot; 1/94s &middot; ISO 400</span>
+              <span>16mm (120mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:14">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/3lLByTqRBnD0x7qOIxR6dgi_bsq5JOlSA1e8FXSZhCk/rs:fit:1024:1024:0/q:90/L3Bvc3QvZTQ1ODRkOWQtMzk1Ni00MzE0LTgxNWItOTRjODgyYThmMDM1L3Bob3Rv" alt="Photo 15" loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span>Jan 13, 2026</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/1.8 &middot; 1/504s &middot; ISO 50</span>
+              <span>7mm (24mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:17">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/M1kju9iGkMCU4Q8ZVDLQcMlZ5lmESoDyEbwgsO8ly40/rs:fit:1024:1024:0/q:90/L3Bvc3QvYmRiYmNmZDktMWY2Ni00MmEyLTgyNGEtOWQ2MTQyNGU0MmQzL3Bob3Rv" alt="delight." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">delight.</span>
+              <span>Jan 4, 2026</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/1.8 &middot; 1/2770s &middot; ISO 50</span>
+              <span>7mm (24mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:20">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/R2Ft_wG1Ewr91IxyXezBzsczJHPaeDzDAZ2A5SbvDOg/rs:fit:1024:1024:0/q:90/L3Bvc3QvZDBjNjdjNDEtYWMwZC00ZjZlLTg3ZjYtYTlkZTZjMTUwY2ZjL3Bob3Rv" alt="path." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">path.</span>
+              <span>Nov 14, 2025</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/1.8 &middot; 1/3922s &middot; ISO 50</span>
+              <span>7mm (24mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:23">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/kVz4xxzPWfNjVAZwwfVO7WT-VH4faav5m1KbTPyNDbA/rs:fit:1024:1024:0/q:90/L3Bvc3QvZjNmNTI5MTUtYWQzMi00YTg0LTg1MWEtNjkxNzYzODBlNTBmL3Bob3Rv" alt="yawn." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">yawn.</span>
+              <span>Nov 14, 2025</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/2.8 &middot; 1/533s &middot; ISO 32</span>
+              <span>16mm (120mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:26">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/2Ydm1QGd7lf2iGrzIpa-ejh1nFH2mYtLLnaT4TG2aCY/rs:fit:1024:1024:0/q:90/L3Bvc3QvN2ZmYWM1ZWYtOWU3Ni00ZTFmLWI0NTItYWJjODc3ZWJjNzA1L3Bob3Rv" alt="vroom." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">vroom.</span>
+              <span>Nov 12, 2025</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/1.8 &middot; 1/743s &middot; ISO 50</span>
+              <span>7mm (24mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:29">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/yyOc1pbhHwpMvTY1q6e8REh0rxkGT-u8h_aPOgQJDbE/rs:fit:1024:1024:0/q:90/L3Bvc3QvOTY1NTU4ODgtMTcyNi00OGQ0LWI1OWYtOWRkNDFmZjU4Yjk0L3Bob3Rv" alt="lost." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">lost.</span>
+              <span>Oct 31, 2025</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/2.2 &middot; 1/448s &middot; ISO 32</span>
+              <span>2mm (14mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:32">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/BQcpvB96CgINMY8Mx5Ho-yAq6D82X-LTiTiw5NvJK6w/rs:fit:1024:1024:0/q:90/L3Bvc3QvNzBiOGRhMDMtNDA4OS00ZTcwLWJkZDctMDMwYjJjOGM4MDI3L3Bob3Rv" alt="system." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">system.</span>
+              <span>Nov 1, 2025</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/2.8 &middot; 1/50000s &middot; ISO 32</span>
+              <span>16mm (120mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:35">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/zxIQIrIGq_oIk2wMAlknC9Bq5E2wn5XppGE0vsyFI6g/rs:fit:1024:1024:0/q:90/L3Bvc3QvZGJmNDMwNjctOGUwOS00ZDkzLTliYjYtMDU3N2U3YmI4YThjL3Bob3Rv" alt="nope." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">nope.</span>
+              <span>Oct 31, 2025</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/2.8 &middot; 1/3058s &middot; ISO 50</span>
+              <span>16mm (120mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:38">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/sEm07sw7sS_IJjP574Tw5yWCodM26XpBh4uGRQe31Ys/rs:fit:1024:1024:0/q:90/L3Bvc3QvYTdmMWJlMGUtMjIzNS00YTJhLTk3ZWItMmE2NGRhNGM5ZjQyL3Bob3Rv" alt="bow." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">bow.</span>
+              <span>Oct 27, 2025</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/1.8 &middot; 1/26s &middot; ISO 640</span>
+              <span>7mm (24mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:41">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/MaXtjBgHKWQMKlki2LueXRlKeC0XC6DtOYu_Ch34Rx0/rs:fit:1024:1024:0/q:90/L3Bvc3QvMzgzODJjMDgtZDJhMS00N2MwLTlmNTgtZThmNzljMWE5YTFjL3Bob3Rv" alt="shy." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">shy.</span>
+              <span>Jan 1, 2021</span>
+              <span class="gallery-info-camera">iPhone XS</span>
+              <span>ƒ/2.4 &middot; 1/600s &middot; ISO 16</span>
+              <span>6mm (52mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:44">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/2halZwGa-JHVT7dwhAbQcC5LuQzmK_ZZ-6br5YrEb1c/rs:fit:1024:1024:0/q:90/L3Bvc3QvY2I0MDFhZTgtMzU2MC00N2Y5LTliNGMtNjNkZTU2ZjBhNmI5L3Bob3Rv" alt="mischief." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">mischief.</span>
+              <span>Oct 21, 2025</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/2.8 &middot; 1/111s &middot; ISO 320</span>
+              <span>16mm (120mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:47">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/QmJ6_Sz9FQfHJ2Mp9ttxFPKWWy2tSwK6YzJ-_QeySCg/rs:fit:1024:1024:0/q:90/L3Bvc3QvZTQyM2M3YjUtOTkxNy00ZTVjLWJmYmQtYjdjMzA2Y2Y0ZDEwL3Bob3Rv" alt="listen." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">listen.</span>
+              <span>Dec 7, 2024</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/2.8 &middot; 1/99s &middot; ISO 100</span>
+              <span>16mm (120mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:50">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/tYWsWhiuymNXDcH3G0Uoao51fEQKPyx5d6Tkx7FL0Rc/rs:fit:1024:1024:0/q:90/L3Bvc3QvMDY5NGUxMGQtOWMxNS00NmNmLWI4YWUtNGZhYTcyNjFlMDQyL3Bob3Rv" alt="dig." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">dig.</span>
+              <span>May 13, 2023</span>
+              <span class="gallery-info-camera">iPhone 14 Plus</span>
+              <span>ƒ/1.5 &middot; 1/1326s &middot; ISO 50</span>
+              <span>6mm (26mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:53">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/XTg3qNMntelyzUwQgrvf4vhPwaBf2v-FmZfbnqaWNYI/rs:fit:1024:1024:0/q:90/L3Bvc3QvYjZkYmZiZmYtZmE3ZS00ZmVjLTkzNWMtNjdhNjVlNzAzMDI0L3Bob3Rv" alt="nap." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">nap.</span>
+              <span>May 3, 2025</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/2.8 &middot; 1/313s &middot; ISO 50</span>
+              <span>16mm (120mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:56">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/5R8b4-Kch0oH3mZyMTwrmOcf0XrastCU0xkOCm7jwoo/rs:fit:1024:1024:0/q:90/L3Bvc3QvYzg1YWQ4ZmQtNDkyOS00NDJiLWE2YmYtMjZmYjMxOWU0NTVlL3Bob3Rv" alt="stroll." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">stroll.</span>
+              <span>Oct 7, 2025</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/1.8 &middot; 1/739s &middot; ISO 80</span>
+              <span>7mm (24mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:59">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/lu3kENtfvhVl3xOVcmz-6YyBy5OJ4Y6-jsmQ1ogE7Vc/rs:fit:1024:1024:0/q:90/L3Bvc3QvNjczYTQ4NzctNGQzNS00MWMyLTkwZTQtODNiYThmNGE2OWJiL3Bob3Rv" alt="turn." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">turn.</span>
+              <span>Aug 16, 2021</span>
+              <span class="gallery-info-camera">iPhone 12 Mini</span>
+              <span>ƒ/1.6 &middot; 1/868s &middot; ISO 32</span>
+              <span>4mm (26mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:62">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/Fb6BywDA6OPKcED58ImycOEXuAcRwGiLrgMcoyQ6emA/rs:fit:1024:1024:0/q:90/L3Bvc3QvNTVlOTliMTMtZGVmMy00NTExLWJmMWUtNzNlZmI1MDQ1ZThhL3Bob3Rv" alt="cut." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">cut.</span>
+              <span>May 28, 2023</span>
+              <span class="gallery-info-camera">iPhone 12 Mini</span>
+              <span>ƒ/1.6 &middot; 1/50s &middot; ISO 80</span>
+              <span>4mm (26mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:65">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/hdwv9qoKu__DDxx84Goe1IoY2OB6MgtTrxtDPgW9qWQ/rs:fit:1024:1024:0/q:90/L3Bvc3QvNTVmNDA3ZTEtMmUxZi00ZTdhLTgwOTMtYTljMGVjNGQ2YzE0L3Bob3Rv" alt="locked." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">locked.</span>
+              <span>Jun 27, 2019</span>
+              <span class="gallery-info-camera">iPhone XS</span>
+              <span>ƒ/2.4 &middot; 1/305s &middot; ISO 16</span>
+              <span>6mm (52mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:68">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/BZaPiXS3UdDXjZBre2SQ88D3uZ8x6a4S1qWqF4q9QDA/rs:fit:1024:1024:0/q:90/L3Bvc3QvNjZlNWM0ODctNWM5Ny00NTMxLWI1YTMtNjJjZDczNjFjYmEzL3Bob3Rv" alt="Photo 69" loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span>May 7, 2025</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/1.8 &middot; 1/130s &middot; ISO 50</span>
+              <span>7mm (48mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:71">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/U8-p0a2HoFqOyyBWrx67LFualZuC07BdGWJWx8vc4pc/rs:fit:1024:1024:0/q:90/L3Bvc3QvZTg3MmE2NDAtOGE0NS00ZTljLTlhMWUtN2U5MjM0YzdmMjc0L3Bob3Rv" alt="solo." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">solo.</span>
+              <span>Mar 8, 2025</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/2.8 &middot; 1/784s &middot; ISO 50</span>
+              <span>16mm (120mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:74">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/zkbupvEpwhv621BT7js1YM5O0fuN79u4t6vOmgfnqAI/rs:fit:1024:1024:0/q:90/L3Bvc3QvMmJjYjk0N2UtYWY2OS00N2RlLTg2MDUtMGQzMDI1OGYxYTA2L3Bob3Rv" alt="Photo 75" loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span>Aug 24, 2025</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/1.8 &middot; 1/1261s &middot; ISO 80</span>
+              <span>7mm (24mm)</span>
+            </div>
+          </div>
+        </figure>
+        <figure class="gallery-item gallery-hidden" style="order:77">
+          <div class="gallery-img-wrap">
+            <img src="https://cdn.glass.photo/l_fglIZFcfH2bipG69icOllRj-MZF6fNQm-fHyB9-24/rs:fit:1024:1024:0/q:90/L3Bvc3QvZGEyMTJhODItOGI3ZC00ZDdjLThiYjEtOTc0MzFkZTdjNjUyL3Bob3Rv" alt="spectrum." loading="lazy">
+            <button class="gallery-info-btn" aria-label="Toggle photo info"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
+            <div class="gallery-info-overlay">
+              <span class="gallery-info-title">spectrum.</span>
+              <span>Jun 12, 2025</span>
+              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
+              <span>ƒ/2.8 &middot; 1/100s &middot; ISO 125</span>
+              <span>16mm (120mm)</span>
+            </div>
+          </div>
+        </figure>
+      </div>
+    </div>
+    <button class="bar-box gallery-show-more" id="gallery-show-more">show more <span class="material-symbols-sharp">keyboard_arrow_down</span></button>
+    <script>!function(){var batch=9;document.getElementById("gallery-show-more").addEventListener("click",function(){var hidden=Array.from(document.querySelectorAll(".gallery-hidden"));hidden.sort(function(a,b){return(+a.style.order)-(+b.style.order);});for(var i=0;i<batch&&i<hidden.length;i++){hidden[i].classList.remove("gallery-hidden");}if(!document.querySelector(".gallery-hidden"))this.remove();});}();</script>
+    <script>!function(){var g=document.querySelector(".gallery");if(g)g.addEventListener("click",function(e){var btn=e.target.closest(".gallery-info-btn");if(btn)btn.parentElement.classList.toggle("info-open");});}();</script>
+  </section>
+
+  <!-- ROLODEX -->
+  <section>
+    <div class="rolodex-header">
+      <h2 class="section-title">ideas i <span class="highlight">like</span>..</h2>
+      <button class="bar-box" id="rolodex-refresh" aria-label="Shuffle"><span class="material-symbols-sharp">refresh</span></button>
+    </div>
+    <div class="rolodex" id="rolodex"></div>
+    <script>!function(){var items=[{"name": "The Pudding", "url": "https://pudding.cool"}, {"name": "Our World in Data", "url": "https://ourworldindata.org"}, {"name": "Jason Kottke", "url": "https://kottke.org"}, {"name": "Flowing Data", "url": "https://flowingdata.com"}, {"name": "Giorgia Lupi", "url": "https://giorgialupi.com"}, {"name": "Nadieh Bremer", "url": "https://www.visualcinnamon.com"}, {"name": "Amit Varma", "url": "https://seenunseen.in"}, {"name": "Diagram Chasing", "url": "https://diagramchasing.fun/"}, {"name": "LOW\u2190TECH MAGAZINE", "url": "https://solar.lowtechmagazine.com/"}, {"name": "The Marginalian", "url": "https://www.themarginalian.org/"}, {"name": "Only Poems", "url": "https://onlypoems.com/"}, {"name": "Revisual Labs", "url": "https://revisual.co/"}, {"name": "Wait But Why", "url": "https://waitbutwhy.com/"}];function shuffle(){var el=document.getElementById("rolodex");el.textContent="";var a=items.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}a.slice(0,5).forEach(function(item){var link=document.createElement("a");link.className="rolodex-item";link.href=item.url;link.target="_blank";link.rel="noopener";var name=document.createElement("span");name.className="rolodex-name";name.textContent=item.name;var arrow=document.createElement("span");arrow.className="rolodex-arrow";arrow.innerHTML='<span class="material-symbols-sharp">arrow_outward</span>';link.appendChild(name);link.appendChild(arrow);el.appendChild(link);});}shuffle();document.getElementById("rolodex-refresh").addEventListener("click",shuffle);}();</script>
   </section>
 
   <!-- INTERESTS -->
@@ -820,680 +1924,6 @@
       <span class="interest-tag">nature</span>
       <span class="interest-tag">internet</span>
     </div>
-  </section>
-
-  <!-- GALLERY -->
-  <section>
-    <h2 class="section-title">some personal <span class="highlight">clicks</span>..</h2>
-    <div class="gallery">
-      <div class="gallery-col">
-        <figure class="gallery-item" style="order:0">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/m4I6yCVyxTGFryzrgu_fehpyZIh2mN7z7GlTUnz-Qtw/rs:fit:1024:1024:0/q:90/L3Bvc3QvZGIwOGVmMjctYzNhZC00NTE1LWJiNGUtMmFiNjMwZTgwZWI0L3Bob3Rv" alt="locked." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">locked.</span>
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/2.8 &middot; 1/258s &middot; ISO 32</span>
-              <span>16mm (120mm)</span>
-              <span>Feb 24, 2026</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item" style="order:3">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/lWTqii9HY7d3LFbwl_W9u1xL4fXlqo8YGGxGcmJR1wo/rs:fit:1024:1024:0/q:90/L3Bvc3QvZDRmNjRkY2MtOWEwYi00OTkzLThhYTMtNDY4NTQ0YTE2MDhiL3Bob3Rv" alt="progress?" loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">progress?</span>
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/2.8 &middot; 1/3344s &middot; ISO 32</span>
-              <span>16mm (120mm)</span>
-              <span>Feb 6, 2026</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item" style="order:6">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/WAIjXGJzOKkUx3YbMCu9hilPyOy_3UjRqq2wWMDM68U/rs:fit:1024:1024:0/q:90/L3Bvc3QvMTM5M2JiNTEtOTIyYi00MDhjLWFiYWItY2E4ZGY3NjNmZTJjL3Bob3Rv" alt="intensity." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">intensity.</span>
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/1.8 &middot; 1/163s &middot; ISO 50</span>
-              <span>7mm (24mm)</span>
-              <span>Feb 3, 2026</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item gallery-hidden" style="order:9">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/7ILIPwMzI-znVlbxFg2RaebdQPotJpzQSHWjTfRueZo/rs:fit:1024:1024:0/q:90/L3Bvc3QvNDJiY2E0YjItYjI1Yy00NjMwLWI4MzYtYjUyZTQ2YTM4OWZmL3Bob3Rv" alt="wither." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">wither.</span>
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/2.8 &middot; 1/209s &middot; ISO 100</span>
-              <span>16mm (120mm)</span>
-              <span>Jan 22, 2026</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item gallery-hidden" style="order:12">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/4exY_jMrGQbFa6ULdb_IWRVfXbC7RMdWVZz8AIs-UzU/rs:fit:1024:1024:0/q:90/L3Bvc3QvMzc3MjM5ZjAtMTA3My00MmNmLWI4M2YtM2ZlYWM5OGY2MTFjL3Bob3Rv" alt="pretty." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">pretty.</span>
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/1.8 &middot; 1/1248s &middot; ISO 50</span>
-              <span>7mm (24mm)</span>
-              <span>Jan 4, 2026</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item gallery-hidden" style="order:15">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/I3EIGK6doY0l4fshwSv16Zvmp-7NDM95FSpBBc7NOfo/rs:fit:1024:1024:0/q:90/L3Bvc3QvMTg4ZmE5OGYtYTNjOS00MTc1LTlkMTAtMmQyMTliOWU1YjVjL3Bob3Rv" alt="signal." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">signal.</span>
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/2.8 &middot; 1/60s &middot; ISO 500</span>
-              <span>16mm (120mm)</span>
-              <span>Nov 22, 2025</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item gallery-hidden" style="order:18">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/xEdysV4_-pVvv-f2RgGP79oO49QxpfjnFF4fPpa6oBU/rs:fit:1024:1024:0/q:90/L3Bvc3QvM2MxNmI5ZjctNWVmMi00Njg3LWIwYWYtMjYyZWJkZWI5MjJjL3Bob3Rv" alt="curiousity." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">curiousity.</span>
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/2.8 &middot; 1/112s &middot; ISO 160</span>
-              <span>16mm (120mm)</span>
-              <span>Nov 19, 2025</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item gallery-hidden" style="order:21">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/_bpa5FMGnfz_1E0dkSM4H5V45u4qXqzqh67Ut1-2hag/rs:fit:1024:1024:0/q:90/L3Bvc3QvZWM1MTQ2NjItYjlmYi00NmM2LWJmYzAtNjNkYTMxYTlkMzM0L3Bob3Rv" alt="looking." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">looking.</span>
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/1.8 &middot; 1/30s &middot; ISO 2000</span>
-              <span>7mm (24mm)</span>
-              <span>Nov 6, 2025</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item gallery-hidden" style="order:24">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/syJ6wa_QUqbgv5rC6ucHZH_hIgJe1fjuT9eMHP--PeY/rs:fit:1024:1024:0/q:90/L3Bvc3QvMjg4NjdjZjktMjVkYy00ZGM2LWE1YzYtNzhiYTY3NjVhNjFkL3Bob3Rv" alt="rise." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">rise.</span>
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/1.8 &middot; 1/35714s &middot; ISO 50</span>
-              <span>7mm (24mm)</span>
-              <span>Nov 6, 2025</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item gallery-hidden" style="order:27">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/-WlQZMGqa-xegR74B1RKWSHLibEJingwrfHzuAF8x8E/rs:fit:1024:1024:0/q:90/L3Bvc3QvYjVlNDEyOTctNDdmZC00MDM5LWJhNmYtNWI3N2QzNTVlM2IwL3Bob3Rv" alt="weekly." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">weekly.</span>
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/2.8 &middot; 1/244s &middot; ISO 80</span>
-              <span>16mm (120mm)</span>
-              <span>Nov 2, 2025</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item gallery-hidden" style="order:30">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/5wmTKbXbW3vjM3vY5J77T0EyZhUPlU49N8WoK80pq2o/rs:fit:1024:1024:0/q:90/L3Bvc3QvNTYxNjU3ZGMtMzI4MS00NTgxLThhOGUtZTAyMzcwOWNjMWE4L3Bob3Rv" alt="distant." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">distant.</span>
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/2.8 &middot; 1/146s &middot; ISO 125</span>
-              <span>16mm (120mm)</span>
-              <span>Oct 24, 2025</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item gallery-hidden" style="order:33">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/OWXGoNNnchgrHLP9A4DBRtEYifN0rAlqA4WCtBzUMc4/rs:fit:1024:1024:0/q:90/L3Bvc3QvZWMzNWU5NzktYjcyZC00N2JkLTk1MjItOThlODM1NTQ1OWY3L3Bob3Rv" alt="lead." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">lead.</span>
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/2.8 &middot; 1/387s &middot; ISO 50</span>
-              <span>16mm (120mm)</span>
-              <span>Oct 18, 2025</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item gallery-hidden" style="order:36">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/slHTcMW3lH_N2afugrs5Q-q7a-2akY0Jr4KRfVWsOio/rs:fit:1024:1024:0/q:90/L3Bvc3QvMGFmYjdjOTItNzk4MC00NTZjLTljNTUtYjgzYzdjNTg4MWM5L3Bob3Rv" alt="above." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">above.</span>
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/1.8 &middot; 1/33s &middot; ISO 200</span>
-              <span>7mm (123mm)</span>
-              <span>Oct 21, 2025</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item gallery-hidden" style="order:39">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/emzTJn3zmuRn4N7M0UDgVAvo04UeiFaoO_AM02WIGa4/rs:fit:1024:1024:0/q:90/L3Bvc3QvY2M4ZDQwNGUtMDA1ZC00YWMxLThkZGItNDQwY2UzZDc3NDEzL3Bob3Rv" alt="festive." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">festive.</span>
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/2.8 &middot; 1/73s &middot; ISO 250</span>
-              <span>16mm (120mm)</span>
-              <span>Oct 22, 2025</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item gallery-hidden" style="order:42">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/SWFPehyzEf538c4yABAA0b5yuYPsi4D9DhaS10wmvNM/rs:fit:1024:1024:0/q:90/L3Bvc3QvNWM0ODYzMDctY2JjYy00MTM4LWIzMDEtMmQyYzdiMTI0ZTBlL3Bob3Rv" alt="locks." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">locks.</span>
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/2.8 &middot; 1/22s &middot; ISO 800</span>
-              <span>16mm (120mm)</span>
-              <span>Oct 20, 2025</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item gallery-hidden" style="order:45">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/YlncAaerEGhysYIRx9nOSRIUkMYtoNX9aYs8bHT0Zpg/rs:fit:1024:1024:0/q:90/L3Bvc3QvY2ExYjc5YWEtM2YwZS00YzkxLThiOTYtZDZiOGYxN2E2OTNjL3Bob3Rv" alt="locked." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">locked.</span>
-              <span class="gallery-info-camera">iPhone 12 Mini</span>
-              <span>ƒ/1.6 &middot; 1/121s &middot; ISO 100</span>
-              <span>4mm (26mm)</span>
-              <span>May 12, 2023</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item gallery-hidden" style="order:48">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/Xlqqhmpz1wBZfeBsWpwwZkvufPRo0fc1txJZ8k5sp8M/rs:fit:1024:1024:0/q:90/L3Bvc3QvNWVhOGNkMGYtZmMzNi00MTNkLThkN2UtNjMzMmNjYjZkYzAxL3Bob3Rv" alt="frolic." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">frolic.</span>
-              <span class="gallery-info-camera">iPhone 12 Mini</span>
-              <span>ƒ/1.6 &middot; 1/4464s &middot; ISO 32</span>
-              <span>4mm (26mm)</span>
-              <span>Mar 19, 2022</span>
-            </div>
-          </div>
-        </figure>
-      </div>
-      <div class="gallery-col">
-        <figure class="gallery-item" style="order:1">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/H6dKerHuWrb-GNh29xw_BqbQHVG4rwg33fVAfUtUMlk/rs:fit:1024:1024:0/q:90/L3Bvc3QvNzk1ODQ4OTItZTMxYy00MjExLWEyNTYtMGU0MzFkZmExNjkxL3Bob3Rv" alt="draw." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">draw.</span>
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/1.8 &middot; 1/183s &middot; ISO 50</span>
-              <span>7mm (24mm)</span>
-              <span>Feb 21, 2026</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item" style="order:4">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/nefGpqoqv1W1-QV951VBZn0uC_4HiPz1li4HEou8sPw/rs:fit:1024:1024:0/q:90/L3Bvc3QvYmYzNDBkY2UtNDZhNy00MmI0LWI0YmYtNDBjY2JmZjQ2N2Q0L3Bob3Rv" alt="landing." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">landing.</span>
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/2.8 &middot; 1/50000s &middot; ISO 32</span>
-              <span>16mm (120mm)</span>
-              <span>Feb 7, 2026</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item" style="order:7">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/9fIsGGdiTI-EX0cESwqOC6oQPqWSJMl6DuJm3MPTXAc/rs:fit:1024:1024:0/q:90/L3Bvc3QvMmM0Y2UwNTItM2EwNi00ODkyLTkwMDAtNjU0NDMzMjM1ZGE2L3Bob3Rv" alt="mini." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">mini.</span>
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/2.8 &middot; 1/94s &middot; ISO 400</span>
-              <span>16mm (120mm)</span>
-              <span>Feb 2, 2026</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item gallery-hidden" style="order:10">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/3lLByTqRBnD0x7qOIxR6dgi_bsq5JOlSA1e8FXSZhCk/rs:fit:1024:1024:0/q:90/L3Bvc3QvZTQ1ODRkOWQtMzk1Ni00MzE0LTgxNWItOTRjODgyYThmMDM1L3Bob3Rv" alt="" loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/1.8 &middot; 1/504s &middot; ISO 50</span>
-              <span>7mm (24mm)</span>
-              <span>Jan 13, 2026</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item gallery-hidden" style="order:13">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/M1kju9iGkMCU4Q8ZVDLQcMlZ5lmESoDyEbwgsO8ly40/rs:fit:1024:1024:0/q:90/L3Bvc3QvYmRiYmNmZDktMWY2Ni00MmEyLTgyNGEtOWQ2MTQyNGU0MmQzL3Bob3Rv" alt="delight." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">delight.</span>
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/1.8 &middot; 1/2770s &middot; ISO 50</span>
-              <span>7mm (24mm)</span>
-              <span>Jan 4, 2026</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item gallery-hidden" style="order:16">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/R2Ft_wG1Ewr91IxyXezBzsczJHPaeDzDAZ2A5SbvDOg/rs:fit:1024:1024:0/q:90/L3Bvc3QvZDBjNjdjNDEtYWMwZC00ZjZlLTg3ZjYtYTlkZTZjMTUwY2ZjL3Bob3Rv" alt="path." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">path.</span>
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/1.8 &middot; 1/3922s &middot; ISO 50</span>
-              <span>7mm (24mm)</span>
-              <span>Nov 14, 2025</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item gallery-hidden" style="order:19">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/kVz4xxzPWfNjVAZwwfVO7WT-VH4faav5m1KbTPyNDbA/rs:fit:1024:1024:0/q:90/L3Bvc3QvZjNmNTI5MTUtYWQzMi00YTg0LTg1MWEtNjkxNzYzODBlNTBmL3Bob3Rv" alt="yawn." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">yawn.</span>
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/2.8 &middot; 1/533s &middot; ISO 32</span>
-              <span>16mm (120mm)</span>
-              <span>Nov 14, 2025</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item gallery-hidden" style="order:22">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/2Ydm1QGd7lf2iGrzIpa-ejh1nFH2mYtLLnaT4TG2aCY/rs:fit:1024:1024:0/q:90/L3Bvc3QvN2ZmYWM1ZWYtOWU3Ni00ZTFmLWI0NTItYWJjODc3ZWJjNzA1L3Bob3Rv" alt="vroom." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">vroom.</span>
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/1.8 &middot; 1/743s &middot; ISO 50</span>
-              <span>7mm (24mm)</span>
-              <span>Nov 12, 2025</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item gallery-hidden" style="order:25">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/yyOc1pbhHwpMvTY1q6e8REh0rxkGT-u8h_aPOgQJDbE/rs:fit:1024:1024:0/q:90/L3Bvc3QvOTY1NTU4ODgtMTcyNi00OGQ0LWI1OWYtOWRkNDFmZjU4Yjk0L3Bob3Rv" alt="lost." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">lost.</span>
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/2.2 &middot; 1/448s &middot; ISO 32</span>
-              <span>2mm (14mm)</span>
-              <span>Oct 31, 2025</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item gallery-hidden" style="order:28">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/BQcpvB96CgINMY8Mx5Ho-yAq6D82X-LTiTiw5NvJK6w/rs:fit:1024:1024:0/q:90/L3Bvc3QvNzBiOGRhMDMtNDA4OS00ZTcwLWJkZDctMDMwYjJjOGM4MDI3L3Bob3Rv" alt="system." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">system.</span>
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/2.8 &middot; 1/50000s &middot; ISO 32</span>
-              <span>16mm (120mm)</span>
-              <span>Nov 1, 2025</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item gallery-hidden" style="order:31">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/zxIQIrIGq_oIk2wMAlknC9Bq5E2wn5XppGE0vsyFI6g/rs:fit:1024:1024:0/q:90/L3Bvc3QvZGJmNDMwNjctOGUwOS00ZDkzLTliYjYtMDU3N2U3YmI4YThjL3Bob3Rv" alt="nope." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">nope.</span>
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/2.8 &middot; 1/3058s &middot; ISO 50</span>
-              <span>16mm (120mm)</span>
-              <span>Oct 31, 2025</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item gallery-hidden" style="order:34">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/sEm07sw7sS_IJjP574Tw5yWCodM26XpBh4uGRQe31Ys/rs:fit:1024:1024:0/q:90/L3Bvc3QvYTdmMWJlMGUtMjIzNS00YTJhLTk3ZWItMmE2NGRhNGM5ZjQyL3Bob3Rv" alt="bow." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">bow.</span>
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/1.8 &middot; 1/26s &middot; ISO 640</span>
-              <span>7mm (24mm)</span>
-              <span>Oct 27, 2025</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item gallery-hidden" style="order:37">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/MaXtjBgHKWQMKlki2LueXRlKeC0XC6DtOYu_Ch34Rx0/rs:fit:1024:1024:0/q:90/L3Bvc3QvMzgzODJjMDgtZDJhMS00N2MwLTlmNTgtZThmNzljMWE5YTFjL3Bob3Rv" alt="shy." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">shy.</span>
-              <span class="gallery-info-camera">iPhone XS</span>
-              <span>ƒ/2.4 &middot; 1/600s &middot; ISO 16</span>
-              <span>6mm (52mm)</span>
-              <span>Jan 1, 2021</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item gallery-hidden" style="order:40">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/2halZwGa-JHVT7dwhAbQcC5LuQzmK_ZZ-6br5YrEb1c/rs:fit:1024:1024:0/q:90/L3Bvc3QvY2I0MDFhZTgtMzU2MC00N2Y5LTliNGMtNjNkZTU2ZjBhNmI5L3Bob3Rv" alt="mischief." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">mischief.</span>
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/2.8 &middot; 1/111s &middot; ISO 320</span>
-              <span>16mm (120mm)</span>
-              <span>Oct 21, 2025</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item gallery-hidden" style="order:43">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/QmJ6_Sz9FQfHJ2Mp9ttxFPKWWy2tSwK6YzJ-_QeySCg/rs:fit:1024:1024:0/q:90/L3Bvc3QvZTQyM2M3YjUtOTkxNy00ZTVjLWJmYmQtYjdjMzA2Y2Y0ZDEwL3Bob3Rv" alt="listen." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">listen.</span>
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/2.8 &middot; 1/99s &middot; ISO 100</span>
-              <span>16mm (120mm)</span>
-              <span>Dec 7, 2024</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item gallery-hidden" style="order:46">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/tYWsWhiuymNXDcH3G0Uoao51fEQKPyx5d6Tkx7FL0Rc/rs:fit:1024:1024:0/q:90/L3Bvc3QvMDY5NGUxMGQtOWMxNS00NmNmLWI4YWUtNGZhYTcyNjFlMDQyL3Bob3Rv" alt="dig." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">dig.</span>
-              <span class="gallery-info-camera">iPhone 14 Plus</span>
-              <span>ƒ/1.5 &middot; 1/1326s &middot; ISO 50</span>
-              <span>6mm (26mm)</span>
-              <span>May 13, 2023</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item gallery-hidden" style="order:49">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/XTg3qNMntelyzUwQgrvf4vhPwaBf2v-FmZfbnqaWNYI/rs:fit:1024:1024:0/q:90/L3Bvc3QvYjZkYmZiZmYtZmE3ZS00ZmVjLTkzNWMtNjdhNjVlNzAzMDI0L3Bob3Rv" alt="nap." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">nap.</span>
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/2.8 &middot; 1/313s &middot; ISO 50</span>
-              <span>16mm (120mm)</span>
-              <span>May 3, 2025</span>
-            </div>
-          </div>
-        </figure>
-      </div>
-      <div class="gallery-col">
-        <figure class="gallery-item" style="order:2">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/HMiC3TbCBe-LmGsCkmd8XmUh1IJndKXh-jtQmPPm2sU/rs:fit:1024:1024:0/q:90/L3Bvc3QvMDYyMzE2MzUtNWY5MS00ZDE2LWEyM2QtNGU4NTczZWRhZWYxL3Bob3Rv" alt="spill." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">spill.</span>
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/2.8 &middot; 1/11111s &middot; ISO 32</span>
-              <span>16mm (120mm)</span>
-              <span>Feb 19, 2026</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item" style="order:5">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/u20JjOBm2asjVqjN3VzWymBP41kGl9Sbb3FFjqyHA-E/rs:fit:1024:1024:0/q:90/L3Bvc3QvZGUzN2FkYTEtNTdmOC00MGQ4LWIyM2QtN2NlNDFiZjI0OTcyL3Bob3Rv" alt="band." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">band.</span>
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/1.8 &middot; 1/74s &middot; ISO 125</span>
-              <span>7mm (24mm)</span>
-              <span>Feb 3, 2026</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item" style="order:8">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/9Mv4_R_lPkRrLe3JIftHC_272nPv8Oo3BUT7QjlZ_Vc/rs:fit:1024:1024:0/q:90/L3Bvc3QvYzJlZTI5ZWEtZThkZi00Y2I3LWJhNjUtZDhmMTMxNzE0MDUwL3Bob3Rv" alt="floating." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">floating.</span>
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/2.8 &middot; 1/714s &middot; ISO 32</span>
-              <span>16mm (120mm)</span>
-              <span>Jan 25, 2026</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item gallery-hidden" style="order:11">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/xmYv_lrKzYXYtDGDUOl_xAs20dsSTMo9hRiCwuY2NLY/rs:fit:1024:1024:0/q:90/L3Bvc3QvMjlmNzg5ZTktNTQyYS00MTQ1LWE5NzUtMGQ3N2FmZDVhNmQ3L3Bob3Rv" alt="fleeting." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">fleeting.</span>
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/1.8 &middot; 1/1408s &middot; ISO 50</span>
-              <span>7mm (24mm)</span>
-              <span>Jan 4, 2026</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item gallery-hidden" style="order:14">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/Q1q4YTLRaZRZ-0H-Awm5FaPLXvgiyVftEGm7EHSgWxg/rs:fit:1024:1024:0/q:90/L3Bvc3QvMDEyNmMxMjItY2NhMC00YjBmLTgyZTItYTJiZjBmZjJjNjQwL3Bob3Rv" alt="reach." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">reach.</span>
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/2.8 &middot; 1/244s &middot; ISO 200</span>
-              <span>16mm (120mm)</span>
-              <span>Nov 27, 2025</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item gallery-hidden" style="order:17">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/0W8oEUcBwwsakpM-aXRWRuT9s6EMfJr1T-kGRb9_wxE/rs:fit:1024:1024:0/q:90/L3Bvc3QvYWQ1NjZmMjQtNWJmMS00YTNiLTk4YmEtYTEwMGQ2OWYzMDg0L3Bob3Rv" alt="slow." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">slow.</span>
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/2.8 &middot; 1/483s &middot; ISO 80</span>
-              <span>16mm (120mm)</span>
-              <span>Nov 19, 2025</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item gallery-hidden" style="order:20">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/9zwcFUe1eCNuc_YB8QotbRlALi5AYi8BbzGbvesnxxg/rs:fit:1024:1024:0/q:90/L3Bvc3QvYWNjZTRlM2UtOTBlYS00MzkzLWFlMzAtNjg2MzdhNGE5Y2RkL3Bob3Rv" alt="" loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/1.8 &middot; 1/1085s &middot; ISO 50</span>
-              <span>7mm (24mm)</span>
-              <span>Nov 16, 2025</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item gallery-hidden" style="order:23">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/IeHzy1-NsW1kimegfj-TyS4dxgAc_hWCKKHJzh7_E-g/rs:fit:1024:1024:0/q:90/L3Bvc3QvOTRhZThmNDktZDg1ZS00YWE3LWIzZDQtYTYzZjQ1MTYxZGNlL3Bob3Rv" alt="games." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">games.</span>
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/2.8 &middot; 1/644s &middot; ISO 32</span>
-              <span>16mm (120mm)</span>
-              <span>Nov 5, 2025</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item gallery-hidden" style="order:26">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/WPRxwN6qY2iKlF_9YoIA8MJ7vkh2inzq9rR_9s4DwQE/rs:fit:1024:1024:0/q:90/L3Bvc3QvOTU1NjIwNmEtOGRjZS00M2MxLTk4ZmItZmRkY2ZiYWZiM2U1L3Bob3Rv" alt="nap." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">nap.</span>
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/2.8 &middot; 1/40s &middot; ISO 1000</span>
-              <span>16mm (120mm)</span>
-              <span>Oct 24, 2025</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item gallery-hidden" style="order:29">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/GByNaaUPmoqQAA4t_-wb2q1lT_lCiQTAMKzc3LpMvrI/rs:fit:1024:1024:0/q:90/L3Bvc3QvOTUzYzVmM2UtMWI3OS00ZTEzLThhNTItY2M3NDgyZDg3NTJjL3Bob3Rv" alt="clipped." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">clipped.</span>
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/1.8 &middot; 1/4762s &middot; ISO 50</span>
-              <span>7mm (24mm)</span>
-              <span>Nov 1, 2025</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item gallery-hidden" style="order:32">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/70rfAQzDj3-tDZkpykVAz_IzpqVK8EluhAIaxdLNeL0/rs:fit:1024:1024:0/q:90/L3Bvc3QvZjJiMjg4YzMtZTJkZi00Nzg3LWE4OGEtYjYxYzJmZGY3NmM5L3Bob3Rv" alt="guard." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">guard.</span>
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/2.8 &middot; 1/151s &middot; ISO 125</span>
-              <span>16mm (120mm)</span>
-              <span>Oct 29, 2025</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item gallery-hidden" style="order:35">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/vdikRSkrTt2WZ_-M4Sw9_4XL4sOhXfyulcmw7BJI5MI/rs:fit:1024:1024:0/q:90/L3Bvc3QvNDRiY2Q1ZDYtNWEyNC00YWI2LWIxMmYtYjlhMjExZDUyZmE0L3Bob3Rv" alt="reset." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">reset.</span>
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/1.8 &middot; 1/50s &middot; ISO 125</span>
-              <span>7mm (123mm)</span>
-              <span>Oct 22, 2025</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item gallery-hidden" style="order:38">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/Uge4y1RggL7JpPML4Uhc5RPWM5ZguB5NZdMvegrldcU/rs:fit:1024:1024:0/q:90/L3Bvc3QvNjkzZTg3MDEtZDNjNS00YTg5LWE1NWItNjViOWIzOTA2YjIxL3Bob3Rv" alt="sneaky." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">sneaky.</span>
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/2.8 &middot; 1/99s &middot; ISO 80</span>
-              <span>16mm (120mm)</span>
-              <span>Oct 22, 2025</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item gallery-hidden" style="order:41">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/XnNzGsv8hMUoSjWCPivMGmgB3J4_P_Yt8MfMw2SSwgM/rs:fit:1024:1024:0/q:90/L3Bvc3QvZjMwZTMyOGYtYTAwYy00OGRmLWFjMjItYWEyNTQ5ODBjZjAxL3Bob3Rv" alt="pour." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">pour.</span>
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/2.8 &middot; 1/111s &middot; ISO 320</span>
-              <span>16mm (120mm)</span>
-              <span>Oct 21, 2025</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item gallery-hidden" style="order:44">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/5qnDvCwXZxZQPOPhli4prCh5zIKeO6knObJgMKHp7FI/rs:fit:1024:1024:0/q:90/L3Bvc3QvZWZjY2NkMTEtOTVlMy00NzViLWI0MjAtMmRjMjM2OTEyNDE0L3Bob3Rv" alt="memories." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">memories.</span>
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/2.8 &middot; 1/60s &middot; ISO 500</span>
-              <span>16mm (120mm)</span>
-              <span>Mar 23, 2025</span>
-            </div>
-          </div>
-        </figure>
-        <figure class="gallery-item gallery-hidden" style="order:47">
-          <div class="gallery-img-wrap">
-            <img src="https://cdn.glass.photo/vvZR0ybQXI7e6Khd5EB1Y1poMUVKRFmWRTwC5-m4UGI/rs:fit:1024:1024:0/q:90/L3Bvc3QvYTI4NTc1ZDAtNDE4Mi00ZDYwLTkyN2MtZWIwMjkwMjEwYWZkL3Bob3Rv" alt="sip." loading="lazy">
-            <button class="gallery-info-btn"><span class="material-symbols-sharp gallery-icon-info">info</span><span class="material-symbols-sharp gallery-icon-close">close</span></button>
-            <div class="gallery-info-overlay">
-              <span class="gallery-info-title">sip.</span>
-              <span class="gallery-info-camera">iPhone 15 Pro Max</span>
-              <span>ƒ/2.8 &middot; 1/537s &middot; ISO 50</span>
-              <span>16mm (120mm)</span>
-              <span>Sep 12, 2025</span>
-            </div>
-          </div>
-        </figure>
-      </div>
-    </div>
-    <button class="bar-box gallery-show-more" id="gallery-show-more">show more <span class="material-symbols-sharp">keyboard_arrow_down</span></button>
-    <script>!function(){var batch=9;document.getElementById("gallery-show-more").addEventListener("click",function(){var hidden=Array.from(document.querySelectorAll(".gallery-hidden"));hidden.sort(function(a,b){return(+a.style.order)-(+b.style.order);});for(var i=0;i<batch&&i<hidden.length;i++){hidden[i].classList.remove("gallery-hidden");}if(!document.querySelector(".gallery-hidden"))this.remove();});}();</script>
-    <script>!function(){var g=document.querySelector(".gallery");if(g)g.addEventListener("click",function(e){var btn=e.target.closest(".gallery-info-btn");if(btn)btn.parentElement.classList.toggle("info-open");});}();</script>
-  </section>
-
-  <!-- ROLODEX -->
-  <section>
-    <div class="rolodex-header">
-      <h2 class="section-title">things i <span class="highlight">like</span>..</h2>
-      <button class="bar-box" id="rolodex-refresh" aria-label="Shuffle"><span class="material-symbols-sharp">refresh</span></button>
-    </div>
-    <div class="rolodex" id="rolodex"></div>
-    <script>!function(){var items=[{"name": "The Pudding", "url": "https://pudding.cool"}, {"name": "Our World in Data", "url": "https://ourworldindata.org"}, {"name": "Datawrapper", "url": "https://datawrapper.de"}, {"name": "Observable", "url": "https://observablehq.com"}, {"name": "Jason Kottke", "url": "https://kottke.org"}, {"name": "Flowing Data", "url": "https://flowingdata.com"}, {"name": "Giorgia Lupi", "url": "https://giorgialupi.com"}, {"name": "Nadieh Bremer", "url": "https://www.visualcinnamon.com"}, {"name": "Amit Varma", "url": "https://seenunseen.in"}];function shuffle(){var el=document.getElementById("rolodex");el.innerHTML="";var a=items.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}a.slice(0,5).forEach(function(item){var link=document.createElement("a");link.className="rolodex-item";link.href=item.url;link.target="_blank";link.rel="noopener";var name=document.createElement("span");name.className="rolodex-name";name.textContent=item.name;var arrow=document.createElement("span");arrow.className="rolodex-arrow";arrow.innerHTML='<span class="material-symbols-sharp">arrow_outward</span>';link.appendChild(name);link.appendChild(arrow);el.appendChild(link);});}shuffle();document.getElementById("rolodex-refresh").addEventListener("click",shuffle);}();</script>
   </section>
 
     <!-- FOOTER -->
