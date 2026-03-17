@@ -1,3 +1,6 @@
+# **other** interests
+i am curious about, in no particular order.
+
 - walking
 - coffee
 - cycling

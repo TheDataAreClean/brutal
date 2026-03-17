@@ -55,8 +55,8 @@
     }
 
     // Restore season from session, else default to current month
-    var savedSeason = sessionStorage.getItem('season');
-    applySeason(savedSeason !== null ? Number(savedSeason) : new Date().getMonth());
+    var savedSeason = parseInt(sessionStorage.getItem('season'), 10);
+    applySeason(!isNaN(savedSeason) ? savedSeason : new Date().getMonth());
 
     // Build dropdown (safe DOM — no innerHTML)
     (function() {
@@ -68,7 +68,7 @@
         swatch.className = 'season-swatch';
         swatch.style.background = s.light;
         btn.appendChild(swatch);
-        btn.appendChild(document.createTextNode(monthNames[i] + ' \u2014 ' + s.name));
+        btn.appendChild(document.createTextNode(monthNames[i] + ' — ' + s.name));
         btn.onclick = function(e) {
           e.stopPropagation();
           applySeason(i, true);
@@ -78,7 +78,7 @@
       });
       var info = document.createElement('div');
       info.className = 'season-info';
-      info.textContent = 'colours from bengaluru\u2019s seasonal blooms';
+      info.textContent = "colours from bengaluru's seasonal blooms";
       dropdown.appendChild(info);
     })();
 
@@ -141,7 +141,7 @@
         return r.json().then(function(d) {
           var aqi = d.current.us_aqi;
           var label = aqi <= 50 ? 'Good' : aqi <= 100 ? 'Moderate' : aqi <= 150 ? 'Unhealthy for some' : aqi <= 200 ? 'Unhealthy' : 'Poor';
-          return aqi + ' \u2014 ' + label;
+          return aqi + ' — ' + label;
         });
       },
       function(v) { document.getElementById('aqi').textContent = v; },

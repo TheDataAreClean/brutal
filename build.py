@@ -161,6 +161,16 @@ def parse_inline(text):
     )
 
 
+def apply_highlight(text):
+    """Convert **bold** to <span class="highlight">bold</span>."""
+    return re.sub(r'\*\*(.+?)\*\*', r'<span class="highlight">\1</span>', text)
+
+
+def apply_name(text):
+    """Convert **bold** to <span class="name">bold</span> (used in hero/intro)."""
+    return re.sub(r'\*\*(.+?)\*\*', r'<span class="name">\1</span>', text)
+
+
 def parse_kv_list(text):
     """Parse lines like '- key: value' into an ordered list of (key, value)."""
     items = []
@@ -211,9 +221,8 @@ def render_hero(md):
         else:
             tagline = line
 
-    # **text** → <span class="name">text</span>
-    heading = re.sub(r'\*\*(.+?)\*\*', r'<span class="name">\1</span>', heading)
-    tagline = re.sub(r'\*\*(.+?)\*\*', r'<span class="name">\1</span>', tagline)
+    heading = apply_name(heading)
+    tagline = apply_name(tagline)
 
     return (
         '  <!-- HERO -->\n'
@@ -261,10 +270,7 @@ def render_about(md):
     else:
         h2 = f'      <h2>{heading}</h2>'
 
-    highlighted = [
-        re.sub(r'\*\*(.+?)\*\*', r'<span class="highlight">\1</span>', p)
-        for p in paragraphs
-    ]
+    highlighted = [apply_highlight(p) for p in paragraphs]
     paras = '\n'.join(
         f'        <p>\n'
         f'          {p}\n'
@@ -310,8 +316,7 @@ def render_projects(md):
     if current_project:
         projects.append(current_project)
 
-    # **text** → <span class="highlight">text</span>
-    title = re.sub(r'\*\*(.+?)\*\*', r'<span class="highlight">\1</span>', title)
+    title = apply_highlight(title)
 
     proj_parts = []
     for p in projects:
@@ -367,7 +372,7 @@ def render_articles(md):
     if current:
         articles.append(current)
 
-    title = re.sub(r'\*\*(.+?)\*\*', r'<span class="highlight">\1</span>', title)
+    title = apply_highlight(title)
 
     parts = []
     for a in articles:
@@ -379,7 +384,8 @@ def render_articles(md):
                 for t in a['tags'].split(',')
                 if t.strip()
             )
-            tags_html = f'\n        <span class="article-tags">{tag_spans}</span>'
+            if tag_spans:
+                tags_html = f'\n        <span class="article-tags">{tag_spans}</span>'
         parts.append(
             f'      <a class="article" href="{a["url"]}" target="_blank" rel="noopener">\n'
             f'        <span class="article-name">{a["name"]}</span>\n'
@@ -404,7 +410,17 @@ def render_articles(md):
 
 
 def render_lately(md):
-    items = dict(parse_kv_list(md))
+    lines = md.strip().split('\n')
+    title = ''
+    kv_lines = []
+    for line in lines:
+        stripped = line.strip()
+        if stripped.startswith('# '):
+            title = stripped[2:]
+        else:
+            kv_lines.append(line)
+    title = apply_highlight(title)
+    items = dict(parse_kv_list('\n'.join(kv_lines)))
     label_map = {
         'read': ('menu_book', 'reading'),
         'listened': ('headphones', 'listening to'),
@@ -452,9 +468,13 @@ def render_lately(md):
             )
 
     return (
+        '  <!-- LATELY -->\n'
+        '  <section>\n'
+        f'    <h2 class="section-title">{title}</h2>\n'
         '    <div class="lately-list">\n'
         + '\n'.join(parts) + '\n'
-        + '    </div>'
+        + '    </div>\n'
+        '  </section>'
     )
 
 
@@ -481,15 +501,20 @@ def render_footer(footer_md):
     )
 
 
-def render_work_section(md):
-    """Parse work.md into a single toolkit section."""
+def render_toolkit(md):
+    """Parse toolkit.md into a toolkit section."""
     lines = md.strip().split('\n')
+    title = ''
     items = []
 
     for line in lines:
         stripped = line.strip()
-        if stripped.startswith('- '):
+        if stripped.startswith('# '):
+            title = stripped[2:]
+        elif stripped.startswith('- '):
             items.append(stripped[2:].strip())
+
+    title = apply_highlight(title)
 
     boxes = '\n'.join(
         f'      <span class="offering-tag">{s}</span>'
@@ -499,7 +524,7 @@ def render_work_section(md):
     return (
         '  <!-- OFFERINGS -->\n'
         '  <section>\n'
-        '    <h2 class="section-title">my <span class="highlight">toolkit</span></h2>\n'
+        f'    <h2 class="section-title">{title}</h2>\n'
         '    <div class="offerings">\n'
         f'{boxes}\n'
         '    </div>\n'
@@ -611,8 +636,8 @@ def fetch_glass_photos():
             if not page:
                 break
             all_posts.extend(page)
-            # v3 returns a plain list with no cursor; stop when fewer than limit
-            cursor = None if len(page) < 50 else cursor
+            # v3 returns a plain list with no next cursor; always stop after one call
+            cursor = None
 
         photos = [p for post in all_posts if (p := _parse_glass_post(post))]
 
@@ -627,10 +652,17 @@ def fetch_glass_photos():
         return []
 
 
-def render_gallery(photos, num_cols=3, initial=9):
+def render_gallery(photos, heading_md='', num_cols=3, initial=9):
     """Render masonry gallery with EXIF info overlays, show-more, and round-robin columns."""
     if not photos:
         return ''
+
+    title = ''
+    for line in heading_md.strip().split('\n'):
+        if line.strip().startswith('# '):
+            title = line.strip()[2:]
+            break
+    title = apply_highlight(title)
 
     # Distribute photos round-robin across columns
     cols = [[] for _ in range(num_cols)]
@@ -714,7 +746,7 @@ def render_gallery(photos, num_cols=3, initial=9):
     return (
         '  <!-- GALLERY -->\n'
         '  <section>\n'
-        '    <h2 class="section-title">some personal <span class="highlight">clicks</span>..</h2>\n'
+        f'    <h2 class="section-title">{title}</h2>\n'
         '    <div class="gallery">\n'
         + '\n'.join(col_parts) + '\n'
         + '    </div>\n'
@@ -724,15 +756,9 @@ def render_gallery(photos, num_cols=3, initial=9):
     )
 
 
-def render_home_body(hero_md):
-    """Home page body: hero."""
-    hero_html = render_hero(hero_md)
-    return hero_html
-
-
 def render_page_intro(text):
     """Render an opening tagline, **bold** becomes accent-colored."""
-    styled = re.sub(r'\*\*(.+?)\*\*', r'<span class="name">\1</span>', text)
+    styled = apply_name(text)
     return (
         '  <section class="page-intro">\n'
         f'    <p class="tagline">{styled}</p>\n'
@@ -740,11 +766,11 @@ def render_page_intro(text):
     )
 
 
-def render_work_body(work_md, projects_md, articles_md, about_md):
+def render_work_body(intro_md, about_md, toolkit_md, projects_md, articles_md):
     """Work page body: intro + about + toolkit + projects + articles."""
-    intro_html = render_page_intro('at work,<br>i am a multi-disciplinary **data communicator**.')
+    intro_html = render_page_intro(intro_md.strip())
     about_html = render_about(about_md)
-    work_html = render_work_section(work_md)
+    work_html = render_toolkit(toolkit_md)
     projects_html = render_projects(projects_md)
     articles_html = render_articles(articles_md)
     return intro_html + '\n\n' + about_html + '\n\n' + work_html + '\n\n' + projects_html + '\n\n' + articles_html
@@ -753,22 +779,33 @@ def render_work_body(work_md, projects_md, articles_md, about_md):
 def render_interests(md):
     """Parse interests.md into a tag list."""
     lines = md.strip().split('\n')
+    title = ''
+    subtitle = ''
     tags = []
     for line in lines:
         stripped = line.strip()
-        if stripped.startswith('- '):
+        if stripped.startswith('# '):
+            title = stripped[2:]
+        elif stripped.startswith('- '):
             tags.append(stripped[2:].strip())
+        elif stripped and not title:
+            pass  # skip lines before heading
+        elif stripped and not subtitle:
+            subtitle = stripped
+
+    title = apply_highlight(title)
 
     tag_html = '\n'.join(
         f'      <span class="interest-tag">{t}</span>'
         for t in tags
     )
+    subtitle_html = f'    <p class="section-subtitle">{subtitle}</p>\n' if subtitle else ''
 
     return (
         '  <!-- INTERESTS -->\n'
         '  <section>\n'
-        '    <h2 class="section-title">other <span class="highlight">stuff</span>..</h2>\n'
-        '    <p class="section-subtitle">that i am curious about, in no particular order.</p>\n'
+        f'    <h2 class="section-title">{title}</h2>\n'
+        f'{subtitle_html}'
         '    <div class="interests">\n'
         f'{tag_html}\n'
         '    </div>\n'
@@ -777,22 +814,26 @@ def render_interests(md):
 
 
 def render_rolodex(md):
-    """Parse rolodex.md into a hidden list, JS picks 5 random on each load."""
+    """Parse ideas.md into a hidden list, JS picks 5 random on each load."""
+    title = ''
     items = []
     for line in md.strip().split('\n'):
         stripped = line.strip()
-        if stripped.startswith('- '):
+        if stripped.startswith('# '):
+            title = stripped[2:]
+        elif stripped.startswith('- '):
             m = re.match(r'\[(.+?)\]\((.+?)\)', stripped[2:].strip())
             if m:
                 items.append({'name': m.group(1), 'url': m.group(2)})
 
+    title = apply_highlight(title)
     items_json = json.dumps(items)
 
     return (
         '  <!-- ROLODEX -->\n'
         '  <section>\n'
         '    <div class="rolodex-header">\n'
-        '      <h2 class="section-title">ideas i <span class="highlight">like</span>..</h2>\n'
+        f'      <h2 class="section-title">{title}</h2>\n'
         '      <button class="bar-box" id="rolodex-refresh" aria-label="Shuffle">'
         '<span class="material-symbols-sharp">refresh</span></button>\n'
         '    </div>\n'
@@ -814,19 +855,13 @@ def render_rolodex(md):
     )
 
 
-def render_play_body(lately_md, interests_md, rolodex_md, photos):
-    """Play page body: intro + interests + lately + photo gallery + rolodex."""
-    intro_html = render_page_intro('during **play**,<br>i do **whatever i want**.')
-    lately_html = (
-        '  <!-- LATELY -->\n'
-        '  <section>\n'
-        '    <h2 class="section-title"><span class="highlight">lately</span>, i have been..</h2>\n'
-        + render_lately(lately_md) + '\n'
-        + '  </section>'
-    )
-    gallery_html = render_gallery(photos)
-    interests_html = render_interests(interests_md)
+def render_play_body(intro_md, lately_md, clicks_md, interests_md, rolodex_md, photos):
+    """Play page body: intro + lately + clicks + ideas + other stuff."""
+    intro_html = render_page_intro(intro_md.strip())
+    lately_html = render_lately(lately_md)
+    gallery_html = render_gallery(photos, clicks_md)
     rolodex_html = render_rolodex(rolodex_md)
+    interests_html = render_interests(interests_md)
     parts = [intro_html, lately_html]
     if gallery_html:
         parts.append(gallery_html)
@@ -900,16 +935,21 @@ def build():
     css = read(BASE / 'style.css')
     js = read(BASE / 'script.js')
 
-    meta_md = read(CONTENT / 'meta.md')
-    hero_md = read(CONTENT / 'hero.md')
-    about_md = read(CONTENT / 'about.md')
-    projects_md = read(CONTENT / 'projects.md')
-    lately_md = read(CONTENT / 'lately.md')
-    footer_md = read(CONTENT / 'footer.md')
-    work_md = read(CONTENT / 'work.md')
-    interests_md = read(CONTENT / 'interests.md')
-    rolodex_md = read(CONTENT / 'rolodex.md')
-    articles_md = read(CONTENT / 'articles.md')
+    meta_md    = read(CONTENT / 'meta.md')
+    footer_md  = read(CONTENT / 'footer.md')
+    hero_md    = read(CONTENT / 'hero.md')
+
+    work_intro_md   = read(CONTENT / 'work' / 'intro.md')
+    about_md        = read(CONTENT / 'work' / 'about.md')
+    toolkit_md      = read(CONTENT / 'work' / 'toolkit.md')
+    projects_md     = read(CONTENT / 'work' / 'projects.md')
+    articles_md     = read(CONTENT / 'work' / 'articles.md')
+
+    play_intro_md   = read(CONTENT / 'play' / 'intro.md')
+    lately_md       = read(CONTENT / 'play' / 'lately.md')
+    clicks_md       = read(CONTENT / 'play' / 'clicks.md')
+    ideas_md        = read(CONTENT / 'play' / 'ideas.md')
+    interests_md    = read(CONTENT / 'play' / 'interests.md')
 
     # Shared pieces
     meta_html = render_meta(meta_md)
@@ -922,9 +962,9 @@ def build():
     photos = fetch_glass_photos()
 
     # Page bodies
-    home_body = render_home_body(hero_md)
-    work_body = render_work_body(work_md, projects_md, articles_md, about_md)
-    play_body = render_play_body(lately_md, interests_md, rolodex_md, photos)
+    home_body = render_hero(hero_md)
+    work_body = render_work_body(work_intro_md, about_md, toolkit_md, projects_md, articles_md)
+    play_body = render_play_body(play_intro_md, lately_md, clicks_md, interests_md, ideas_md, photos)
 
     # Generate seasonal images
     month = datetime.now().month - 1  # 0-indexed

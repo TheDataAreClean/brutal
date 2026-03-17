@@ -78,7 +78,7 @@
     }
     ::selection {
       background: var(--accent);
-      color: var(--white);
+      color: var(--on-accent);
     }
     body {
       font-family: 'Schibsted Grotesk', sans-serif;
@@ -241,6 +241,7 @@
       padding: 8px 10px;
       opacity: 0.5;
       border-top: 1px solid currentColor;
+      white-space: normal;
     }
     nav {
       position: fixed;
@@ -798,11 +799,11 @@
   <div class="top-bar">
     <div class="nav-logo-wrap">
       <a class="nav-logo-home" href=""></a>
-      <button class="nav-logo-season" onclick="toggleSeasons(event)" aria-label="Change accent color"></button>
+      <button type="button" class="nav-logo-season" onclick="toggleSeasons(event)" aria-label="Change accent color"></button>
       <div class="season-dropdown" id="season-dropdown"></div>
     </div>
     <div class="top-bar-center">
-      <button class="bar-box" onclick="copyEmail()" aria-label="Copy email address">
+      <button type="button" class="bar-box" onclick="copyEmail()" aria-label="Copy email address">
         <span class="material-symbols-sharp">mail</span>
       </button>
       <a class="bar-box" href="https://www.instagram.com/thedataareclean/" target="_blank" rel="noopener" aria-label="Instagram">
@@ -812,7 +813,7 @@
         <svg viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
       </a>
     </div>
-    <button class="bar-box" onclick="toggleTheme()" aria-label="Toggle dark mode">
+    <button type="button" class="bar-box" onclick="toggleTheme()" aria-label="Toggle dark mode">
       <span class="material-symbols-sharp icon-moon">dark_mode</span>
       <span class="material-symbols-sharp icon-sun">light_mode</span>
     </button>
@@ -902,8 +903,8 @@
       if (save) sessionStorage.setItem('season', index);
     }
     // Restore season from session, else default to current month
-    var savedSeason = sessionStorage.getItem('season');
-    applySeason(savedSeason !== null ? Number(savedSeason) : new Date().getMonth());
+    var savedSeason = parseInt(sessionStorage.getItem('season'), 10);
+    applySeason(!isNaN(savedSeason) ? savedSeason : new Date().getMonth());
     // Build dropdown (safe DOM — no innerHTML)
     (function() {
       var dropdown = document.getElementById('season-dropdown');
@@ -914,7 +915,7 @@
         swatch.className = 'season-swatch';
         swatch.style.background = s.light;
         btn.appendChild(swatch);
-        btn.appendChild(document.createTextNode(monthNames[i] + ' \u2014 ' + s.name));
+        btn.appendChild(document.createTextNode(monthNames[i] + ' — ' + s.name));
         btn.onclick = function(e) {
           e.stopPropagation();
           applySeason(i, true);
@@ -924,7 +925,7 @@
       });
       var info = document.createElement('div');
       info.className = 'season-info';
-      info.textContent = 'colours from bengaluru\u2019s seasonal blooms';
+      info.textContent = "colours from bengaluru's seasonal blooms";
       dropdown.appendChild(info);
     })();
     function toggleSeasons(e) {
@@ -981,7 +982,7 @@
         return r.json().then(function(d) {
           var aqi = d.current.us_aqi;
           var label = aqi <= 50 ? 'Good' : aqi <= 100 ? 'Moderate' : aqi <= 150 ? 'Unhealthy for some' : aqi <= 200 ? 'Unhealthy' : 'Poor';
-          return aqi + ' \u2014 ' + label;
+          return aqi + ' — ' + label;
         });
       },
       function(v) { document.getElementById('aqi').textContent = v; },

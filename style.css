@@ -103,7 +103,7 @@
 
     ::selection {
       background: var(--accent);
-      color: var(--white);
+      color: var(--on-accent);
     }
 
     body {
@@ -273,6 +273,7 @@
       text-align: left;
     }
 
+    /* active always applies; hover only on pointer devices — kept separate intentionally */
     .season-option.active {
       background: var(--accent);
       color: var(--on-accent);
@@ -295,6 +296,7 @@
       padding: 8px 10px;
       opacity: 0.5;
       border-top: 1px solid currentColor;
+      white-space: normal;
     }
 
     /* ---- BOTTOM NAV (fixed) ---- */
