@@ -152,6 +152,26 @@ def read(path):
     return Path(path).read_text()
 
 
+def parse_labels(md):
+    """Parse labels.md into a dict of key: value pairs."""
+    labels = {}
+    for line in md.strip().split('\n'):
+        stripped = line.strip()
+        if stripped.startswith('- '):
+            key, _, value = stripped[2:].partition(':')
+            labels[key.strip()] = value.strip()
+    return labels
+
+
+def slugify(text):
+    """Convert a project name to a URL slug."""
+    text = text.lower()
+    text = re.sub(r'[^\w\s-]', '', text)
+    text = re.sub(r'[\s_]+', '-', text)
+    text = re.sub(r'-+', '-', text)
+    return text.strip('-')
+
+
 def parse_inline(text):
     """Convert [text](url) to <a> tags."""
     return re.sub(
@@ -161,14 +181,17 @@ def parse_inline(text):
     )
 
 
+def _apply_span(text, cls):
+    """Convert **bold** to <span class="{cls}">bold</span>."""
+    return re.sub(r'\*\*(.+?)\*\*', rf'<span class="{cls}">\1</span>', text)
+
+
 def apply_highlight(text):
-    """Convert **bold** to <span class="highlight">bold</span>."""
-    return re.sub(r'\*\*(.+?)\*\*', r'<span class="highlight">\1</span>', text)
+    return _apply_span(text, 'highlight')
 
 
 def apply_name(text):
-    """Convert **bold** to <span class="name">bold</span> (used in hero/intro)."""
-    return re.sub(r'\*\*(.+?)\*\*', r'<span class="name">\1</span>', text)
+    return _apply_span(text, 'name')
 
 
 def parse_kv_list(text):
@@ -188,8 +211,6 @@ def render_meta(md):
     desc = items.get('description', '')
     url = items.get('url', '')
     image = items.get('image', '')
-    twitter = items.get('twitter', '')
-
     favicon = items.get('favicon', '')
     image_url = url.rstrip('/') + '/' + image if image and not image.startswith('http') else image
 
@@ -206,7 +227,6 @@ def render_meta(md):
         f'  <meta name="twitter:title" content="{title}">\n'
         f'  <meta name="twitter:description" content="{desc}">\n'
         f'  <meta name="twitter:image" content="{image_url}">'
-        + (f'\n  <meta name="twitter:site" content="@{twitter}">' if twitter else '')
     )
 
 
@@ -292,43 +312,42 @@ def render_about(md):
     )
 
 
-def render_projects(md):
-    lines = md.strip().split('\n')
-    title = ''
+def render_projects(heading_md, project_mds, labels):
+    """Render the projects grid from a list of individual project markdown strings."""
+    title = apply_highlight(heading_md.strip().lstrip('# '))
+    case_study_label = labels.get('case-study', 'case study')
     projects = []
-    current_project = None
 
-    for line in lines:
-        stripped = line.strip()
-        if stripped.startswith('# '):
-            title = stripped[2:]
-        elif stripped.startswith('## '):
-            if current_project:
-                projects.append(current_project)
-            current_project = {'name': stripped[3:], 'role': '', 'url': '', 'desc': ''}
-        elif stripped.startswith('- ') and current_project:
-            key, _, value = stripped[2:].partition(':')
-            key = key.strip()
-            value = value.strip()
-            if key in ('role', 'url', 'desc'):
-                current_project[key] = value
-
-    if current_project:
-        projects.append(current_project)
-
-    title = apply_highlight(title)
+    for md in project_mds:
+        p = {'name': '', 'role': '', 'url': '', 'desc': '', 'slug': ''}
+        for line in md.strip().split('\n'):
+            stripped = line.strip()
+            if stripped.startswith('# '):
+                p['name'] = stripped[2:]
+                p['slug'] = slugify(stripped[2:])
+            elif stripped.startswith('- ') and not stripped.startswith('## '):
+                key, _, value = stripped[2:].partition(':')
+                key = key.strip()
+                value = value.strip()
+                if key in ('role', 'url', 'desc'):
+                    p[key] = value
+            elif stripped.startswith('## '):
+                break  # stop at first section heading
+        if p['name']:
+            projects.append(p)
 
     proj_parts = []
     for p in projects:
         desc = parse_inline(p['desc'])
         proj_parts.append(
             f'      <div class="project">\n'
-            f'        <a class="project-top" href="{p["url"]}" target="_blank" rel="noopener">\n'
-            f'          <span class="project-name">{p["name"]}</span>\n'
-            '          <span class="project-arrow"><span class="material-symbols-sharp">arrow_outward</span></span>\n'
-            '        </a>\n'
+            f'        <span class="project-name">{p["name"]}</span>\n'
             f'        <span class="project-role">{p["role"]}</span>\n'
             f'        <span class="project-desc">{desc}</span>\n'
+            '        <div class="project-actions">\n'
+            f'          <a class="bar-box project-visit" href="{p["url"]}" target="_blank" rel="noopener" aria-label="Visit site"><span class="material-symbols-sharp">arrow_outward</span></a>\n'
+            f'          <a class="bar-box project-casestudy" href="{{{{nav_root}}}}work/{p["slug"]}/">{case_study_label}</a>\n'
+            '        </div>\n'
             '      </div>'
         )
 
@@ -347,7 +366,7 @@ def render_projects(md):
     )
 
 
-def render_articles(md):
+def render_articles(md, labels):
     """Parse articles.md into a list of article cards."""
     lines = md.strip().split('\n')
     title = ''
@@ -374,8 +393,9 @@ def render_articles(md):
 
     title = apply_highlight(title)
 
+    initial = 6
     parts = []
-    for a in articles:
+    for idx, a in enumerate(articles):
         date_html = f' <span class="article-date">{a["date"]}</span>' if a['date'] else ''
         tags_html = ''
         if a.get('tags'):
@@ -386,8 +406,9 @@ def render_articles(md):
             )
             if tag_spans:
                 tags_html = f'\n        <span class="article-tags">{tag_spans}</span>'
+        hidden = ' article-hidden' if idx >= initial else ''
         parts.append(
-            f'      <a class="article" href="{a["url"]}" target="_blank" rel="noopener">\n'
+            f'      <a class="article{hidden}" href="{a["url"]}" target="_blank" rel="noopener">\n'
             f'        <span class="article-name">{a["name"]}</span>\n'
             f'        <span class="article-meta"><span class="article-publisher">{a["publisher"]}</span>{date_html}</span>{tags_html}\n'
             '        <span class="article-arrow"><span class="material-symbols-sharp">arrow_outward</span></span>\n'
@@ -395,6 +416,19 @@ def render_articles(md):
         )
 
     articles_inner = '\n'.join(parts)
+
+    show_more_label = labels.get('show-more', 'show more')
+    has_more = len(articles) > initial
+    show_more = (
+        f'    <button type="button" class="bar-box articles-show-more" id="articles-show-more" aria-label="{show_more_label}">'
+        f'{show_more_label} <span class="material-symbols-sharp">keyboard_arrow_down</span></button>\n'
+        f'    <script>!function(){{var batch={initial};'
+        'document.getElementById("articles-show-more").addEventListener("click",function(){'
+        'var hidden=Array.from(document.querySelectorAll(".article-hidden"));'
+        'hidden.slice(0,batch).forEach(function(el){{el.classList.remove("article-hidden");}});'
+        'if(!document.querySelector(".article-hidden"))this.remove();'
+        '});}();</script>\n'
+    ) if has_more else ''
 
     return (
         '  <!-- ARTICLES -->\n'
@@ -405,7 +439,8 @@ def render_articles(md):
         '    <div class="articles">\n'
         f'{articles_inner}\n'
         '    </div>\n'
-        '  </section>'
+        + show_more
+        + '  </section>'
     )
 
 
@@ -652,8 +687,16 @@ def fetch_glass_photos():
         return []
 
 
-def render_gallery(photos, heading_md='', num_cols=3, initial=9):
-    """Render masonry gallery with EXIF info overlays, show-more, and round-robin columns."""
+def render_gallery(photos, heading_md='', labels=None, num_cols=3, initial=9, gallery_url=None):
+    """Render masonry gallery with EXIF info overlays and lightbox.
+
+    Items are output sequentially; JS redistributes them round-robin into the
+    correct number of columns for the viewport (3 desktop / 2 tablet / 1 mobile),
+    giving left-to-right reading order at every breakpoint.
+
+    gallery_url: when set, replaces show-more with a "view all" link to this URL
+    initial: number of photos visible; None means show all
+    """
     if not photos:
         return ''
 
@@ -662,97 +705,236 @@ def render_gallery(photos, heading_md='', num_cols=3, initial=9):
         if line.strip().startswith('# '):
             title = line.strip()[2:]
             break
-    title = apply_highlight(title)
+    title = apply_highlight(title) if title else ''
 
-    # Distribute photos round-robin across columns
-    cols = [[] for _ in range(num_cols)]
-    for i, photo in enumerate(photos):
-        cols[i % num_cols].append((i, photo))
+    effective_initial = initial if initial is not None else len(photos)
 
-    col_parts = []
-    for col in cols:
-        items = []
-        for idx, photo in col:
-            desc = escape(photo['description'])
-            hidden = ' gallery-hidden' if idx >= initial else ''
+    items = []
+    for idx, photo in enumerate(photos):
+        desc = escape(photo['description'])
+        hidden = ' gallery-hidden' if idx >= effective_initial else ''
 
-            # Build info overlay: name, date, then everything else
-            info_lines = []
-            if desc:
-                info_lines.append(f'<span class="gallery-info-title">{desc}</span>')
-            if photo.get('date'):
-                info_lines.append(f'<span>{escape(photo["date"])}</span>')
-            if photo.get('camera'):
-                info_lines.append(f'<span class="gallery-info-camera">{escape(photo["camera"])}</span>')
-            exif_parts = []
-            if photo.get('aperture'):
-                exif_parts.append(escape(photo['aperture']))
-            if photo.get('shutter'):
-                exif_parts.append(escape(photo['shutter']))
-            if photo.get('iso'):
-                exif_parts.append('ISO ' + escape(photo['iso']))
-            if exif_parts:
-                info_lines.append(f'<span>{" &middot; ".join(exif_parts)}</span>')
-            if photo.get('focal'):
-                info_lines.append(f'<span>{escape(photo["focal"])}</span>')
+        info_lines = []
+        if desc:
+            info_lines.append(f'<span class="gallery-info-title">{desc}</span>')
+        if photo.get('date'):
+            info_lines.append(f'<span>{escape(photo["date"])}</span>')
+        if photo.get('camera'):
+            info_lines.append(f'<span class="gallery-info-camera">{escape(photo["camera"])}</span>')
+        exif_parts = []
+        if photo.get('aperture'):
+            exif_parts.append(escape(photo['aperture']))
+        if photo.get('shutter'):
+            exif_parts.append(escape(photo['shutter']))
+        if photo.get('iso'):
+            exif_parts.append('ISO ' + escape(photo['iso']))
+        if exif_parts:
+            info_lines.append(f'<span>{" &middot; ".join(exif_parts)}</span>')
+        if photo.get('focal'):
+            info_lines.append(f'<span>{escape(photo["focal"])}</span>')
 
-            info_btn = ''
-            info_overlay = ''
-            if info_lines:
-                info_btn = (
-                    '\n            <button class="gallery-info-btn" aria-label="Toggle photo info">'
-                    '<span class="material-symbols-sharp gallery-icon-info">info</span>'
-                    '<span class="material-symbols-sharp gallery-icon-close">close</span>'
-                    '</button>'
-                )
-                overlay_inner = ''.join(f'\n              {l}' for l in info_lines)
-                info_overlay = f'\n            <div class="gallery-info-overlay">{overlay_inner}\n            </div>'
-
-            items.append(
-                f'        <figure class="gallery-item{hidden}" style="order:{idx}">\n'
-                f'          <div class="gallery-img-wrap">\n'
-                f'            <img src="{photo["url"]}" alt="{desc or f"Photo {idx + 1}"}" loading="lazy">{info_btn}{info_overlay}\n'
-                f'          </div>\n'
-                f'        </figure>'
+        info_btn = ''
+        info_overlay = ''
+        if info_lines:
+            info_btn = (
+                '\n          <button type="button" class="gallery-info-btn" aria-label="Toggle photo info">'
+                '<span class="material-symbols-sharp gallery-icon-info">info</span>'
+                '<span class="material-symbols-sharp gallery-icon-close">close</span>'
+                '</button>'
             )
-        col_parts.append(
-            '      <div class="gallery-col">\n'
-            + '\n'.join(items) + '\n'
-            + '      </div>'
+            overlay_inner = ''.join(f'\n            {l}' for l in info_lines)
+            info_overlay = f'\n          <div class="gallery-info-overlay">{overlay_inner}\n          </div>'
+
+        loading = 'eager' if idx < num_cols else 'lazy'
+        items.append(
+            f'      <figure class="gallery-item{hidden}" data-photo-idx="{idx}">\n'
+            f'        <div class="gallery-img-wrap">\n'
+            f'          <img src="{photo["url"]}" alt="{desc or f"Photo {idx + 1}"}" loading="{loading}">{info_btn}{info_overlay}\n'
+            f'        </div>\n'
+            f'      </figure>'
         )
 
-    has_more = len(photos) > initial
-    show_more = (
-        '    <button class="bar-box gallery-show-more" id="gallery-show-more">show more <span class="material-symbols-sharp">keyboard_arrow_down</span></button>\n'
-        '    <script>!function(){var batch=' + str(initial) + ';'
-        'document.getElementById("gallery-show-more").addEventListener("click",function(){'
-        'var hidden=Array.from(document.querySelectorAll(".gallery-hidden"));'
-        'hidden.sort(function(a,b){return(+a.style.order)-(+b.style.order);});'
-        'for(var i=0;i<batch&&i<hidden.length;i++){hidden[i].classList.remove("gallery-hidden");}'
-        'if(!document.querySelector(".gallery-hidden"))this.remove();'
-        '});}();</script>\n'
-    ) if has_more else ''
+    # JS distributes items into columns based on viewport; re-runs on resize
+    layout_js = (
+        '    <script>!function(){'
+        'var lastN=0;'
+        'function layout(){'
+        'var w=window.innerWidth;'
+        'var n=w<=768?1:w<=1024?2:3;'
+        'if(n===lastN)return;'
+        'lastN=n;'
+        'var g=document.querySelector(".gallery");'
+        'if(!g)return;'
+        'var items=Array.from(g.querySelectorAll(".gallery-item")).sort(function(a,b){return(+a.dataset.photoIdx)-(+b.dataset.photoIdx);});'
+        'Array.from(g.querySelectorAll(".gallery-col")).forEach(function(c){c.remove();});'
+        'var cols=[];'
+        'for(var i=0;i<n;i++){'
+        'var col=document.createElement("div");'
+        'col.className="gallery-col";'
+        'g.appendChild(col);'
+        'cols.push(col);'
+        '}'
+        'items.forEach(function(item,i){cols[i%n].appendChild(item);});'
+        '}'
+        'layout();'
+        'window.addEventListener("resize",layout);'
+        '}();</script>\n'
+    )
 
-    # Info toggle JS (event delegation)
+    if gallery_url:
+        view_all_label = (labels or {}).get('view-all', 'view all photos')
+        show_more = (
+            f'    <a class="bar-box gallery-view-all" href="{gallery_url}">{view_all_label} '
+            '<span class="material-symbols-sharp">arrow_outward</span></a>\n'
+        )
+    else:
+        show_more_label = (labels or {}).get('show-more', 'show more')
+        has_more = len(photos) > effective_initial
+        show_more = (
+            f'    <button type="button" class="bar-box gallery-show-more" id="gallery-show-more" aria-label="{show_more_label}">{show_more_label} <span class="material-symbols-sharp">keyboard_arrow_down</span></button>\n'
+            '    <script>!function(){var batch=' + str(effective_initial) + ';'
+            'document.getElementById("gallery-show-more").addEventListener("click",function(){'
+            'var hidden=Array.from(document.querySelectorAll(".gallery-hidden"));'
+            'hidden.sort(function(a,b){return(+a.dataset.photoIdx)-(+b.dataset.photoIdx);});'
+            'for(var i=0;i<batch&&i<hidden.length;i++){hidden[i].classList.remove("gallery-hidden");}'
+            'if(!document.querySelector(".gallery-hidden"))this.remove();'
+            '});}();</script>\n'
+        ) if has_more else ''
+
+    # Info toggle JS — stops propagation so info button doesn't open lightbox
     info_js = (
         '    <script>!function(){'
-        'var g=document.querySelector(".gallery");'
-        'if(g)g.addEventListener("click",function(e){'
-        'var btn=e.target.closest(".gallery-info-btn");'
-        'if(btn)btn.parentElement.classList.toggle("info-open");'
+        'document.querySelectorAll(".gallery-info-btn").forEach(function(btn){'
+        'btn.addEventListener("click",function(e){'
+        'e.stopPropagation();'
+        'btn.parentElement.classList.toggle("info-open");'
+        '});'
         '});}();</script>\n'
     )
+
+    # Build photos JSON for lightbox (HTML-escape all strings)
+    photos_data = [
+        {
+            'url': p['url'],
+            'desc': escape(p['description'].strip()),
+            'date': escape(p.get('date', '').strip()),
+            'camera': escape((p.get('camera') or '').strip()),
+            'aperture': escape((p.get('aperture') or '').strip()),
+            'shutter': escape((p.get('shutter') or '').strip()),
+            'iso': escape((p.get('iso') or '').strip()),
+            'focal': escape((p.get('focal') or '').strip()),
+        }
+        for p in photos
+    ]
+    photos_json = json.dumps(photos_data)
+
+    lightbox_html = (
+        '  <div class="lightbox" id="gallery-lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer">\n'
+        '    <div class="lightbox-header">\n'
+        '      <button type="button" class="lightbox-btn lightbox-close" id="lightbox-close" aria-label="Close">'
+        '<span class="material-symbols-sharp">close</span></button>\n'
+        '    </div>\n'
+        '    <div class="lightbox-body">\n'
+        '      <div class="lightbox-frame">\n'
+        '        <img class="lightbox-img" id="lightbox-img" src="" alt="">\n'
+        '      </div>\n'
+        '      <div class="lightbox-sidebar">\n'
+        '        <div class="lightbox-meta" id="lightbox-meta"></div>\n'
+        '        <div class="lightbox-nav">\n'
+        '          <button type="button" class="lightbox-btn" id="lightbox-prev" aria-label="Previous photo">←</button>\n'
+        '          <span class="lightbox-counter" id="lightbox-counter"></span>\n'
+        '          <button type="button" class="lightbox-btn" id="lightbox-next" aria-label="Next photo">→</button>\n'
+        '        </div>\n'
+        '      </div>\n'
+        '    </div>\n'
+        '  </div>\n'
+    )
+
+    lightbox_js = (
+        '    <script>!function(){'
+        f'var photos={photos_json};'
+        'var lb=document.getElementById("gallery-lightbox");'
+        'document.body.appendChild(lb);'
+        'var lbImg=document.getElementById("lightbox-img");'
+        'var lbMeta=document.getElementById("lightbox-meta");'
+        'var lbCounter=document.getElementById("lightbox-counter");'
+        'var cur=0;'
+        'function show(i){'
+        'cur=(i+photos.length)%photos.length;'
+        'var p=photos[cur];'
+        'lbImg.src=p.url;lbImg.alt=p.desc||"Photo "+(cur+1);'
+        'var m="";'
+        'm+=\'<span class="lightbox-title">\'+p.desc+"</span>";'
+        'm+="<span>"+p.date+"</span>";'
+        'm+=\'<span class="lightbox-camera">\'+p.camera+"</span>";'
+        'var ex=[];'
+        'if(p.aperture)ex.push(p.aperture);'
+        'if(p.shutter)ex.push(p.shutter);'
+        'if(p.iso)ex.push("ISO "+p.iso);'
+        'm+="<span>"+ex.join(" \u00b7 ")+"</span>";'
+        'm+="<span>"+p.focal+"</span>";'
+        'lbMeta.innerHTML=m;'
+        'lbCounter.textContent=(cur+1)+" / "+photos.length;'
+        'lb.classList.add("open");'
+        'document.getElementById("lightbox-close").focus();'
+        '}'
+        'function closeLb(){lb.classList.remove("open");}'
+        'document.querySelectorAll(".gallery-item").forEach(function(fig){'
+        'fig.addEventListener("click",function(e){'
+        'if(e.target.closest(".gallery-info-btn"))return;'
+        'show(+fig.dataset.photoIdx);'
+        '});'
+        '});'
+        'document.getElementById("lightbox-close").addEventListener("click",closeLb);'
+        'document.getElementById("lightbox-prev").addEventListener("click",function(){show(cur-1);});'
+        'document.getElementById("lightbox-next").addEventListener("click",function(){show(cur+1);});'
+        'lb.addEventListener("click",function(e){if(e.target===lb)closeLb();});'
+        'document.addEventListener("keydown",function(e){'
+        'if(!lb.classList.contains("open"))return;'
+        'if(e.key==="Escape")closeLb();'
+        'if(e.key==="ArrowLeft")show(cur-1);'
+        'if(e.key==="ArrowRight")show(cur+1);'
+        '});'
+        '}();</script>\n'
+    )
+
+    title_html = f'    <h2 class="section-title">{title}</h2>\n' if title else ''
 
     return (
         '  <!-- GALLERY -->\n'
         '  <section>\n'
-        f'    <h2 class="section-title">{title}</h2>\n'
-        '    <div class="gallery">\n'
-        + '\n'.join(col_parts) + '\n'
+        + title_html
+        + '    <div class="gallery">\n'
+        + '\n'.join(items) + '\n'
         + '    </div>\n'
+        + layout_js
         + show_more
         + info_js
-        + '  </section>'
+        + '  </section>\n'
+        + lightbox_html
+        + lightbox_js
+    )
+
+
+def render_gallery_page(photos, heading_md, labels):
+    """Render the gallery index page body (all photos, lightbox on click)."""
+    title = ''
+    for line in heading_md.strip().split('\n'):
+        if line.strip().startswith('# '):
+            title = line.strip()[2:]
+            break
+    title = apply_highlight(title) if title else 'gallery'
+
+    back_label = labels.get('back-to-play', '← back to play')
+    gallery_html = render_gallery(photos, labels=labels, initial=None)
+
+    return (
+        '  <!-- GALLERY PAGE HEADER -->\n'
+        '  <section class="project-header">\n'
+        f'    <h1>{title}</h1>\n'
+        f'    <a class="bar-box project-back" href="../">{back_label}</a>\n'
+        '  </section>\n\n'
+        + gallery_html
     )
 
 
@@ -766,13 +948,13 @@ def render_page_intro(text):
     )
 
 
-def render_work_body(intro_md, about_md, toolkit_md, projects_md, articles_md):
+def render_work_body(intro_md, about_md, toolkit_md, projects_heading_md, project_mds, articles_md, labels):
     """Work page body: intro + about + toolkit + projects + articles."""
     intro_html = render_page_intro(intro_md.strip())
     about_html = render_about(about_md)
     work_html = render_toolkit(toolkit_md)
-    projects_html = render_projects(projects_md)
-    articles_html = render_articles(articles_md)
+    projects_html = render_projects(projects_heading_md, project_mds, labels)
+    articles_html = render_articles(articles_md, labels)
     return intro_html + '\n\n' + about_html + '\n\n' + work_html + '\n\n' + projects_html + '\n\n' + articles_html
 
 
@@ -834,7 +1016,7 @@ def render_rolodex(md):
         '  <section>\n'
         '    <div class="rolodex-header">\n'
         f'      <h2 class="section-title">{title}</h2>\n'
-        '      <button class="bar-box" id="rolodex-refresh" aria-label="Shuffle">'
+        '      <button type="button" class="bar-box" id="rolodex-refresh" aria-label="Shuffle">'
         '<span class="material-symbols-sharp">refresh</span></button>\n'
         '    </div>\n'
         '    <div class="rolodex" id="rolodex"></div>\n'
@@ -855,11 +1037,106 @@ def render_rolodex(md):
     )
 
 
-def render_play_body(intro_md, lately_md, clicks_md, interests_md, rolodex_md, photos):
+def render_project_page(md, labels):
+    """Parse a project detail markdown file into a case study page body."""
+    lines = md.strip().split('\n')
+    name = ''
+    role = ''
+    url = ''
+    section = None
+    section_headings = {}  # section_key -> display heading from markdown
+    section_order = ['overview', 'contribution', 'highlights']
+    section_idx = 0
+    overview_lines = []
+    contribution_items = []
+    highlight_items = []
+
+    for line in lines:
+        stripped = line.strip()
+        if stripped.startswith('# '):
+            name = stripped[2:]
+        elif stripped.startswith('- role:'):
+            role = stripped[7:].strip()
+        elif stripped.startswith('- url:'):
+            url = stripped[6:].strip()
+        elif stripped.startswith('## ') and not stripped.startswith('- '):
+            if section_idx < len(section_order):
+                key = section_order[section_idx]
+                section_headings[key] = stripped[3:]
+                section = key
+                section_idx += 1
+        elif section == 'overview' and stripped and not stripped.startswith('- '):
+            overview_lines.append(stripped)
+        elif section == 'contribution' and stripped.startswith('- '):
+            contribution_items.append(stripped[2:])
+        elif section == 'highlights' and stripped.startswith('- '):
+            highlight_items.append(stripped[2:])
+
+    overview_heading = section_headings.get('overview', 'overview')
+    contrib_heading = section_headings.get('contribution', 'what i did')
+    highlights_heading = section_headings.get('highlights', 'highlights')
+
+    visit_label = labels.get('visit-site', 'visit site')
+    back_label = labels.get('back-to-work', '← back to work')
+
+    overview_html = '\n'.join(
+        f'        <p>{p}</p>' for p in overview_lines
+    )
+    contrib_html = '\n'.join(
+        f'        <li>{item}</li>' for item in contribution_items
+    )
+    highlights_html = '\n'.join(
+        f'        <div class="project-highlight">{parse_inline(item)}</div>'
+        for item in highlight_items
+    )
+
+    visit_btn = (
+        f'    <a class="bar-box project-back" href="{url}" target="_blank" rel="noopener">'
+        f'{visit_label} <span class="material-symbols-sharp">arrow_outward</span></a>\n'
+    ) if url else ''
+
+    last_section = (
+        '  <section>\n'
+        f'    <h2 class="section-title">{highlights_heading}</h2>\n'
+        '    <div class="project-highlights">\n'
+        f'{highlights_html}\n'
+        '    </div>\n'
+        f'    <a class="bar-box project-back" href="../">{back_label}</a>\n'
+        '  </section>'
+        if highlights_html else
+        '  <section>\n'
+        f'    <a class="bar-box project-back" href="../">{back_label}</a>\n'
+        '  </section>'
+    )
+
+    return (
+        '  <!-- PROJECT DETAIL -->\n'
+        '  <section class="project-header">\n'
+        f'    <h1>{name}</h1>\n'
+        f'    <p class="project-role">{role}</p>\n'
+        f'    {visit_btn}'
+        '  </section>\n\n'
+        '  <section>\n'
+        f'    <h2 class="section-title">{overview_heading}</h2>\n'
+        '    <div class="project-detail-text">\n'
+        f'{overview_html}\n'
+        '    </div>\n'
+        '  </section>\n\n'
+        '  <section>\n'
+        f'    <h2 class="section-title">{contrib_heading}</h2>\n'
+        '    <ul class="project-detail-list">\n'
+        f'{contrib_html}\n'
+        '    </ul>\n'
+        '  </section>\n\n'
+        + last_section
+    )
+
+
+def render_play_body(intro_md, lately_md, clicks_md, interests_md, rolodex_md, photos, labels):
     """Play page body: intro + lately + clicks + ideas + other stuff."""
     intro_html = render_page_intro(intro_md.strip())
     lately_html = render_lately(lately_md)
-    gallery_html = render_gallery(photos, clicks_md)
+    gallery_html = render_gallery(photos, clicks_md, labels, gallery_url='photos/')
     rolodex_html = render_rolodex(rolodex_md)
     interests_html = render_interests(interests_md)
     parts = [intro_html, lately_html]
@@ -870,7 +1147,7 @@ def render_play_body(intro_md, lately_md, clicks_md, interests_md, rolodex_md, p
     return '\n\n'.join(parts)
 
 
-def render_page(template, css, js, meta_html, footer_html, body_html, active_nav, depth=0):
+def render_page(template, css, js, meta_html, footer_html, body_html, active_nav, depth=0, labels=None):
     """Assemble a full HTML page with shared nav/footer, inlined CSS/JS."""
     prefix = '../' * depth if depth > 0 else ''
 
@@ -878,6 +1155,8 @@ def render_page(template, css, js, meta_html, footer_html, body_html, active_nav
     html = html.replace('{{meta}}', meta_html)
     html = html.replace('{{body}}', body_html)
     html = html.replace('{{footer}}', footer_html)
+    html = html.replace('{{toast_email_copied}}', (labels or {}).get('email-copied', 'email copied'))
+    html = html.replace('{{season_info}}', (labels or {}).get('season-info', ''))
 
     # Nav active states
     html = html.replace('{{nav_root}}', prefix)
@@ -940,16 +1219,18 @@ def build():
     hero_md    = read(CONTENT / 'hero.md')
 
     work_intro_md   = read(CONTENT / 'work' / 'intro.md')
-    about_md        = read(CONTENT / 'work' / 'about.md')
-    toolkit_md      = read(CONTENT / 'work' / 'toolkit.md')
-    projects_md     = read(CONTENT / 'work' / 'projects.md')
-    articles_md     = read(CONTENT / 'work' / 'articles.md')
+    about_md            = read(CONTENT / 'work' / 'about.md')
+    toolkit_md          = read(CONTENT / 'work' / 'toolkit.md')
+    projects_heading_md = read(CONTENT / 'work' / 'projects.md')
+    articles_md         = read(CONTENT / 'work' / 'articles.md')
 
     play_intro_md   = read(CONTENT / 'play' / 'intro.md')
     lately_md       = read(CONTENT / 'play' / 'lately.md')
     clicks_md       = read(CONTENT / 'play' / 'clicks.md')
     ideas_md        = read(CONTENT / 'play' / 'ideas.md')
     interests_md    = read(CONTENT / 'play' / 'interests.md')
+
+    labels = parse_labels(read(CONTENT / 'labels.md'))
 
     # Shared pieces
     meta_html = render_meta(meta_md)
@@ -961,10 +1242,27 @@ def build():
     # Fetch Glass.photo images
     photos = fetch_glass_photos()
 
+    # Project files (shared by grid cards and detail pages)
+    project_detail_files = sorted((CONTENT / 'work' / 'projects').glob('*.md'))
+    project_mds = [read(f) for f in project_detail_files]
+
     # Page bodies
     home_body = render_hero(hero_md)
-    work_body = render_work_body(work_intro_md, about_md, toolkit_md, projects_md, articles_md)
-    play_body = render_play_body(play_intro_md, lately_md, clicks_md, interests_md, ideas_md, photos)
+    work_body = render_work_body(work_intro_md, about_md, toolkit_md, projects_heading_md, project_mds, articles_md, labels)
+    play_body = render_play_body(play_intro_md, lately_md, clicks_md, interests_md, ideas_md, photos, labels)
+
+    # Project detail pages
+    project_pages = [
+        (f'work/{f.stem}/index.html', render_project_page(md, labels), 'work', 2)
+        for f, md in zip(project_detail_files, project_mds)
+    ]
+
+    # Gallery index page (all photos, lightbox on click)
+    gallery_pages = []
+    if photos:
+        gallery_pages.append(
+            ('play/photos/index.html', render_gallery_page(photos, clicks_md, labels), 'play', 2)
+        )
 
     # Generate seasonal images
     month = datetime.now().month - 1  # 0-indexed
@@ -980,12 +1278,14 @@ def build():
         ('index.html', home_body, 'home', 0),
         ('work/index.html', work_body, 'work', 1),
         ('play/index.html', play_body, 'play', 1),
+        *project_pages,
+        *gallery_pages,
     ]
 
     DIST.mkdir(exist_ok=True)
 
     for path, body, active, depth in pages:
-        html = render_page(template, css, js, meta_html, footer_html, body, active, depth)
+        html = render_page(template, css, js, meta_html, footer_html, body, active, depth, labels=labels)
         out = DIST / path
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(html)

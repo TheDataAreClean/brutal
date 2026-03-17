@@ -6,12 +6,12 @@
       sessionStorage.setItem('theme', next);
     }
 
-    function copyEmail() {
-      navigator.clipboard.writeText('hello@thedataareclean.com').then(function() {
+    function copyEmail(btn) {
+      navigator.clipboard.writeText(btn.dataset.email).then(function() {
         var toast = document.getElementById('toast');
         toast.classList.add('visible');
         setTimeout(function() { toast.classList.remove('visible'); }, 2000);
-      });
+      }).catch(function() {});
     }
 
     // Restore theme from session, else match OS
@@ -78,7 +78,7 @@
       });
       var info = document.createElement('div');
       info.className = 'season-info';
-      info.textContent = "colours from bengaluru's seasonal blooms";
+      info.textContent = dropdown.dataset.info || '';
       dropdown.appendChild(info);
     })();
 

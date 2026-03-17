@@ -53,6 +53,18 @@
       --gallery-btn-border: rgba(255,255,255,0.5);
       --gallery-btn-border-hover: rgba(255,255,255,0.8);
       --gallery-btn-color: rgba(255,255,255,0.8);
+      --lightbox-bg: rgba(0,0,0,0.95);
+      --lightbox-frame-border: rgba(255,255,255,0.12);
+      --lightbox-text: rgba(255,255,255,0.7);
+      --lightbox-btn-border: rgba(255,255,255,0.3);
+      --lightbox-btn-border-hover: rgba(255,255,255,0.6);
+      --lightbox-btn-hover-bg: rgba(255,255,255,0.1);
+      --inner-gap: 8px;
+      --gallery-info-btn-sz: 28px;
+      --gallery-info-btn-offset: 8px;
+      --icon-sz: 16px;
+      --icon-sz-lg: 18px;
+      --nav-logo-season-sz: 14px;
       --accent: var(--accent-light);
       --accent-light: #7d4abf;
       --accent-dark: #a878d8;
@@ -64,6 +76,8 @@
       --box-gap: var(--space-sm);
       --box-pad: 12px 16px;
       --bar-h: 40px;
+      --bar-pad: 20px;
+      --btn-pad-x: 16px;
       --text-display: clamp(32px, 9vw, 128px);
       --text-heading: clamp(24px, 4vw, 36px);
       --text-subhead: clamp(18px, 2.5vw, 24px);
@@ -120,7 +134,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 20px var(--padding) var(--box-gap);
+      padding: var(--bar-pad) var(--padding) var(--box-gap);
       background: var(--white);
     }
     .top-bar-center {
@@ -140,15 +154,15 @@
       top: 0;
       left: 0;
       right: 0;
-      bottom: 14px;
+      bottom: var(--nav-logo-season-sz);
       cursor: pointer;
     }
     .nav-logo-season {
       position: absolute;
       bottom: 0;
       left: 0;
-      width: 14px;
-      height: 14px;
+      width: var(--nav-logo-season-sz);
+      height: var(--nav-logo-season-sz);
       background: var(--black);
       border: none;
       cursor: pointer;
@@ -180,12 +194,12 @@
       }
     }
     .bar-box .material-symbols-sharp {
-      font-size: 18px;
+      font-size: var(--icon-sz-lg);
       font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 18;
     }
     .bar-box svg {
-      width: 16px;
-      height: 16px;
+      width: var(--icon-sz);
+      height: var(--icon-sz);
       fill: currentColor;
     }
     .icon-sun { display: none; }
@@ -211,7 +225,7 @@
     .season-option {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: var(--inner-gap);
       padding: 6px 10px;
       cursor: pointer;
       background: none;
@@ -252,7 +266,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: var(--box-gap) var(--padding) 20px;
+      padding: var(--box-gap) var(--padding) var(--bar-pad);
       background: var(--white);
     }
     .nav-link-box {
@@ -260,7 +274,7 @@
       height: var(--bar-h);
       display: inline-flex;
       align-items: center;
-      padding: 0 16px;
+      padding: 0 var(--btn-pad-x);
       font-size: var(--text-ui);
       font-weight: 700;
       letter-spacing: 1px;
@@ -283,17 +297,22 @@
     }
     .content-box {
       position: fixed;
-      top: calc(var(--bar-h) + 20px + 2 * var(--box-gap));
-      bottom: calc(var(--bar-h) + 20px + 2 * var(--box-gap));
+      top: calc(var(--bar-h) + var(--bar-pad) + 2 * var(--box-gap));
+      bottom: calc(var(--bar-h) + var(--bar-pad) + 2 * var(--box-gap));
       left: var(--padding);
       right: var(--padding);
       border: 1px solid var(--black);
       overflow-y: auto;
-      scrollbar-width: none;
+      scrollbar-width: thin;
+      scrollbar-color: var(--accent) transparent;
       padding: var(--box-gap) 0;
     }
     .content-box::-webkit-scrollbar {
-      display: none;
+      width: 4px;
+      background: transparent;
+    }
+    .content-box::-webkit-scrollbar-thumb {
+      background: var(--accent);
     }
     .toast {
       height: var(--bar-h);
@@ -304,7 +323,7 @@
       font-size: var(--text-ui);
       font-weight: 700;
       letter-spacing: 1px;
-      padding: 0 16px;
+      padding: 0 var(--btn-pad-x);
       opacity: 0;
       pointer-events: none;
     }
@@ -312,7 +331,7 @@
       opacity: 1;
     }
     .hero {
-      min-height: calc(100vh - 2 * var(--bar-h) - 40px - 4 * var(--box-gap) - 2px);
+      min-height: calc(100vh - 2 * var(--bar-h) - 2 * var(--bar-pad) - 4 * var(--box-gap) - 2px);
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
@@ -333,7 +352,7 @@
       margin-top: var(--space-md);
     }
     .page-intro {
-      min-height: calc(100vh - 2 * var(--bar-h) - 40px - 4 * var(--box-gap) - 2px);
+      min-height: calc(100vh - 2 * var(--bar-h) - 2 * var(--bar-pad) - 4 * var(--box-gap) - 2px);
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
@@ -343,6 +362,12 @@
     .page-intro .tagline {
       font-size: var(--text-heading);
       max-width: none;
+    }
+    .project-header {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+      align-items: flex-start;
     }
     section {
       padding: var(--space-lg) var(--padding);
@@ -395,8 +420,8 @@
       line-height: 1.5;
     }
     .projects {
-      display: flex;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
       gap: var(--box-gap);
     }
     .project {
@@ -404,30 +429,8 @@
       padding: var(--box-pad);
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      color: inherit;
+      gap: var(--inner-gap);
       min-width: 0;
-      flex: 1 1 280px;
-      max-width: 100%;
-      overflow: hidden;
-      position: relative;
-    }
-    @media (hover: hover) {
-      .project:hover {
-        color: var(--accent);
-      }
-    }
-    .project-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      text-decoration: none;
-      color: inherit;
-    }
-    .project-top::after {
-      content: '';
-      position: absolute;
-      inset: 0;
     }
     .project-name {
       font-size: var(--text-body);
@@ -445,31 +448,94 @@
       line-height: 1.4;
       overflow-wrap: break-word;
       word-break: break-word;
+      flex: 1;
     }
     .project-desc a {
       color: var(--accent);
       text-decoration: none;
-      position: relative;
-      z-index: 1;
     }
-    .project-arrow {
-      color: var(--accent);
+    .project-actions {
+      display: flex;
+      gap: var(--box-gap);
+      margin-top: 4px;
     }
-    .project-arrow .material-symbols-sharp {
-      font-size: 18px;
-      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 18;
+    .project-visit.bar-box {
+      width: var(--bar-h);
+      height: var(--bar-h);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    .articles {
+    .project-casestudy.bar-box {
+      flex: 1;
+      height: var(--bar-h);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--text-ui);
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-decoration: none;
+    }
+    .project-detail-text p {
+      font-size: var(--text-body);
+      line-height: 1.5;
+      margin-bottom: var(--space-sm);
+    }
+    .project-detail-list {
+      list-style: none;
       display: flex;
       flex-direction: column;
+      gap: var(--inner-gap);
+    }
+    .project-detail-list li {
+      font-size: var(--text-body);
+      line-height: 1.5;
+      padding-left: 1em;
+      position: relative;
+    }
+    .project-detail-list li::before {
+      content: '—';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+    }
+    .project-highlights {
+      display: flex;
+      flex-direction: column;
+      gap: var(--inner-gap);
+    }
+    .project-highlight a {
+      font-size: var(--text-body);
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .project-back.bar-box {
+      display: inline-flex;
+      align-items: center;
+      width: auto;
+      height: var(--bar-h);
+      padding: 0 var(--btn-pad-x);
+      font-size: var(--text-ui);
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-decoration: none;
+    }
+    .project-highlights + .project-back.bar-box {
+      margin-top: var(--space-md);
+    }
+    .articles {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
       gap: var(--box-gap);
     }
     .article {
       border: 1px solid var(--black);
       padding: var(--box-pad);
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
+      display: grid;
+      grid-template-rows: 1fr auto auto;
+      gap: var(--inner-gap);
       text-decoration: none;
       color: inherit;
       position: relative;
@@ -483,12 +549,12 @@
       font-size: var(--text-body);
       font-weight: 700;
       line-height: 1.5;
-      padding-right: 28px;
+      padding-right: var(--gallery-info-btn-sz);
     }
     .article-meta {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: var(--inner-gap);
     }
     .article-publisher {
       font-size: var(--text-small);
@@ -516,12 +582,12 @@
     .article-arrow {
       color: var(--accent);
       position: absolute;
-      top: 12px;
-      right: 16px;
+      top: var(--box-gap);
+      right: var(--btn-pad-x);
       flex-shrink: 0;
     }
     .article-arrow .material-symbols-sharp {
-      font-size: 18px;
+      font-size: var(--icon-sz-lg);
       font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 18;
     }
     .lately-list {
@@ -535,7 +601,7 @@
       padding: var(--box-pad);
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: var(--inner-gap);
       text-decoration: none;
       color: inherit;
     }
@@ -549,7 +615,7 @@
       color: var(--accent);
     }
     .lately-label .material-symbols-sharp {
-      font-size: 16px;
+      font-size: var(--icon-sz);
       font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 16;
     }
     .lately-value {
@@ -563,7 +629,7 @@
       align-items: center;
     }
     .lately-arrow .material-symbols-sharp {
-      font-size: 16px;
+      font-size: var(--icon-sz);
       font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 16;
     }
     @media (hover: hover) {
@@ -598,7 +664,7 @@
       padding: var(--box-pad);
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: var(--inner-gap);
       text-decoration: none;
       color: inherit;
     }
@@ -616,7 +682,7 @@
       color: var(--accent);
     }
     .rolodex-arrow .material-symbols-sharp {
-      font-size: 16px;
+      font-size: var(--icon-sz);
       font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 16;
     }
     .gallery {
@@ -632,6 +698,7 @@
     }
     .gallery-item {
       border: 1px solid var(--black);
+      cursor: pointer;
     }
     .gallery-img-wrap {
       position: relative;
@@ -642,10 +709,10 @@
     }
     .gallery-info-btn {
       position: absolute;
-      bottom: 8px;
-      right: 8px;
-      width: 28px;
-      height: 28px;
+      bottom: var(--gallery-info-btn-offset);
+      right: var(--gallery-info-btn-offset);
+      width: var(--gallery-info-btn-sz);
+      height: var(--gallery-info-btn-sz);
       border: 1px solid var(--gallery-btn-border);
       background: var(--gallery-btn-bg);
       color: var(--gallery-btn-color);
@@ -657,7 +724,7 @@
       z-index: 2;
     }
     .gallery-info-btn .material-symbols-sharp {
-      font-size: 16px;
+      font-size: var(--icon-sz);
       font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 16;
     }
     @media (hover: hover) {
@@ -667,8 +734,9 @@
         color: var(--on-accent);
       }
     }
+    .gallery-icon-info  { display: inline; }
     .gallery-icon-close { display: none; }
-    .info-open .gallery-icon-info { display: none; }
+    .info-open .gallery-icon-info  { display: none; }
     .info-open .gallery-icon-close { display: inline; }
     .gallery-info-overlay {
       position: absolute;
@@ -681,7 +749,7 @@
       display: none;
       flex-direction: column;
       justify-content: flex-end;
-      padding: 12px 44px 12px 16px;
+      padding: var(--box-gap) calc(var(--gallery-info-btn-sz) + 2 * var(--gallery-info-btn-offset)) var(--box-gap) var(--btn-pad-x);
       gap: 2px;
       font-size: var(--text-ui);
       letter-spacing: 1px;
@@ -700,13 +768,16 @@
     .gallery-info-camera {
       font-weight: 700;
     }
-    .gallery-hidden {
+    .gallery-hidden,
+    .article-hidden {
       display: none;
     }
-    .gallery-show-more.bar-box {
+    .articles-show-more.bar-box,
+    .gallery-show-more.bar-box,
+    .gallery-view-all.bar-box {
       width: 100%;
       height: var(--bar-h);
-      padding: 0 16px;
+      padding: 0 var(--btn-pad-x);
       margin-top: var(--space-md);
       font-size: var(--text-ui);
       font-weight: 700;
@@ -715,7 +786,114 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: var(--inner-gap);
+    }
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      background: var(--lightbox-bg);
+      display: none;
+      flex-direction: column;
+      padding: 0 var(--padding);
+    }
+    .lightbox.open {
+      display: flex;
+    }
+    .lightbox-header {
+      height: calc(var(--bar-h) + var(--bar-pad) + 2 * var(--box-gap));
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
+    .lightbox-body {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      gap: var(--space-md);
+      padding-bottom: calc(var(--bar-h) + var(--bar-pad) + 2 * var(--box-gap));
+    }
+    .lightbox-frame {
+      flex: 1;
+      min-width: 0;
+      position: relative;
+      border: 1px solid var(--lightbox-frame-border);
+    }
+    .lightbox-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+    .lightbox-sidebar {
+      width: 220px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--box-gap);
+    }
+    .lightbox-meta {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      color: var(--lightbox-text);
+      font-size: var(--text-small);
+      line-height: 1.4;
+    }
+    .lightbox-meta span {
+      min-height: 1.4em;
+    }
+    .lightbox-title {
+      font-weight: 700;
+      color: var(--on-accent);
+      letter-spacing: 0;
+    }
+    .lightbox-camera {
+      font-weight: 700;
+    }
+    .lightbox-nav {
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+    .lightbox-counter {
+      flex: 1;
+      text-align: center;
+      font-size: var(--text-ui);
+      letter-spacing: 1px;
+      color: var(--lightbox-text);
+      white-space: nowrap;
+    }
+    .lightbox-btn {
+      width: var(--bar-h);
+      height: var(--bar-h);
+      flex-shrink: 0;
+      border: 1px solid var(--lightbox-btn-border);
+      background: none;
+      color: var(--lightbox-text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: var(--text-ui);
+      letter-spacing: 1px;
+      font-weight: 700;
+    }
+    .lightbox-btn .material-symbols-sharp {
+      font-size: var(--icon-sz-lg);
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 18;
+    }
+    @media (hover: hover) {
+      .lightbox-btn:hover {
+        background: var(--lightbox-btn-hover-bg);
+        border-color: var(--lightbox-btn-border-hover);
+        color: var(--on-accent);
+      }
     }
     footer {
       padding: var(--space-lg) var(--padding);
@@ -752,6 +930,13 @@
       font-size: var(--text-small);
     }
     @media (max-width: 768px) {
+      .projects,
+      .articles {
+        grid-template-columns: 1fr;
+      }
+      .article {
+        grid-template-rows: auto auto auto;
+      }
       .about-content {
         grid-template-columns: 1fr;
         gap: var(--space-md);
@@ -775,19 +960,32 @@
       .footer-bottom {
         align-items: flex-start;
       }
-      .gallery {
+      .lightbox {
+        padding: 0;
+      }
+      .lightbox-header {
+        padding: 0 var(--padding);
+      }
+      .lightbox-body {
         flex-direction: column;
+        gap: 0;
+        padding-bottom: 0;
       }
-      .gallery-col {
-        display: contents;
+      .lightbox-frame {
+        flex: 1;
+        width: 100%;
+        border: none;
+        min-height: 0;
       }
-    }
-    @media (min-width: 769px) and (max-width: 1024px) {
-      .gallery {
-        flex-wrap: wrap;
+      .lightbox-sidebar {
+        width: 100%;
+        flex-direction: column;
+        flex-shrink: 0;
+        padding: var(--box-gap) var(--padding) var(--bar-pad);
+        gap: var(--box-gap);
       }
-      .gallery-col {
-        flex: 1 1 calc(50% - var(--box-gap));
+      .lightbox-meta {
+        flex: none;
       }
     }
   </style>
@@ -798,12 +996,12 @@
 
   <div class="top-bar">
     <div class="nav-logo-wrap">
-      <a class="nav-logo-home" href="../"></a>
+      <a class="nav-logo-home" href="../" aria-label="Home"></a>
       <button type="button" class="nav-logo-season" onclick="toggleSeasons(event)" aria-label="Change accent color"></button>
-      <div class="season-dropdown" id="season-dropdown"></div>
+      <div class="season-dropdown" id="season-dropdown" data-info="colours from bengaluru's seasonal blooms"></div>
     </div>
     <div class="top-bar-center">
-      <button type="button" class="bar-box" onclick="copyEmail()" aria-label="Copy email address">
+      <button type="button" class="bar-box" onclick="copyEmail(this)" data-email="hello@thedataareclean.com" aria-label="Copy email address">
         <span class="material-symbols-sharp">mail</span>
       </button>
       <a class="bar-box" href="https://www.instagram.com/thedataareclean/" target="_blank" rel="noopener" aria-label="Instagram">
@@ -873,28 +1071,31 @@
     </h2>
     <div class="projects">
       <div class="project">
-        <a class="project-top" href="https://www.dataforindia.com/" target="_blank" rel="noopener">
-          <span class="project-name">Data For India</span>
-          <span class="project-arrow"><span class="material-symbols-sharp">arrow_outward</span></span>
-        </a>
+        <span class="project-name">Data For India</span>
         <span class="project-role">audience and product lead</span>
         <span class="project-desc">leading audience engagement and product innovation at Data For India to make the platform's data-first information accessible.</span>
+        <div class="project-actions">
+          <a class="bar-box project-visit" href="https://www.dataforindia.com/" target="_blank" rel="noopener" aria-label="Visit site"><span class="material-symbols-sharp">arrow_outward</span></a>
+          <a class="bar-box project-casestudy" href="../work/data-for-india/">case study (soon)</a>
+        </div>
       </div>
       <div class="project">
-        <a class="project-top" href="https://www.instagram.com/36truths/" target="_blank" rel="noopener">
-          <span class="project-name">[thirty-six] truths:</span>
-          <span class="project-arrow"><span class="material-symbols-sharp">arrow_outward</span></span>
-        </a>
+        <span class="project-name">[thirty-six] truths:</span>
         <span class="project-role">storyteller</span>
         <span class="project-desc">co-running an independent data storytelling studio with <a href="https://thoughtput.in/" target="_blank" rel="noopener">Hamsa</a>, making small data cool again.</span>
+        <div class="project-actions">
+          <a class="bar-box project-visit" href="https://www.instagram.com/36truths/" target="_blank" rel="noopener" aria-label="Visit site"><span class="material-symbols-sharp">arrow_outward</span></a>
+          <a class="bar-box project-casestudy" href="../work/thirty-six-truths/">case study (soon)</a>
+        </div>
       </div>
       <div class="project">
-        <a class="project-top" href="https://vizchitra.com/" target="_blank" rel="noopener">
-          <span class="project-name">VizChitra</span>
-          <span class="project-arrow"><span class="material-symbols-sharp">arrow_outward</span></span>
-        </a>
+        <span class="project-name">VizChitra</span>
         <span class="project-role">core team volunteer</span>
         <span class="project-desc">contributing to India's premier data visualisation community and conference, helping practitioners learn, share and push the craft forward.</span>
+        <div class="project-actions">
+          <a class="bar-box project-visit" href="https://vizchitra.com/" target="_blank" rel="noopener" aria-label="Visit site"><span class="material-symbols-sharp">arrow_outward</span></a>
+          <a class="bar-box project-casestudy" href="../work/vizchitra/">case study (soon)</a>
+        </div>
       </div>
     </div>
   </section>
@@ -941,37 +1142,39 @@
         <span class="article-tags"><span class="article-tag">education</span><span class="article-tag">policy</span><span class="article-tag">regulation</span></span>
         <span class="article-arrow"><span class="material-symbols-sharp">arrow_outward</span></span>
       </a>
-      <a class="article" href="https://the-ken.com/story/the-speed-bumps-in-leads-plan-to-digitise-indias-budget-private-schools/" target="_blank" rel="noopener">
+      <a class="article article-hidden" href="https://the-ken.com/story/the-speed-bumps-in-leads-plan-to-digitise-indias-budget-private-schools/" target="_blank" rel="noopener">
         <span class="article-name">The speed bumps in LEAD's plan to digitise India's budget private schools</span>
         <span class="article-meta"><span class="article-publisher">The Ken</span> <span class="article-date">Feb 2022</span></span>
         <span class="article-tags"><span class="article-tag">edtech</span><span class="article-tag">product</span><span class="article-tag">schools</span></span>
         <span class="article-arrow"><span class="material-symbols-sharp">arrow_outward</span></span>
       </a>
-      <a class="article" href="https://the-ken.com/story/beyond-whitehat-jr-the-hinterland-niche-calling-indias-coding-edtechs/" target="_blank" rel="noopener">
+      <a class="article article-hidden" href="https://the-ken.com/story/beyond-whitehat-jr-the-hinterland-niche-calling-indias-coding-edtechs/" target="_blank" rel="noopener">
         <span class="article-name">Beyond WhiteHat Jr: the hinterland niche calling India's coding edtechs</span>
         <span class="article-meta"><span class="article-publisher">The Ken</span> <span class="article-date">Feb 2022</span></span>
         <span class="article-tags"><span class="article-tag">edtech</span><span class="article-tag">coding</span><span class="article-tag">market</span></span>
         <span class="article-arrow"><span class="material-symbols-sharp">arrow_outward</span></span>
       </a>
-      <a class="article" href="https://the-ken.com/story/amazons-steep-learning-curve-in-indias-crowded-online-test-prep-market/" target="_blank" rel="noopener">
+      <a class="article article-hidden" href="https://the-ken.com/story/amazons-steep-learning-curve-in-indias-crowded-online-test-prep-market/" target="_blank" rel="noopener">
         <span class="article-name">Amazon's steep learning curve in India's crowded online test prep market</span>
         <span class="article-meta"><span class="article-publisher">The Ken</span> <span class="article-date">Jan 2022</span></span>
         <span class="article-tags"><span class="article-tag">edtech</span><span class="article-tag">amazon</span><span class="article-tag">test prep</span></span>
         <span class="article-arrow"><span class="material-symbols-sharp">arrow_outward</span></span>
       </a>
-      <a class="article" href="https://the-ken.com/story/up-in-the-air-the-vague-byjus-niti-aayog-stab-at-public-edtech/" target="_blank" rel="noopener">
+      <a class="article article-hidden" href="https://the-ken.com/story/up-in-the-air-the-vague-byjus-niti-aayog-stab-at-public-edtech/" target="_blank" rel="noopener">
         <span class="article-name">Up in the air: The vague Byju's-NITI Aayog stab at public edtech</span>
         <span class="article-meta"><span class="article-publisher">The Ken</span> <span class="article-date">Dec 2021</span></span>
         <span class="article-tags"><span class="article-tag">edtech</span><span class="article-tag">public policy</span><span class="article-tag">government</span></span>
         <span class="article-arrow"><span class="material-symbols-sharp">arrow_outward</span></span>
       </a>
-      <a class="article" href="https://state-of-foss.in/" target="_blank" rel="noopener">
+      <a class="article article-hidden" href="https://state-of-foss.in/" target="_blank" rel="noopener">
         <span class="article-name">The State of Free & Open Source Software in India</span>
         <span class="article-meta"><span class="article-publisher">CivicDataLab</span> <span class="article-date">Jan 2021</span></span>
         <span class="article-tags"><span class="article-tag">open source</span><span class="article-tag">research</span><span class="article-tag">india</span></span>
         <span class="article-arrow"><span class="material-symbols-sharp">arrow_outward</span></span>
       </a>
     </div>
+    <button type="button" class="bar-box articles-show-more" id="articles-show-more" aria-label="show more">show more <span class="material-symbols-sharp">keyboard_arrow_down</span></button>
+    <script>!function(){var batch=6;document.getElementById("articles-show-more").addEventListener("click",function(){var hidden=Array.from(document.querySelectorAll(".article-hidden"));hidden.slice(0,batch).forEach(function(el){{el.classList.remove("article-hidden");}});if(!document.querySelector(".article-hidden"))this.remove();});}();</script>
   </section>
 
     <!-- FOOTER -->
@@ -999,12 +1202,12 @@
       html.setAttribute('data-theme', next);
       sessionStorage.setItem('theme', next);
     }
-    function copyEmail() {
-      navigator.clipboard.writeText('hello@thedataareclean.com').then(function() {
+    function copyEmail(btn) {
+      navigator.clipboard.writeText(btn.dataset.email).then(function() {
         var toast = document.getElementById('toast');
         toast.classList.add('visible');
         setTimeout(function() { toast.classList.remove('visible'); }, 2000);
-      });
+      }).catch(function() {});
     }
     // Restore theme from session, else match OS
     (function() {
@@ -1065,7 +1268,7 @@
       });
       var info = document.createElement('div');
       info.className = 'season-info';
-      info.textContent = "colours from bengaluru's seasonal blooms";
+      info.textContent = dropdown.dataset.info || '';
       dropdown.appendChild(info);
     })();
     function toggleSeasons(e) {

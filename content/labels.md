@@ -1,0 +1,8 @@
+- case-study: case study (soon)
+- visit-site: visit site
+- back-to-work: ← back to work
+- show-more: show more
+- view-all: view all photos
+- back-to-play: ← back to play
+- email-copied: email copied
+- season-info: colours from bengaluru's seasonal blooms
