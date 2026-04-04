@@ -1,16 +1,19 @@
 #!/usr/bin/env python3
-# Requires: pip install Pillow (for OG image + favicon generation)
 """Build script for portfolio site.
 
 Reads markdown content files, renders them into HTML,
 and assembles multi-page output: /, /work/, /play/.
 
-Usage: python3 build.py
+Usage:
+  python3 build.py               — normal build
+  python3 build.py --gen-monthly — regenerate all 12 monthly OG images + favicons
+                                   (requires: pip install Pillow)
 """
 
 import json
 import re
 import shutil
+import sys
 import urllib.request
 from datetime import datetime
 from html import escape
@@ -1264,14 +1267,17 @@ def build():
             ('play/photos/index.html', render_gallery_page(photos, clicks_md, labels), 'play', 2)
         )
 
-    # Generate seasonal images
-    month = datetime.now().month - 1  # 0-indexed
-    accent = SEASON_COLORS[month]
-    try:
-        generate_og_image(accent, hero_md, BASE / 'assets' / 'og-image.png')
-        generate_favicon(accent, BASE / 'assets' / 'favicon.png')
-    except Exception as e:
-        print(f'Warning: image generation failed ({e}), skipping.')
+    # Copy pre-generated monthly OG image + favicon
+    month = datetime.now().month  # 1-indexed
+    accent = SEASON_COLORS[month - 1]
+    monthly = BASE / 'assets' / 'monthly'
+    og_src = monthly / f'og-{month:02d}.png'
+    fav_src = monthly / f'favicon-{month:02d}.png'
+    if og_src.exists() and fav_src.exists():
+        shutil.copy2(og_src, BASE / 'assets' / 'og-image.png')
+        shutil.copy2(fav_src, BASE / 'assets' / 'favicon.png')
+    else:
+        print(f'Warning: monthly assets missing for month {month:02d}, run: python3 build.py --gen-monthly')
 
     # Build pages
     pages = [
@@ -1297,7 +1303,7 @@ def build():
         assets_dst = DIST / 'assets'
         if assets_dst.exists():
             shutil.rmtree(assets_dst)
-        shutil.copytree(assets_src, assets_dst, ignore=shutil.ignore_patterns('README.md'))
+        shutil.copytree(assets_src, assets_dst, ignore=shutil.ignore_patterns('README.md', 'monthly'))
 
     # Copy CNAME for GitHub Pages
     cname = BASE / 'CNAME'
@@ -1307,5 +1313,28 @@ def build():
     print(f'Done — og accent: {accent}')
 
 
+MONTH_NAMES = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+]
+
+
+def generate_monthly_assets():
+    """Generate all 12 monthly OG images and favicons into assets/monthly/."""
+    hero_md = (CONTENT / 'hero.md').read_text()
+    out_dir = BASE / 'assets' / 'monthly'
+    out_dir.mkdir(parents=True, exist_ok=True)
+    for i, (accent, name) in enumerate(zip(SEASON_COLORS, MONTH_NAMES), start=1):
+        og_path = out_dir / f'og-{i:02d}.png'
+        fav_path = out_dir / f'favicon-{i:02d}.png'
+        generate_og_image(accent, hero_md, og_path)
+        generate_favicon(accent, fav_path)
+        print(f'Generated {name} ({accent}): {og_path.name}, {fav_path.name}')
+    print('Done — all 12 monthly assets generated.')
+
+
 if __name__ == '__main__':
-    build()
+    if '--gen-monthly' in sys.argv:
+        generate_monthly_assets()
+    else:
+        build()

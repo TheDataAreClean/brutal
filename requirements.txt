@@ -1,1 +1,4 @@
+# Pillow is only needed to regenerate monthly assets:
+#   python3 build.py --gen-monthly
+# Not required for normal builds or CI.
 Pillow>=10.0.0
