@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build script for portfolio site.
+"""Build script for brutal site.
 
 Reads markdown content files, renders them into HTML,
 and assembles multi-page output: /, /work/, /play/.
@@ -143,10 +143,19 @@ def generate_og_image(accent_hex, hero_md, output_path):
 
 
 def generate_favicon(accent_hex, output_path):
-    """Generate a solid accent color favicon."""
-    from PIL import Image
-    accent = tuple(int(accent_hex[i:i+2], 16) for i in (1, 3, 5))
-    img = Image.new('RGB', (64, 64), accent)
+    """Generate favicon: white background, black border box, black square bottom-left."""
+    from PIL import Image, ImageDraw
+    size = 64
+    margin = 8
+    cube_size = 13
+    black = (0x1a, 0x1a, 0x1a)
+    white = (0xff, 0xff, 0xff)
+    img = Image.new('RGB', (size, size), white)
+    draw = ImageDraw.Draw(img)
+    draw.rectangle([margin, margin, size - margin, size - margin], outline=black, width=1)
+    cube_x = margin + 1
+    cube_y = size - margin - cube_size
+    draw.rectangle([cube_x, cube_y, cube_x + cube_size, cube_y + cube_size], fill=black)
     Path(output_path).parent.mkdir(parents=True, exist_ok=True)
     img.save(output_path)
 
@@ -599,345 +608,63 @@ def fetch_icon_font():
         print(f'Warning: icon font download failed ({e}), keeping existing file.')
 
 
-def _parse_glass_post(post):
-    """Extract photo dict from a Glass.photo post object."""
-    img_url = post.get('image1024x1024', '')
-    if not img_url:
-        return None
-    exif = post.get('exif') or {}
-    camera_obj = post.get('camera') or {}
-    date_str = ''
-    raw_date = exif.get('date_time_original', '')
-    if raw_date:
-        try:
-            dt = datetime.fromisoformat(raw_date.replace('Z', '+00:00'))
-            date_str = dt.strftime('%b %d, %Y').replace(' 0', ' ')
-        except (ValueError, TypeError):
-            pass
-    return {
-        'url': img_url,
-        'description': post.get('description') or '',
-        'created': post.get('created_at', ''),
-        'camera': camera_obj.get('model', ''),
-        'aperture': exif.get('aperture', ''),
-        'shutter': exif.get('exposure_time', ''),
-        'iso': exif.get('iso', ''),
-        'focal': exif.get('focal_length', ''),
-        'date': date_str,
-    }
 
 
-def fetch_glass_photos():
-    """Fetch all photos from Glass.photo profile with EXIF metadata."""
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (compatible; portfolio-build/1.0)',
-        'Accept': 'application/json',
-        'Referer': 'https://glass.photo/thedataareclean',
-    }
+def render_playground(md):
+    """Render playground section: linked image cards for external projects.
 
-    try:
-        # Page 1: parse __NEXT_DATA__ from the profile HTML
-        req = urllib.request.Request('https://glass.photo/thedataareclean', headers={
-            'User-Agent': headers['User-Agent'],
-        })
-        with urllib.request.urlopen(req, timeout=10) as resp:
-            html = resp.read().decode('utf-8')
-
-        match = re.search(
-            r'<script\s+id="__NEXT_DATA__"\s+type="application/json">\s*({.+?})\s*</script>',
-            html,
-            re.DOTALL,
-        )
-        if not match:
-            print('Warning: Could not find __NEXT_DATA__ in Glass.photo page.')
-            return []
-
-        data = json.loads(match.group(1))
-        posts_obj = (
-            data.get('props', {})
-            .get('pageProps', {})
-            .get('fallbackData', {})
-            .get('posts', {})
-        )
-        all_posts = list(posts_obj.get('data', []))
-        cursor = posts_obj.get('nextCursor')
-
-        # Subsequent pages: Glass API v3 returns a plain list
-        while cursor:
-            api_url = (
-                f'https://glass.photo/api/v3/users/thedataareclean/posts'
-                f'?cursor={cursor}&limit=50'
-            )
-            req = urllib.request.Request(api_url, headers=headers)
-            with urllib.request.urlopen(req, timeout=10) as resp:
-                page = json.loads(resp.read().decode('utf-8'))
-            if not page:
-                break
-            all_posts.extend(page)
-            # v3 returns a plain list with no next cursor; always stop after one call
-            cursor = None
-
-        photos = [p for post in all_posts if (p := _parse_glass_post(post))]
-
-        # Newest first
-        photos.sort(key=lambda p: p['created'], reverse=True)
-
-        print(f'Fetched {len(photos)} photos from Glass.photo')
-        return photos
-
-    except Exception as e:
-        print(f'Warning: Glass.photo fetch failed ({e}), using empty gallery.')
-        return []
-
-
-def render_gallery(photos, heading_md='', labels=None, num_cols=3, initial=9, gallery_url=None):
-    """Render masonry gallery with EXIF info overlays and lightbox.
-
-    Items are output sequentially; JS redistributes them round-robin into the
-    correct number of columns for the viewport (3 desktop / 2 tablet / 1 mobile),
-    giving left-to-right reading order at every breakpoint.
-
-    gallery_url: when set, replaces show-more with a "view all" link to this URL
-    initial: number of photos visible; None means show all
+    Format per line: [Name](url) | image-filename.png | one-line description | year (optional)
+    Images are served from assets/playground/.
     """
-    if not photos:
+    lines = [l.strip() for l in md.strip().split('\n') if l.strip()]
+    title = ''
+    cards = []
+    for line in lines:
+        if line.startswith('# '):
+            title = apply_highlight(line[2:])
+        elif '|' in line:
+            parts = [p.strip() for p in line.split('|', 3)]
+            if len(parts) >= 3:
+                m = re.match(r'\[(.+?)\]\((.+?)\)', parts[0])
+                if m:
+                    cards.append({
+                        'name': m.group(1), 'url': m.group(2),
+                        'img': parts[1], 'desc': parts[2],
+                        'year': parts[3] if len(parts) == 4 else '',
+                    })
+
+    if not cards:
         return ''
 
-    title = ''
-    for line in heading_md.strip().split('\n'):
-        if line.strip().startswith('# '):
-            title = line.strip()[2:]
-            break
-    title = apply_highlight(title) if title else ''
-
-    effective_initial = initial if initial is not None else len(photos)
-
-    items = []
-    for idx, photo in enumerate(photos):
-        desc = escape(photo['description'])
-        hidden = ' gallery-hidden' if idx >= effective_initial else ''
-
-        info_lines = []
-        if desc:
-            info_lines.append(f'<span class="gallery-info-title">{desc}</span>')
-        if photo.get('date'):
-            info_lines.append(f'<span>{escape(photo["date"])}</span>')
-        if photo.get('camera'):
-            info_lines.append(f'<span class="gallery-info-camera">{escape(photo["camera"])}</span>')
-        exif_parts = []
-        if photo.get('aperture'):
-            exif_parts.append(escape(photo['aperture']))
-        if photo.get('shutter'):
-            exif_parts.append(escape(photo['shutter']))
-        if photo.get('iso'):
-            exif_parts.append('ISO ' + escape(photo['iso']))
-        if exif_parts:
-            info_lines.append(f'<span>{" &middot; ".join(exif_parts)}</span>')
-        if photo.get('focal'):
-            info_lines.append(f'<span>{escape(photo["focal"])}</span>')
-
-        info_btn = ''
-        info_overlay = ''
-        if info_lines:
-            info_btn = (
-                '\n          <button type="button" class="gallery-info-btn" aria-label="Toggle photo info">'
-                '<span class="material-symbols-sharp gallery-icon-info">info</span>'
-                '<span class="material-symbols-sharp gallery-icon-close">close</span>'
-                '</button>'
-            )
-            overlay_inner = ''.join(f'\n            {l}' for l in info_lines)
-            info_overlay = f'\n          <div class="gallery-info-overlay">{overlay_inner}\n          </div>'
-
-        loading = 'eager' if idx < num_cols else 'lazy'
-        items.append(
-            f'      <figure class="gallery-item{hidden}" data-photo-idx="{idx}">\n'
-            f'        <div class="gallery-img-wrap">\n'
-            f'          <img src="{photo["url"]}" alt="{desc or f"Photo {idx + 1}"}" loading="{loading}">{info_btn}{info_overlay}\n'
+    card_parts = []
+    for c in cards:
+        year_html = f'          <span class="playground-card-year">{escape(c["year"])}</span>\n' if c['year'] else ''
+        card_parts.append(
+            f'      <a class="playground-card" href="{escape(c["url"])}" target="_blank" rel="noopener" aria-label="{escape(c["name"])}">\n'
+            f'        <div class="playground-card-img">\n'
+            f'          <img src="{{{{nav_root}}}}assets/playground/{escape(c["img"])}" alt="{escape(c["name"])}" loading="lazy">\n'
             f'        </div>\n'
-            f'      </figure>'
+            f'        <div class="playground-card-body">\n'
+            f'          <div class="playground-card-header">\n'
+            f'            <span class="playground-card-name">{escape(c["name"])}</span>\n'
+            f'            <span class="material-symbols-sharp playground-card-arrow" aria-hidden="true">arrow_outward</span>\n'
+            f'          </div>\n'
+            f'{year_html}'
+            f'          <span class="playground-card-desc">{escape(c["desc"])}</span>\n'
+            f'        </div>\n'
+            f'      </a>'
         )
-
-    # JS distributes items into columns based on viewport; re-runs on resize
-    layout_js = (
-        '    <script>!function(){'
-        'var lastN=0;'
-        'function layout(){'
-        'var w=window.innerWidth;'
-        'var n=w<=768?1:w<=1024?2:3;'
-        'if(n===lastN)return;'
-        'lastN=n;'
-        'var g=document.querySelector(".gallery");'
-        'if(!g)return;'
-        'var items=Array.from(g.querySelectorAll(".gallery-item")).sort(function(a,b){return(+a.dataset.photoIdx)-(+b.dataset.photoIdx);});'
-        'Array.from(g.querySelectorAll(".gallery-col")).forEach(function(c){c.remove();});'
-        'var cols=[];'
-        'for(var i=0;i<n;i++){'
-        'var col=document.createElement("div");'
-        'col.className="gallery-col";'
-        'g.appendChild(col);'
-        'cols.push(col);'
-        '}'
-        'items.forEach(function(item,i){cols[i%n].appendChild(item);});'
-        '}'
-        'layout();'
-        'window.addEventListener("resize",layout);'
-        '}();</script>\n'
-    )
-
-    if gallery_url:
-        view_all_label = (labels or {}).get('view-all', 'view all photos')
-        show_more = (
-            f'    <a class="bar-box gallery-view-all" href="{gallery_url}">{view_all_label} '
-            '<span class="material-symbols-sharp">arrow_outward</span></a>\n'
-        )
-    else:
-        show_more_label = (labels or {}).get('show-more', 'show more')
-        has_more = len(photos) > effective_initial
-        show_more = (
-            f'    <button type="button" class="bar-box gallery-show-more" id="gallery-show-more" aria-label="{show_more_label}">{show_more_label} <span class="material-symbols-sharp">keyboard_arrow_down</span></button>\n'
-            '    <script>!function(){var batch=' + str(effective_initial) + ';'
-            'document.getElementById("gallery-show-more").addEventListener("click",function(){'
-            'var hidden=Array.from(document.querySelectorAll(".gallery-hidden"));'
-            'hidden.sort(function(a,b){return(+a.dataset.photoIdx)-(+b.dataset.photoIdx);});'
-            'for(var i=0;i<batch&&i<hidden.length;i++){hidden[i].classList.remove("gallery-hidden");}'
-            'if(!document.querySelector(".gallery-hidden"))this.remove();'
-            '});}();</script>\n'
-        ) if has_more else ''
-
-    # Info toggle JS — stops propagation so info button doesn't open lightbox
-    info_js = (
-        '    <script>!function(){'
-        'document.querySelectorAll(".gallery-info-btn").forEach(function(btn){'
-        'btn.addEventListener("click",function(e){'
-        'e.stopPropagation();'
-        'btn.parentElement.classList.toggle("info-open");'
-        '});'
-        '});}();</script>\n'
-    )
-
-    # Build photos JSON for lightbox (HTML-escape all strings)
-    photos_data = [
-        {
-            'url': p['url'],
-            'desc': escape(p['description'].strip()),
-            'date': escape(p.get('date', '').strip()),
-            'camera': escape((p.get('camera') or '').strip()),
-            'aperture': escape((p.get('aperture') or '').strip()),
-            'shutter': escape((p.get('shutter') or '').strip()),
-            'iso': escape((p.get('iso') or '').strip()),
-            'focal': escape((p.get('focal') or '').strip()),
-        }
-        for p in photos
-    ]
-    photos_json = json.dumps(photos_data)
-
-    lightbox_html = (
-        '  <div class="lightbox" id="gallery-lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer">\n'
-        '    <div class="lightbox-header">\n'
-        '      <button type="button" class="lightbox-btn lightbox-close" id="lightbox-close" aria-label="Close">'
-        '<span class="material-symbols-sharp">close</span></button>\n'
-        '    </div>\n'
-        '    <div class="lightbox-body">\n'
-        '      <div class="lightbox-frame">\n'
-        '        <img class="lightbox-img" id="lightbox-img" src="" alt="">\n'
-        '      </div>\n'
-        '      <div class="lightbox-sidebar">\n'
-        '        <div class="lightbox-meta" id="lightbox-meta"></div>\n'
-        '        <div class="lightbox-nav">\n'
-        '          <button type="button" class="lightbox-btn" id="lightbox-prev" aria-label="Previous photo">←</button>\n'
-        '          <span class="lightbox-counter" id="lightbox-counter"></span>\n'
-        '          <button type="button" class="lightbox-btn" id="lightbox-next" aria-label="Next photo">→</button>\n'
-        '        </div>\n'
-        '      </div>\n'
-        '    </div>\n'
-        '  </div>\n'
-    )
-
-    lightbox_js = (
-        '    <script>!function(){'
-        f'var photos={photos_json};'
-        'var lb=document.getElementById("gallery-lightbox");'
-        'document.body.appendChild(lb);'
-        'var lbImg=document.getElementById("lightbox-img");'
-        'var lbMeta=document.getElementById("lightbox-meta");'
-        'var lbCounter=document.getElementById("lightbox-counter");'
-        'var cur=0;'
-        'function show(i){'
-        'cur=(i+photos.length)%photos.length;'
-        'var p=photos[cur];'
-        'lbImg.src=p.url;lbImg.alt=p.desc||"Photo "+(cur+1);'
-        'var m="";'
-        'm+=\'<span class="lightbox-title">\'+p.desc+"</span>";'
-        'm+="<span>"+p.date+"</span>";'
-        'm+=\'<span class="lightbox-camera">\'+p.camera+"</span>";'
-        'var ex=[];'
-        'if(p.aperture)ex.push(p.aperture);'
-        'if(p.shutter)ex.push(p.shutter);'
-        'if(p.iso)ex.push("ISO "+p.iso);'
-        'm+="<span>"+ex.join(" \u00b7 ")+"</span>";'
-        'm+="<span>"+p.focal+"</span>";'
-        'lbMeta.innerHTML=m;'
-        'lbCounter.textContent=(cur+1)+" / "+photos.length;'
-        'lb.classList.add("open");'
-        'document.getElementById("lightbox-close").focus();'
-        '}'
-        'function closeLb(){lb.classList.remove("open");}'
-        'document.querySelectorAll(".gallery-item").forEach(function(fig){'
-        'fig.addEventListener("click",function(e){'
-        'if(e.target.closest(".gallery-info-btn"))return;'
-        'show(+fig.dataset.photoIdx);'
-        '});'
-        '});'
-        'document.getElementById("lightbox-close").addEventListener("click",closeLb);'
-        'document.getElementById("lightbox-prev").addEventListener("click",function(){show(cur-1);});'
-        'document.getElementById("lightbox-next").addEventListener("click",function(){show(cur+1);});'
-        'lb.addEventListener("click",function(e){if(e.target===lb)closeLb();});'
-        'document.addEventListener("keydown",function(e){'
-        'if(!lb.classList.contains("open"))return;'
-        'if(e.key==="Escape")closeLb();'
-        'if(e.key==="ArrowLeft")show(cur-1);'
-        'if(e.key==="ArrowRight")show(cur+1);'
-        '});'
-        '}();</script>\n'
-    )
-
-    title_html = f'    <h2 class="section-title">{title}</h2>\n' if title else ''
 
     return (
-        '  <!-- GALLERY -->\n'
+        '  <!-- PLAYGROUND -->\n'
         '  <section>\n'
-        + title_html
-        + '    <div class="gallery">\n'
-        + '\n'.join(items) + '\n'
+        '    <h2 class="section-title">\n'
+        f'      {title}\n'
+        '    </h2>\n'
+        '    <div class="projects">\n'
+        + '\n'.join(card_parts) + '\n'
         + '    </div>\n'
-        + layout_js
-        + show_more
-        + info_js
-        + '  </section>\n'
-        + lightbox_html
-        + lightbox_js
-    )
-
-
-def render_gallery_page(photos, heading_md, labels):
-    """Render the gallery index page body (all photos, lightbox on click)."""
-    title = ''
-    for line in heading_md.strip().split('\n'):
-        if line.strip().startswith('# '):
-            title = line.strip()[2:]
-            break
-    title = apply_highlight(title) if title else 'gallery'
-
-    back_label = labels.get('back-to-play', '← back to play')
-    gallery_html = render_gallery(photos, labels=labels, initial=None)
-
-    return (
-        '  <!-- GALLERY PAGE HEADER -->\n'
-        '  <section class="project-header">\n'
-        f'    <h1>{title}</h1>\n'
-        f'    <a class="bar-box project-back" href="../">{back_label}</a>\n'
-        '  </section>\n\n'
-        + gallery_html
+        '  </section>'
     )
 
 
@@ -1135,16 +862,16 @@ def render_project_page(md, labels):
     )
 
 
-def render_play_body(intro_md, lately_md, clicks_md, interests_md, rolodex_md, photos, labels):
-    """Play page body: intro + lately + clicks + ideas + other stuff."""
+def render_play_body(intro_md, lately_md, playground_md, interests_md, rolodex_md):
+    """Play page body: intro + lately + playground + ideas + interests."""
     intro_html = render_page_intro(intro_md.strip())
     lately_html = render_lately(lately_md)
-    gallery_html = render_gallery(photos, clicks_md, labels, gallery_url='photos/')
+    playground_html = render_playground(playground_md)
     rolodex_html = render_rolodex(rolodex_md)
     interests_html = render_interests(interests_md)
     parts = [intro_html, lately_html]
-    if gallery_html:
-        parts.append(gallery_html)
+    if playground_html:
+        parts.append(playground_html)
     parts.append(rolodex_html)
     parts.append(interests_html)
     return '\n\n'.join(parts)
@@ -1229,7 +956,7 @@ def build():
 
     play_intro_md   = read(CONTENT / 'play' / 'intro.md')
     lately_md       = read(CONTENT / 'play' / 'lately.md')
-    clicks_md       = read(CONTENT / 'play' / 'clicks.md')
+    playground_md   = read(CONTENT / 'play' / 'playground.md')
     ideas_md        = read(CONTENT / 'play' / 'ideas.md')
     interests_md    = read(CONTENT / 'play' / 'interests.md')
 
@@ -1242,9 +969,6 @@ def build():
     # Download subsetted icon font
     fetch_icon_font()
 
-    # Fetch Glass.photo images
-    photos = fetch_glass_photos()
-
     # Project files (shared by grid cards and detail pages)
     project_detail_files = sorted((CONTENT / 'work' / 'projects').glob('*.md'))
     project_mds = [read(f) for f in project_detail_files]
@@ -1252,7 +976,7 @@ def build():
     # Page bodies
     home_body = render_hero(hero_md)
     work_body = render_work_body(work_intro_md, about_md, toolkit_md, projects_heading_md, project_mds, articles_md, labels)
-    play_body = render_play_body(play_intro_md, lately_md, clicks_md, interests_md, ideas_md, photos, labels)
+    play_body = render_play_body(play_intro_md, lately_md, playground_md, interests_md, ideas_md)
 
     # Project detail pages
     project_pages = [
@@ -1260,24 +984,18 @@ def build():
         for f, md in zip(project_detail_files, project_mds)
     ]
 
-    # Gallery index page (all photos, lightbox on click)
-    gallery_pages = []
-    if photos:
-        gallery_pages.append(
-            ('play/photos/index.html', render_gallery_page(photos, clicks_md, labels), 'play', 2)
-        )
-
-    # Copy pre-generated monthly OG image + favicon
+    # Copy pre-generated monthly OG image
     month = datetime.now().month  # 1-indexed
-    accent = SEASON_COLORS[month - 1]
     monthly = BASE / 'assets' / 'monthly'
     og_src = monthly / f'og-{month:02d}.png'
-    fav_src = monthly / f'favicon-{month:02d}.png'
-    if og_src.exists() and fav_src.exists():
+    if og_src.exists():
         shutil.copy2(og_src, BASE / 'assets' / 'og-image.png')
-        shutil.copy2(fav_src, BASE / 'assets' / 'favicon.png')
     else:
-        print(f'Warning: monthly assets missing for month {month:02d}, run: python3 build.py --gen-monthly')
+        print(f'Warning: monthly OG image missing for month {month:02d}, run: python3 build.py --gen-monthly')
+
+    # Generate static favicon
+    accent = SEASON_COLORS[month - 1]
+    generate_favicon(accent, BASE / 'assets' / 'favicon.png')
 
     # Build pages
     pages = [
@@ -1285,7 +1003,6 @@ def build():
         ('work/index.html', work_body, 'work', 1),
         ('play/index.html', play_body, 'play', 1),
         *project_pages,
-        *gallery_pages,
     ]
 
     DIST.mkdir(exist_ok=True)
@@ -1320,17 +1037,15 @@ MONTH_NAMES = [
 
 
 def generate_monthly_assets():
-    """Generate all 12 monthly OG images and favicons into assets/monthly/."""
+    """Generate all 12 monthly OG images into assets/monthly/."""
     hero_md = (CONTENT / 'hero.md').read_text()
     out_dir = BASE / 'assets' / 'monthly'
     out_dir.mkdir(parents=True, exist_ok=True)
     for i, (accent, name) in enumerate(zip(SEASON_COLORS, MONTH_NAMES), start=1):
         og_path = out_dir / f'og-{i:02d}.png'
-        fav_path = out_dir / f'favicon-{i:02d}.png'
         generate_og_image(accent, hero_md, og_path)
-        generate_favicon(accent, fav_path)
-        print(f'Generated {name} ({accent}): {og_path.name}, {fav_path.name}')
-    print('Done — all 12 monthly assets generated.')
+        print(f'Generated {name} ({accent}): {og_path.name}')
+    print('Done — all 12 monthly OG images generated.')
 
 
 if __name__ == '__main__':

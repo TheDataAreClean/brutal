@@ -108,6 +108,7 @@
       --black: #ffffff;
       --white: #000000;
       --accent: var(--accent-dark);
+      --on-accent: #000000;
     }
     .skip-to-content {
       position: absolute;
@@ -211,7 +212,7 @@
       position: absolute;
       top: 100%;
       left: 0;
-      margin-top: 8px;
+      margin-top: var(--inner-gap);
       background: var(--black);
       color: var(--white);
       font-size: var(--text-ui);
@@ -381,7 +382,7 @@
     .section-subtitle {
       font-size: var(--text-body);
       line-height: 1.5;
-      margin-top: calc(-1 * var(--space-md) + 16px);
+      margin-top: calc(-1 * var(--space-md) + var(--btn-pad-x));
       margin-bottom: var(--space-md);
     }
     .about-content {
@@ -478,6 +479,69 @@
       letter-spacing: 1px;
       text-decoration: none;
     }
+    .playground-card {
+      border: 1px solid var(--black);
+      display: flex;
+      flex-direction: column;
+      text-decoration: none;
+      color: var(--black);
+      min-width: 0;
+    }
+    .playground-card-img {
+      padding: var(--box-pad);
+      padding-bottom: 0;
+    }
+    .playground-card-img img {
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      object-fit: cover;
+      display: block;
+    }
+    .playground-card-body {
+      padding: var(--box-pad);
+      display: flex;
+      flex-direction: column;
+      gap: var(--inner-gap);
+    }
+    .playground-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: var(--inner-gap);
+    }
+    .playground-card-name {
+      font-size: var(--text-body);
+      font-weight: 700;
+      line-height: 1.5;
+    }
+    .playground-card-arrow {
+      font-size: var(--icon-sz-lg);
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 18;
+      color: var(--accent);
+      flex-shrink: 0;
+      line-height: 1.5;
+    }
+    .playground-card-year {
+      font-size: var(--text-small);
+      line-height: 1.4;
+      letter-spacing: 0.5px;
+      color: var(--accent);
+    }
+    .playground-card-desc {
+      font-size: var(--text-small);
+      line-height: 1.4;
+    }
+    @media (hover: hover) {
+      .playground-card:hover {
+        background: var(--accent);
+        color: var(--on-accent);
+        border-color: var(--accent);
+      }
+      .playground-card:hover .playground-card-arrow,
+      .playground-card:hover .playground-card-year {
+        color: var(--on-accent);
+      }
+    }
     .project-detail-text p {
       font-size: var(--text-body);
       line-height: 1.5;
@@ -542,7 +606,17 @@
     }
     @media (hover: hover) {
       .article:hover {
-        color: var(--accent);
+        background: var(--accent);
+        color: var(--on-accent);
+        border-color: var(--accent);
+      }
+      .article:hover .article-publisher,
+      .article:hover .article-arrow {
+        color: var(--on-accent);
+      }
+      .article:hover .article-tag {
+        border-color: var(--on-accent);
+        color: var(--on-accent);
       }
     }
     .article-name {
@@ -634,7 +708,13 @@
     }
     @media (hover: hover) {
       .lately-item:hover {
-        color: var(--accent);
+        background: var(--accent);
+        color: var(--on-accent);
+        border-color: var(--accent);
+      }
+      .lately-item:hover .lately-label,
+      .lately-item:hover .lately-arrow {
+        color: var(--on-accent);
       }
     }
     .interests {
@@ -670,7 +750,12 @@
     }
     @media (hover: hover) {
       .rolodex-item:hover {
-        color: var(--accent);
+        background: var(--accent);
+        color: var(--on-accent);
+        border-color: var(--accent);
+      }
+      .rolodex-item:hover .rolodex-arrow {
+        color: var(--on-accent);
       }
     }
     .rolodex-name {

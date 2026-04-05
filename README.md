@@ -21,7 +21,7 @@ content/
   play/
     intro.md          ← play page opening tagline
     lately.md         ← recent activity (kv-list)
-    clicks.md         ← gallery section heading
+    playground.md     ← external project cards (name, url, image, desc, year)
     ideas.md          ← rolodex links
     interests.md      ← curiosity tags
 template.html         ← shared HTML shell with {{placeholders}}
@@ -33,8 +33,12 @@ assets/
   fonts/
     SchibstedGrotesk.ttf          ← used by Pillow for OG image generation
     MaterialSymbolsSharp.woff2    ← self-hosted icon font (downloaded by build.py)
-  og-image.png
-  favicon.png
+  monthly/
+    og-01.png … og-12.png        ← pre-generated seasonal OG images (one per month)
+  playground/
+    *.png                         ← screenshot previews for playground cards (manual)
+  og-image.png                    ← copied from monthly/ at build time
+  favicon.png                     ← generated fresh on every build (static design)
 CNAME                 ← custom domain
 CLAUDE.md             ← instructions for Claude Code
 ```
@@ -47,7 +51,6 @@ dist/
   work/index.html           ← work page
   play/index.html           ← play page
   work/<slug>/index.html    ← project case study pages (one per projects/*.md)
-  play/photos/index.html    ← full photo gallery with lightbox
   assets/
   CNAME
 ```
@@ -58,8 +61,7 @@ CSS and JS are inlined into every HTML file. Asset paths are rewritten per page 
 
 - **/** — full-viewport hero with name + tagline
 - **/work** — about, toolkit tags, project cards (3-col grid), published writings (3-col grid, show-more in batches of 6)
-- **/play** — lately, Glass.photo masonry gallery (9 shown, view-all link), rolodex (5 random links per visit with shuffle), curiosity tags
-- **/play/photos/** — full masonry gallery (all photos) with lightbox viewer, EXIF info overlays, and keyboard navigation
+- **/play** — lately, playground cards (external projects with screenshot previews), rolodex (5 random links per visit with shuffle), curiosity tags
 - **/work/\<slug\>/** — project case study: overview, what i did, highlights, back to work
 
 ## Design system
@@ -129,12 +131,10 @@ Note: Material Symbols `opsz` in `font-variation-settings` must match the render
 
 - `--black` / `--white` — swap in dark mode (`#1a1a1a`/`#ffffff` → `#ffffff`/`#000000`)
 - `--accent` — seasonal, set by JS per month (12 Bengaluru bloom colours); separate `--accent-light` and `--accent-dark` variants
-- `--on-accent` — always `#ffffff`; text/icons on accent-coloured fills
-- `--gallery-overlay-bg`, `--gallery-btn-*` — fixed semi-transparent values for photo card overlays (do not swap in dark mode)
-- `--lightbox-bg` — `rgba(0,0,0,0.95)` — lightbox backdrop (always dark, not swapped)
-- `--lightbox-frame-border`, `--lightbox-text`, `--lightbox-btn-*` — semi-transparent white values for lightbox UI
-- `--gallery-info-btn-sz`, `--gallery-info-btn-offset` — gallery info button sizing tokens
+- `--on-accent` — `#ffffff` in light mode, `#000000` in dark mode; always use this for text/icons on accent-coloured fills
 - Theme and season persist within a session via `sessionStorage`; weather/AQI cached 1h in `localStorage`
+
+**Hover pattern (all bordered interactive box elements):** `background: var(--accent)`, `color: var(--on-accent)`, `border-color: var(--accent)`. Accent-coloured children (arrows, labels) must also override to `var(--on-accent)`. Always inside `@media (hover: hover)`. Applies to: `.bar-box`, `.article`, `.lately-item`, `.rolodex-item`, `.playground-card`, `.nav-link-box`, `.season-option`.
 
 ## Build
 
@@ -155,11 +155,17 @@ python3 -m venv .venv
 
 Each build:
 1. Downloads a subsetted `MaterialSymbolsSharp.woff2` (~25KB) from the Google Fonts API
-2. Fetches all photos from Glass.photo with EXIF metadata (cursor-paginated)
-3. Renders all pages from markdown content
-4. Inlines minified CSS + JS into each HTML file
-5. Generates seasonal OG image + favicon using Pillow (skipped if Pillow not installed)
+2. Copies the current month's pre-generated OG image from `assets/monthly/`
+3. Generates the favicon (static design, requires Pillow)
+4. Renders all pages from markdown content
+5. Inlines minified CSS + JS into each HTML file
 6. Writes output to `dist/`, copies assets
+
+To pre-generate all 12 monthly OG images (requires Pillow):
+
+```bash
+python3 build.py --gen-monthly
+```
 
 ## Edit content
 
@@ -204,15 +210,26 @@ Each article is a `## Title` block in `content/work/articles.md`. First 6 are vi
 - url: https://url.com/
 ```
 
-### Gallery
+### Playground
 
-Photos are fetched automatically from Glass.photo at build time — no manual config needed. The play page shows the 9 most recent with a "view all photos" link to `/play/photos/`. The full gallery page shows all photos in a responsive masonry grid (3-col desktop, 2-col tablet, 1-col mobile) with:
+In `content/play/playground.md`, each line is one project card. Format:
 
-- **Lightbox** — click any photo to open a full-screen viewer with EXIF info and prev/next navigation (keyboard arrows supported)
-- **Info overlay** — tap the info button on any card to see description, date, camera, and EXIF
-- **Responsive layout** — JS redistributes photos into the correct column count on load and orientation change, preserving left-to-right reading order
+```
+[Name](https://url) | image.png | one-line description | year
+```
 
-The gallery heading lives in `content/play/clicks.md`.
+- `image.png` — filename only; file must exist in `assets/playground/`
+- `year` — optional; displayed in accent colour below the name
+
+Example:
+```markdown
+# playground
+
+[memories](https://photos.thedataareclean.com) | photos.png | experiments behind the viewfinder. | 2024
+[musings](https://musings.thedataareclean.com) | musings.png | a place for my thoughts and ideas. | 2024
+```
+
+Cards render as a 3-col grid (same as projects). Each card links externally with an `arrow_outward` indicator.
 
 ### Lately
 
@@ -237,11 +254,9 @@ All UI copy lives in `content/labels.md`. Keys are fixed; only values change:
 | Key | Default | Used for |
 |---|---|---|
 | `case-study` | case study | project card button |
-| `visit-site` | visit site | project card button |
+| `visit-site` | visit site | project case study page button |
 | `back-to-work` | ← back to work | case study page back link |
-| `show-more` | show more | articles + gallery expand button |
-| `view-all` | view all photos | gallery "view all" link on play page |
-| `back-to-play` | ← back to play | photos page back link |
+| `show-more` | show more | articles expand button |
 | `email-copied` | email copied | clipboard toast message |
 | `season-info` | colours from bengaluru's seasonal blooms | season picker footnote |
 

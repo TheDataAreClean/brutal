@@ -33,14 +33,13 @@ If a string appears on the page, it must be editable without touching Python or 
 | `render_projects(heading_md, mds, labels)` | projects.md + projects/*.md | 3-col grid |
 | `render_articles(md, labels)` | articles.md | 3-col grid + show-more |
 | `render_lately(md)` | lately.md | activity list |
-| `render_gallery(photos, heading_md, labels, ...)` | Glass.photo API + clicks.md | masonry gallery with lightbox |
-| `render_gallery_page(photos, heading_md, labels)` | Glass.photo API + clicks.md | full `/play/photos/` page body |
+| `render_playground(md)` | playground.md | 3-col linked image card grid |
 | `render_rolodex(md)` | ideas.md | randomised link list |
 | `render_interests(md)` | interests.md | tag cloud |
 | `render_project_page(md, labels)` | projects/*.md | case study page |
 | `render_page(template, css, js, ...)` | all above | complete HTML file |
 
-`render_page()` rewrites asset paths based on `depth`: `0` = home, `1` = work/play (`../`), `2` = project detail or photos page (`../../`).
+`render_page()` rewrites asset paths based on `depth`: `0` = home, `1` = work/play (`../`), `2` = project detail (`../../`).
 
 Template placeholders replaced by `render_page()`:
 
@@ -57,16 +56,6 @@ Template placeholders replaced by `render_page()`:
 
 Key helpers: `parse_kv_list` (lines → list of tuples), `parse_labels` (lines → dict), `slugify` (heading → URL slug), `_apply_span(text, cls)` (shared `**x**` → `<span>` impl), `apply_highlight` / `apply_name` (wrappers around `_apply_span`), `parse_inline` (`[x](url)` → `<a>`), `escape` (HTML-escape a string).
 
-### Gallery JS architecture
-
-`render_gallery` embeds three inline `<script>` blocks:
-
-1. **`layout_js`** — on load and resize, creates `.gallery-col` divs and distributes `.gallery-item` elements round-robin by `data-photo-idx` order; column count is `1/2/3` for `≤768px / ≤1024px / >1024px`
-2. **`show_more` script** — reveals hidden items in `data-photo-idx` order on button click
-3. **`info_js`** — toggles `.info-open` on `.gallery-item` when info button is clicked
-
-The lightbox HTML is appended to `document.body` (not `.content-box`) to escape the stacking context. Photos JSON is embedded inline in `lightbox_js`.
-
 ## Design system rules
 
 - **Never use raw color values** — always use a CSS custom property. Dark mode works by swapping `--black`/`--white` at the `:root` level; hardcoded colors break it.
@@ -74,6 +63,8 @@ The lightbox HTML is appended to `document.body` (not `.content-box`) to escape 
 - **New tokens must be documented** — add them to the comment block at the top of `style.css` with a description, and update the tables in README.md.
 - **`.bar-box` is the universal interactive element** — extend with modifier classes only, never override base styles inline. Text bar-boxes add `width: auto` and `padding: 0 var(--btn-pad-x)`.
 - **Icon sizes** — use `var(--icon-sz)` (16px) for inline/small icons and `var(--icon-sz-lg)` (18px) for bar-box icons. The `opsz` value in `font-variation-settings` must match numerically.
+- **Hover pattern** — all bordered interactive box elements (`.bar-box`, `.article`, `.lately-item`, `.rolodex-item`, `.playground-card`, etc.) use the same hover: `background: var(--accent)`, `color: var(--on-accent)`, `border-color: var(--accent)`. Accent-coloured children (arrows, labels, publisher) must also be overridden to `var(--on-accent)` on hover. Always wrap in `@media (hover: hover)`.
+- **`--on-accent`** — `#ffffff` in light mode, `#000000` in dark mode. Always use this token for text/icons on accent-coloured fills — never hardcode white or black.
 
 ## Accessibility rules
 
