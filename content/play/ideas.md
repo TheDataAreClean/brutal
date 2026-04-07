@@ -1,4 +1,4 @@
-# **ideas** i like
+# **people** i keep coming back to
 
 - [The Pudding](https://pudding.cool)
 - [Our World in Data](https://ourworldindata.org)
@@ -13,3 +13,7 @@
 - [Only Poems](https://onlypoems.com/)
 - [Revisual Labs](https://revisual.co/)
 - [Wait But Why](https://waitbutwhy.com/)
+- [Simone Giertz](https://www.youtube.com/@simonegiertz)
+- [Thoraya](https://www.youtube.com/@Thorayaa)
+- [Meghnad S](https://www.youtube.com/@meghnerd)
+- [Laura Kampf](https://www.youtube.com/@laurakampf)

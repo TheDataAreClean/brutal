@@ -1,6 +1,19 @@
-# VizChitra
-- role: core team volunteer
-- url: https://vizchitra.com/
-- desc: contributing to India's premier data visualisation community and conference, helping practitioners learn, share and push the craft forward.
+<!-- CARD -->
+- problem: How do you build a lasting community for data visualisation practitioners in India?
+- org: VizChitra
+- year: 2024
+- tags: community, events
 
-**coming soon**
+<!-- IDENTITY -->
+- url: https://vizchitra.com/
+- slug: vizchitra
+
+<!-- CASE STUDY -->
+
+## overview
+
+case study coming soon.
+
+## what i did
+
+## highlights

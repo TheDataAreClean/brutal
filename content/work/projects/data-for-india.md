@@ -1,6 +1,19 @@
-# Data For India
-- role: audience and product lead
-- url: https://www.dataforindia.com/
-- desc: leading audience engagement and product innovation at Data For India to make the platform's data-first information accessible.
+<!-- CARD -->
+- problem: How do you make a data-first platform actually reach the people the data is about?
+- org: Data For India
+- year: 2024
+- tags: product, audience
 
-**coming soon**
+<!-- IDENTITY -->
+- url: https://www.dataforindia.com/
+- slug: data-for-india
+
+<!-- CASE STUDY -->
+
+## overview
+
+case study coming soon.
+
+## what i did
+
+## highlights

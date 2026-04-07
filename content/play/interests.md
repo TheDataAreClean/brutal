@@ -1,13 +1,16 @@
-# **other** interests
+# **other** things
 i am curious about, in no particular order.
 
 - walking
-- coffee
-- cycling
-- magazines
 - design
-- black
+- the colour black
+- squirrels
 - history
 - caste
-- nature
+- trees
 - internet
+- world wide web
+- community
+- friendship
+- love
+- people

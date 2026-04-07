@@ -1,4 +1,4 @@
-- case-study: case study (soon)
+- case-study: case study
 - visit-site: visit site
 - back-to-work: ← back to work
 - show-more: show more

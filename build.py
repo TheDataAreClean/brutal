@@ -51,18 +51,20 @@ ICON_NAMES = [
 ]
 
 
-def parse_bold_segments(text):
-    """Split text into segments: [(string, is_bold), ...].
+_BOLD_RE = re.compile(r'\*\*(.+?)\*\*')
 
-    **bold** markers indicate accent-colored text.
-    """
+
+def parse_bold_segments(text):
+    """Split text into [(string, is_bold)] segments for OG image rendering."""
     segments = []
-    parts = re.split(r'(\*\*.+?\*\*)', text)
-    for part in parts:
-        if part.startswith('**') and part.endswith('**'):
-            segments.append((part[2:-2], True))
-        else:
-            segments.append((part, False))
+    last = 0
+    for m in _BOLD_RE.finditer(text):
+        if m.start() > last:
+            segments.append((text[last:m.start()], False))
+        segments.append((m.group(1), True))
+        last = m.end()
+    if last < len(text):
+        segments.append((text[last:], False))
     return segments
 
 
@@ -195,7 +197,7 @@ def parse_inline(text):
 
 def _apply_span(text, cls):
     """Convert **bold** to <span class="{cls}">bold</span>."""
-    return re.sub(r'\*\*(.+?)\*\*', rf'<span class="{cls}">\1</span>', text)
+    return _BOLD_RE.sub(rf'<span class="{cls}">\1</span>', text)
 
 
 def apply_highlight(text):
@@ -331,36 +333,42 @@ def render_projects(heading_md, project_mds, labels):
     projects = []
 
     for md in project_mds:
-        p = {'name': '', 'role': '', 'url': '', 'desc': '', 'slug': ''}
+        p = {'org': '', 'url': '', 'problem': '', 'year': '', 'tags': '', 'slug': ''}
         for line in md.strip().split('\n'):
             stripped = line.strip()
-            if stripped.startswith('# '):
-                p['name'] = stripped[2:]
-                p['slug'] = slugify(stripped[2:])
-            elif stripped.startswith('- ') and not stripped.startswith('## '):
+            if stripped.startswith('- ') and not stripped.startswith('## '):
                 key, _, value = stripped[2:].partition(':')
                 key = key.strip()
                 value = value.strip()
-                if key in ('role', 'url', 'desc'):
+                if key in ('org', 'url', 'problem', 'year', 'tags', 'slug'):
                     p[key] = value
+                    if key == 'org' and not p['slug']:
+                        p['slug'] = slugify(value)
             elif stripped.startswith('## '):
                 break  # stop at first section heading
-        if p['name']:
+        if p['org']:
             projects.append(p)
 
     proj_parts = []
     for p in projects:
-        desc = parse_inline(p['desc'])
+        problem = escape(p['problem'])
+        year_html = (
+            f' <span class="project-year">{escape(p["year"])}</span>'
+            if p['year'] else ''
+        )
+        tags_html = ''
+        if p['tags']:
+            tag_spans = ''.join(
+                f'<span class="project-tag">{t.strip()}</span>'
+                for t in p['tags'].split(',') if t.strip()
+            )
+            if tag_spans:
+                tags_html = f'\n        <span class="project-tags">{tag_spans}</span>'
         proj_parts.append(
-            f'      <div class="project">\n'
-            f'        <span class="project-name">{p["name"]}</span>\n'
-            f'        <span class="project-role">{p["role"]}</span>\n'
-            f'        <span class="project-desc">{desc}</span>\n'
-            '        <div class="project-actions">\n'
-            f'          <a class="bar-box project-visit" href="{p["url"]}" target="_blank" rel="noopener" aria-label="Visit site"><span class="material-symbols-sharp">arrow_outward</span></a>\n'
-            f'          <a class="bar-box project-casestudy" href="{{{{nav_root}}}}work/{p["slug"]}/">{case_study_label}</a>\n'
-            '        </div>\n'
-            '      </div>'
+            f'      <a class="project" href="{{{{nav_root}}}}work/{p["slug"]}/">\n'
+            f'        <p class="project-problem">{problem}</p>\n'
+            f'        <span class="project-meta"><span class="project-org">{escape(p["org"])}</span>{year_html}</span>{tags_html}\n'
+            f'      </a>'
         )
 
     projects_inner = '\n'.join(proj_parts)
@@ -467,7 +475,7 @@ def render_lately(md):
         else:
             kv_lines.append(line)
     title = apply_highlight(title)
-    items = dict(parse_kv_list('\n'.join(kv_lines)))
+    items = parse_kv_list('\n'.join(kv_lines))
     label_map = {
         'read': ('menu_book', 'reading'),
         'listened': ('headphones', 'listening to'),
@@ -480,19 +488,15 @@ def render_lately(md):
         'ran': ('directions_run', 'running'),
         'cycled': ('pedal_bike', 'cycling'),
         'photographed': ('photo_camera', 'photographing'),
-        'drank': ('coffee', 'drinking'),
+        'brewed': ('coffee', 'brewing'),
         'visited': ('place', 'visiting'),
         'wrote': ('edit_note', 'writing'),
     }
 
-    order = ('read', 'listened', 'watched', 'cooked', 'explored',
-             'played', 'built', 'learned', 'ran', 'cycled',
-             'photographed', 'drank', 'visited', 'wrote')
-
     parts = []
-    for key in order:
-        raw = items.get(key, '').strip()
-        if not raw:
+    for key, raw in items:
+        raw = raw.strip()
+        if not raw or key not in label_map:
             continue
         icon, label = label_map[key]
         # Extract URL and display text from [text](url), fall back to plain text
@@ -608,8 +612,6 @@ def fetch_icon_font():
         print(f'Warning: icon font download failed ({e}), keeping existing file.')
 
 
-
-
 def render_playground(md):
     """Render playground section: linked image cards for external projects.
 
@@ -661,7 +663,7 @@ def render_playground(md):
         '    <h2 class="section-title">\n'
         f'      {title}\n'
         '    </h2>\n'
-        '    <div class="projects">\n'
+        '    <div class="playground-grid">\n'
         + '\n'.join(card_parts) + '\n'
         + '    </div>\n'
         '  </section>'
@@ -682,10 +684,10 @@ def render_work_body(intro_md, about_md, toolkit_md, projects_heading_md, projec
     """Work page body: intro + about + toolkit + projects + articles."""
     intro_html = render_page_intro(intro_md.strip())
     about_html = render_about(about_md)
-    work_html = render_toolkit(toolkit_md)
+    toolkit_html = render_toolkit(toolkit_md)
     projects_html = render_projects(projects_heading_md, project_mds, labels)
     articles_html = render_articles(articles_md, labels)
-    return intro_html + '\n\n' + about_html + '\n\n' + work_html + '\n\n' + projects_html + '\n\n' + articles_html
+    return intro_html + '\n\n' + about_html + '\n\n' + toolkit_html + '\n\n' + projects_html + '\n\n' + articles_html
 
 
 def render_interests(md):
@@ -770,9 +772,11 @@ def render_rolodex(md):
 def render_project_page(md, labels):
     """Parse a project detail markdown file into a case study page body."""
     lines = md.strip().split('\n')
-    name = ''
-    role = ''
+    org = ''
     url = ''
+    problem = ''
+    year = ''
+    tags = ''
     section = None
     section_headings = {}  # section_key -> display heading from markdown
     section_order = ['overview', 'contribution', 'highlights']
@@ -783,12 +787,20 @@ def render_project_page(md, labels):
 
     for line in lines:
         stripped = line.strip()
-        if stripped.startswith('# '):
-            name = stripped[2:]
-        elif stripped.startswith('- role:'):
-            role = stripped[7:].strip()
-        elif stripped.startswith('- url:'):
-            url = stripped[6:].strip()
+        if stripped.startswith('- ') and not stripped.startswith('## '):
+            key, _, value = stripped[2:].partition(':')
+            key = key.strip()
+            value = value.strip()
+            if key == 'org':
+                org = value
+            elif key == 'url':
+                url = value
+            elif key == 'problem':
+                problem = value
+            elif key == 'tags':
+                tags = value
+            elif key == 'year':
+                year = value
         elif stripped.startswith('## ') and not stripped.startswith('- '):
             if section_idx < len(section_order):
                 key = section_order[section_idx]
@@ -809,56 +821,80 @@ def render_project_page(md, labels):
     visit_label = labels.get('visit-site', 'visit site')
     back_label = labels.get('back-to-work', '← back to work')
 
-    overview_html = '\n'.join(
-        f'        <p>{p}</p>' for p in overview_lines
-    )
-    contrib_html = '\n'.join(
-        f'        <li>{item}</li>' for item in contribution_items
-    )
-    highlights_html = '\n'.join(
-        f'        <div class="project-highlight">{parse_inline(item)}</div>'
-        for item in highlight_items
-    )
+    # Meta line: org · year
+    meta_parts = [escape(p) for p in [org, year] if p]
+    meta_html = ' · '.join(meta_parts)
 
     visit_btn = (
-        f'    <a class="bar-box project-back" href="{url}" target="_blank" rel="noopener">'
-        f'{visit_label} <span class="material-symbols-sharp">arrow_outward</span></a>\n'
+        f'<a class="bar-box project-visit-btn" href="{url}" target="_blank" rel="noopener" aria-label="{visit_label}">'
+        f'<span class="material-symbols-sharp">arrow_outward</span></a>'
     ) if url else ''
 
-    last_section = (
-        '  <section>\n'
-        f'    <h2 class="section-title">{highlights_heading}</h2>\n'
-        '    <div class="project-highlights">\n'
-        f'{highlights_html}\n'
-        '    </div>\n'
-        f'    <a class="bar-box project-back" href="../">{back_label}</a>\n'
-        '  </section>'
-        if highlights_html else
-        '  <section>\n'
-        f'    <a class="bar-box project-back" href="../">{back_label}</a>\n'
-        '  </section>'
-    )
+    back_btn = f'    <a class="bar-box project-back" href="../">{back_label}</a>\n'
+
+    # Build content sections — only render non-empty ones
+    content_sections = []
+
+    if overview_lines:
+        overview_html = '\n'.join(f'        <p>{p}</p>' for p in overview_lines)
+        content_sections.append(
+            '  <section>\n'
+            f'    <h2 class="section-title">{overview_heading}</h2>\n'
+            '    <div class="project-detail-text">\n'
+            f'{overview_html}\n'
+            '    </div>\n'
+            '  </section>'
+        )
+
+    if contribution_items:
+        contrib_html = '\n'.join(f'        <li>{item}</li>' for item in contribution_items)
+        content_sections.append(
+            '  <section>\n'
+            f'    <h2 class="section-title">{contrib_heading}</h2>\n'
+            '    <ul class="project-detail-list">\n'
+            f'{contrib_html}\n'
+            '    </ul>\n'
+            '  </section>'
+        )
+
+    if highlight_items:
+        highlights_html = '\n'.join(
+            f'        <div class="project-highlight">{parse_inline(item)}</div>'
+            for item in highlight_items
+        )
+        content_sections.append(
+            '  <section>\n'
+            f'    <h2 class="section-title">{highlights_heading}</h2>\n'
+            '    <div class="project-highlights">\n'
+            f'{highlights_html}\n'
+            '    </div>\n'
+            '  </section>'
+        )
+
+    back_section = f'  <section class="project-back-section">\n{back_btn}  </section>'
+
+    heading = escape(problem) if problem else escape(org)
+
+    tag_spans = ''.join(
+        f'<span class="project-tag">{t.strip()}</span>'
+        for t in tags.split(',') if t.strip()
+    ) if tags else ''
+    tags_row = (
+        f'    <div class="project-header-tags">'
+        f'<span class="project-tags">{tag_spans}</span>'
+        + visit_btn +
+        f'</div>\n'
+    ) if (tag_spans or visit_btn) else ''
 
     return (
         '  <!-- PROJECT DETAIL -->\n'
         '  <section class="project-header">\n'
-        f'    <h1>{name}</h1>\n'
-        f'    <p class="project-role">{role}</p>\n'
-        f'    {visit_btn}'
-        '  </section>\n\n'
-        '  <section>\n'
-        f'    <h2 class="section-title">{overview_heading}</h2>\n'
-        '    <div class="project-detail-text">\n'
-        f'{overview_html}\n'
-        '    </div>\n'
-        '  </section>\n\n'
-        '  <section>\n'
-        f'    <h2 class="section-title">{contrib_heading}</h2>\n'
-        '    <ul class="project-detail-list">\n'
-        f'{contrib_html}\n'
-        '    </ul>\n'
-        '  </section>\n\n'
-        + last_section
+        f'    <h1 class="project-problem-heading">{heading}</h1>\n'
+        + (f'    <p class="project-detail-meta">{meta_html}</p>\n' if meta_html else '')
+        + tags_row
+        + '  </section>\n\n'
+        + ('\n\n'.join(content_sections) + '\n\n' if content_sections else '')
+        + back_section
     )
 
 

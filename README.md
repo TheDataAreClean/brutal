@@ -60,9 +60,9 @@ CSS and JS are inlined into every HTML file. Asset paths are rewritten per page 
 ## Pages
 
 - **/** — full-viewport hero with name + tagline
-- **/work** — about, toolkit tags, project cards (3-col grid), published writings (3-col grid, show-more in batches of 6)
-- **/play** — lately, playground cards (external projects with screenshot previews), rolodex (5 random links per visit with shuffle), curiosity tags
-- **/work/\<slug\>/** — project case study: overview, what i did, highlights, back to work
+- **/work** — about, toolkit tags, project cards (3-col grid, internal links), published writings (3-col grid, show-more in batches of 6)
+- **/play** — lately, playground cards (2-col grid, external links with screenshot previews), rolodex (5 random links per visit with shuffle), curiosity tags
+- **/work/\<slug\>/** — project case study: problem as h1, org/year meta, tags + visit button, overview, what i did, highlights, back to work
 
 ## Design system
 
@@ -71,11 +71,11 @@ CSS and JS are inlined into every HTML file. Asset paths are rewritten per page 
 | Token | Mobile | Desktop | Use |
 |---|---|---|---|
 | `--text-display` | 32px | 128px | hero h1 |
-| `--text-heading` | 24px | 36px | page intros, section titles, about h2 |
+| `--text-heading` | 24px | 36px | page intros, section titles, about h2, case study h1 |
 | `--text-subhead` | 18px | 24px | hero tagline |
-| `--text-body` | 15px | 17px | about text, tags, project/article names |
-| `--text-small` | 13px | 13px | project role/desc, article meta, footer, gallery info |
-| `--text-ui` | 11px | 11px | nav links, toast, season picker, article tags |
+| `--text-body` | 15px | 17px | about text, tags, project/article names, case study meta |
+| `--text-small` | 13px | 13px | article meta, footer, rolodex, lately |
+| `--text-ui` | 11px | 11px | nav links, toast, season picker, article/project tags |
 
 ### Weight
 
@@ -83,7 +83,7 @@ CSS and JS are inlined into every HTML file. Asset paths are rewritten per page 
 |---|---|
 | 400 | default — body, tags, descriptions |
 | 500 | headings — section titles, about h2 |
-| 700 | emphasis — project/article name, nav, toast, lately value, gallery info title |
+| 700 | emphasis — project/article name, nav, toast, lately value |
 
 ### Line-height
 
@@ -91,15 +91,16 @@ CSS and JS are inlined into every HTML file. Asset paths are rewritten per page 
 |---|---|
 | 1 | hero h1 |
 | 1.05 | section titles |
+| 1.3 | case study problem heading |
 | 1.4 | `--text-small` and `--text-ui` |
 | 1.5 | `--text-body` and above |
 
 ### Letter-spacing
 
-| Value | Use |
-|---|---|
-| 1px | `--text-ui` (nav, toast, tags, show-more) |
-| 0.5px | `--text-small` labels (project role, article meta, footer) |
+| Token | Value | Use |
+|---|---|---|
+| `--ls-ui` | 1px | nav, toast, tags, buttons (`--text-ui` contexts) |
+| `--ls-label` | 0.5px | meta labels, footer, small text (`--text-small` contexts) |
 
 ### Spacing
 
@@ -111,6 +112,8 @@ CSS and JS are inlined into every HTML file. Asset paths are rewritten per page 
 | `--space-sm` | 12px | box gap (alias `--box-gap`) |
 | `--box-gap` | — | alias for `--space-sm` |
 | `--box-pad` | `12px 16px` | inner padding for bordered boxes |
+| `--tag-pad` | `2px 8px` | padding inside pill tags (cards) |
+| `--tag-gap` | `6px` | gap between tags in a group |
 | `--bar-h` | 40px | height of all bars and buttons |
 | `--bar-pad` | 20px | top/bottom padding inside top-bar and nav |
 | `--btn-pad-x` | 16px | horizontal padding in text bar-boxes |
@@ -121,9 +124,9 @@ CSS and JS are inlined into every HTML file. Asset paths are rewritten per page 
 
 | Token | Value | Use |
 |---|---|---|
-| `--icon-sz` | 16px | inline/small icons (svg social icons, inline symbols) |
+| `--icon-sz` | 16px | inline/small icons |
 | `--icon-sz-lg` | 18px | bar-box and primary icons |
-| `--nav-logo-season-sz` | 14px | season picker dot |
+| `--nav-logo-sz` | 14px | season picker dot |
 
 Note: Material Symbols `opsz` in `font-variation-settings` must match the rendered `font-size` value numerically.
 
@@ -134,7 +137,15 @@ Note: Material Symbols `opsz` in `font-variation-settings` must match the render
 - `--on-accent` — `#ffffff` in light mode, `#000000` in dark mode; always use this for text/icons on accent-coloured fills
 - Theme and season persist within a session via `sessionStorage`; weather/AQI cached 1h in `localStorage`
 
-**Hover pattern (all bordered interactive box elements):** `background: var(--accent)`, `color: var(--on-accent)`, `border-color: var(--accent)`. Accent-coloured children (arrows, labels) must also override to `var(--on-accent)`. Always inside `@media (hover: hover)`. Applies to: `.bar-box`, `.article`, `.lately-item`, `.rolodex-item`, `.playground-card`, `.nav-link-box`, `.season-option`.
+**Hover pattern (all bordered interactive box elements):** `background: var(--accent)`, `color: var(--on-accent)`, `border-color: var(--accent)`. Accent-coloured children (arrows, labels, publisher) must also override to `var(--on-accent)`. Always inside `@media (hover: hover)`. Applies to: `.bar-box`, `.project`, `.article`, `.lately-item`, `.rolodex-item`, `.playground-card`, `.nav-link-box`, `.season-option`.
+
+### Responsive breakpoints
+
+| Breakpoint | Behaviour |
+|---|---|
+| > 1024px | 3-col grids (projects, articles) |
+| ≤ 1024px | 2-col grids (projects, articles); playground stays 2-col |
+| ≤ 768px | 1-col everything; lately items wrap; about goes single column |
 
 ## Build
 
@@ -177,26 +188,41 @@ Edit any file in `content/`, then run `python3 build.py`. Inline syntax availabl
 
 ### Projects
 
-Each project lives in its own file at `content/work/projects/<filename>.md`. Files are sorted alphabetically — prefix with a number to control order. The card on the work page links to an auto-generated case study page at `/work/<slug>/`.
+Each project lives in its own file at `content/work/projects/<filename>.md`. Files are sorted alphabetically — prefix with a number to control order. The slug is derived from `- org:` automatically, or set explicitly with `- slug:`.
+
+The card on the work page is an internal link to the case study at `/work/<slug>/`. External visit links appear only on the case study page.
 
 ```markdown
-# Project Name
-- role: your role
+<!-- CARD -->
+- problem: The problem this project addresses, as a question or statement.
+- org: Organisation Name
+- year: 2024
+- tags: tag1, tag2
+
+<!-- IDENTITY -->
 - url: https://example.com/
-- desc: One-line card description.
+- slug: custom-slug       ← optional; auto-derived from org if omitted
+
+<!-- CASE STUDY -->
 
 ## overview
-Case study overview paragraph.
+Case study overview paragraph(s). Each non-empty line becomes a <p>.
 
 ## what i did
 - Bullet one
 - Bullet two
 
 ## highlights
-- [Link text](https://url.com/)
+- [Link text](https://url.com/) or plain text result
 ```
 
-The section headings (`## overview`, `## what i did`, `## highlights`) are displayed as-is — edit them per project if needed.
+Section headings (`## overview`, `## what i did`, `## highlights`) are displayed as written — customise per project. Sections with no content are silently skipped.
+
+**Case study page layout:**
+- Problem statement as `<h1>` (full viewport height intro, anchored bottom)
+- `org · year` meta line with visit site icon button `[↗]`
+- Tags row at bar height, with visit button aligned right
+- Content sections below
 
 ### Articles
 
@@ -225,11 +251,11 @@ Example:
 ```markdown
 # playground
 
-[memories](https://photos.thedataareclean.com) | photos.png | experiments behind the viewfinder. | 2024
-[musings](https://musings.thedataareclean.com) | musings.png | a place for my thoughts and ideas. | 2024
+[memories](https://photos.thedataareclean.com) | photos.png | experiments behind the viewfinder. | 2026
+[musings](https://musings.thedataareclean.com) | musings.png | a place for my thoughts and ideas. | 2026
 ```
 
-Cards render as a 3-col grid (same as projects). Each card links externally with an `arrow_outward` indicator.
+Cards render as a 2-col grid. Each card links externally with an `arrow_outward` indicator.
 
 ### Lately
 
@@ -241,7 +267,7 @@ In `content/play/lately.md`, use `[title](url)` for a linked entry or leave blan
 - watched:
 ```
 
-Available keys: `read`, `listened`, `watched`, `cooked`, `explored`, `played`, `built`, `learned`, `ran`, `cycled`, `photographed`, `drank`, `visited`, `wrote`.
+Available keys: `read`, `listened`, `watched`, `cooked`, `explored`, `played`, `built`, `learned`, `ran`, `cycled`, `photographed`, `brewed`, `visited`, `wrote`.
 
 ### Rolodex
 
@@ -253,8 +279,8 @@ All UI copy lives in `content/labels.md`. Keys are fixed; only values change:
 
 | Key | Default | Used for |
 |---|---|---|
-| `case-study` | case study | project card button |
-| `visit-site` | visit site | project case study page button |
+| `case-study` | case study | project card link text (cards link internally, no arrow) |
+| `visit-site` | visit site | `aria-label` on the icon-only visit button on case study pages |
 | `back-to-work` | ← back to work | case study page back link |
 | `show-more` | show more | articles expand button |
 | `email-copied` | email copied | clipboard toast message |
