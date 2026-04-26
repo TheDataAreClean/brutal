@@ -5,9 +5,11 @@ Reads markdown content files, renders them into HTML,
 and assembles multi-page output: /, /work/, /play/.
 
 Usage:
-  python3 build.py               — normal build
-  python3 build.py --gen-monthly — regenerate all 12 monthly OG images + favicons
-                                   (requires: pip install Pillow)
+  python3 build.py                 — normal build
+  python3 build.py --gen-monthly   — regenerate all 12 monthly OG images + favicons
+                                     (requires: pip install Pillow)
+  python3 build.py --optimize-images — convert all PNG/JPG/JPEG in assets/ to WebP
+                                       and delete the originals (requires: pip install Pillow)
 """
 
 import json
@@ -52,6 +54,10 @@ ICON_NAMES = [
 
 
 _BOLD_RE = re.compile(r'\*\*(.+?)\*\*')
+_ITALIC_RE = re.compile(r'(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)')
+_NUM_LIST_RE = re.compile(r'^\d+\.\s+')
+_SECTION_HDG_RE = re.compile(r'^(#{2,4})(\s|$)')
+_IMG_RE = re.compile(r'^!\[([^\]]*)\]\(([^)]+)\)$')
 
 
 def parse_bold_segments(text):
@@ -206,6 +212,15 @@ def apply_highlight(text):
 
 def apply_name(text):
     return _apply_span(text, 'name')
+
+
+def render_inline(text):
+    """HTML-escape then convert **bold**, *italic*, [link](url) to inline HTML."""
+    text = escape(text)
+    text = _BOLD_RE.sub(r'<strong>\1</strong>', text)
+    text = _ITALIC_RE.sub(r'<em>\1</em>', text)
+    text = re.sub(r'\[(.+?)\]\((.+?)\)', r'<a href="\2" target="_blank" rel="noopener">\1</a>', text)
+    return text
 
 
 def parse_kv_list(text):
@@ -777,20 +792,17 @@ def render_project_page(md, labels):
     problem = ''
     year = ''
     tags = ''
-    section = None
-    section_headings = {}  # section_key -> display heading from markdown
-    section_order = ['overview', 'contribution', 'highlights']
-    section_idx = 0
-    overview_lines = []
-    contribution_items = []
-    highlight_items = []
 
+    # --- Pass 1: extract front-matter key-value pairs (before first ## heading) ---
+    in_frontmatter = True
     for line in lines:
         stripped = line.strip()
-        if stripped.startswith('- ') and not stripped.startswith('## '):
+        if stripped.startswith('## '):
+            in_frontmatter = False
+            break
+        if in_frontmatter and stripped.startswith('- '):
             key, _, value = stripped[2:].partition(':')
-            key = key.strip()
-            value = value.strip()
+            key, value = key.strip(), value.strip()
             if key == 'org':
                 org = value
             elif key == 'url':
@@ -801,27 +813,123 @@ def render_project_page(md, labels):
                 tags = value
             elif key == 'year':
                 year = value
-        elif stripped.startswith('## ') and not stripped.startswith('- '):
-            if section_idx < len(section_order):
-                key = section_order[section_idx]
-                section_headings[key] = stripped[3:]
-                section = key
-                section_idx += 1
-        elif section == 'overview' and stripped and not stripped.startswith('- '):
-            overview_lines.append(stripped)
-        elif section == 'contribution' and stripped.startswith('- '):
-            contribution_items.append(stripped[2:])
-        elif section == 'highlights' and stripped.startswith('- '):
-            highlight_items.append(stripped[2:])
 
-    overview_heading = section_headings.get('overview', 'overview')
-    contrib_heading = section_headings.get('contribution', 'what i did')
-    highlights_heading = section_headings.get('highlights', 'highlights')
+    # --- Pass 2: collect sections generically ---
+    # Find the minimum heading level in this file — that becomes the section level.
+    # Headings exactly one level deeper become subheadings within the current section.
+    # Headings more than one level deeper start a new top-level section (skipped depth).
+    section_level = min(
+        (len(m.group(1)) for line in lines
+         for m in [_SECTION_HDG_RE.match(line.strip())] if m),
+        default=2,
+    )
+    subheading_level = section_level + 1
+
+    sections = []
+    current = None
+    for line in lines:
+        stripped = line.strip()
+        if stripped.startswith('<!--'):
+            continue
+        m = _SECTION_HDG_RE.match(stripped)
+        if m:
+            level = len(m.group(1))
+            heading = stripped[level:].strip()
+            if level == subheading_level and current is not None:
+                current['lines'].append(('subheading', heading))
+            else:
+                current = {'heading': heading, 'lines': []}
+                sections.append(current)
+        elif current is not None and stripped:
+            current['lines'].append(('line', stripped))
+
+    # --- Render each section ---
+    def _render_figure(caption, src):
+        alt = escape(caption)
+        s = escape(src)
+        cap_html = f'\n      <figcaption class="project-figcaption">{alt}</figcaption>' if caption else ''
+        return f'    <figure class="project-figure">\n      <img src="{s}" alt="{alt}" loading="lazy">{cap_html}\n    </figure>'
+
+    def _render_section(sec):
+        heading = escape(sec['heading'])
+        raw_lines = sec['lines']
+        if not raw_lines:
+            return None
+
+        # Classify each raw line into typed items for rendering
+        # ('p', text) | ('li', text) | ('img', caption, src) | ('sub', text)
+        items = []
+        for kind, text in raw_lines:
+            if kind == 'subheading':
+                items.append(('sub', text))
+            else:
+                m = _IMG_RE.match(text)
+                if m:
+                    items.append(('img', m.group(1), m.group(2)))
+                elif text.startswith('- '):
+                    items.append(('li', text[2:]))
+                elif _NUM_LIST_RE.match(text):
+                    items.append(('li', _NUM_LIST_RE.sub('', text, count=1)))
+                else:
+                    items.append(('p', text))
+
+        if not items:
+            return None
+
+        # Detect pure bullet-list sections (no paragraphs, no images, no subheadings)
+        only_bullets = all(g[0] == 'li' for g in items)
+
+        inner_parts = []
+
+        if only_bullets:
+            lis = '\n'.join(f'        <li>{render_inline(g[1])}</li>' for g in items)
+            inner_parts.append(f'    <ul class="project-detail-list">\n{lis}\n    </ul>')
+        else:
+            # Track open list state across mixed content
+            in_list = False
+            for g in items:
+                kind = g[0]
+                if kind == 'sub':
+                    if in_list:
+                        inner_parts.append('    </ul>')
+                        in_list = False
+                    inner_parts.append(f'    <h3 class="project-subheading">{escape(g[1])}</h3>')
+                elif kind == 'li':
+                    if not in_list:
+                        inner_parts.append('    <ul class="project-detail-list">')
+                        in_list = True
+                    inner_parts.append(f'      <li>{render_inline(g[1])}</li>')
+                elif kind == 'p':
+                    if in_list:
+                        inner_parts.append('    </ul>')
+                        in_list = False
+                    inner_parts.append(f'    <p>{render_inline(g[1])}</p>')
+                elif kind == 'img':
+                    if in_list:
+                        inner_parts.append('    </ul>')
+                        in_list = False
+                    inner_parts.append(_render_figure(g[1], g[2]))
+            if in_list:
+                inner_parts.append('    </ul>')
+
+        if not inner_parts:
+            return None
+
+        inner = '\n'.join(inner_parts)
+        return (
+            '  <section class="project-section">\n'
+            f'    <h2 class="section-title">{heading}</h2>\n'
+            '    <div class="project-detail-text">\n'
+            f'{inner}\n'
+            '    </div>\n'
+            '  </section>'
+        )
+
+    content_sections = [s for sec in sections for s in [_render_section(sec)] if s]
 
     visit_label = labels.get('visit-site', 'visit site')
     back_label = labels.get('back-to-work', '← back to work')
 
-    # Meta line: org · year
     meta_parts = [escape(p) for p in [org, year] if p]
     meta_html = ' · '.join(meta_parts)
 
@@ -831,47 +939,6 @@ def render_project_page(md, labels):
     ) if url else ''
 
     back_btn = f'    <a class="bar-box project-back" href="../">{back_label}</a>\n'
-
-    # Build content sections — only render non-empty ones
-    content_sections = []
-
-    if overview_lines:
-        overview_html = '\n'.join(f'        <p>{p}</p>' for p in overview_lines)
-        content_sections.append(
-            '  <section>\n'
-            f'    <h2 class="section-title">{overview_heading}</h2>\n'
-            '    <div class="project-detail-text">\n'
-            f'{overview_html}\n'
-            '    </div>\n'
-            '  </section>'
-        )
-
-    if contribution_items:
-        contrib_html = '\n'.join(f'        <li>{item}</li>' for item in contribution_items)
-        content_sections.append(
-            '  <section>\n'
-            f'    <h2 class="section-title">{contrib_heading}</h2>\n'
-            '    <ul class="project-detail-list">\n'
-            f'{contrib_html}\n'
-            '    </ul>\n'
-            '  </section>'
-        )
-
-    if highlight_items:
-        highlights_html = '\n'.join(
-            f'        <div class="project-highlight">{parse_inline(item)}</div>'
-            for item in highlight_items
-        )
-        content_sections.append(
-            '  <section>\n'
-            f'    <h2 class="section-title">{highlights_heading}</h2>\n'
-            '    <div class="project-highlights">\n'
-            f'{highlights_html}\n'
-            '    </div>\n'
-            '  </section>'
-        )
-
-    back_section = f'  <section class="project-back-section">\n{back_btn}  </section>'
 
     heading = escape(problem) if problem else escape(org)
 
@@ -886,6 +953,8 @@ def render_project_page(md, labels):
         f'</div>\n'
     ) if (tag_spans or visit_btn) else ''
 
+    back_section = f'  <section class="project-back-section">\n{back_btn}  </section>'
+
     return (
         '  <!-- PROJECT DETAIL -->\n'
         '  <section class="project-header">\n'
@@ -895,6 +964,213 @@ def render_project_page(md, labels):
         + '  </section>\n\n'
         + ('\n\n'.join(content_sections) + '\n\n' if content_sections else '')
         + back_section
+    )
+
+
+def _to_pubdate(date_str):
+    """Convert 'Mon YYYY', 'Month YYYY', or 'YYYY' to (datetime, RFC 822 string).
+
+    Uses the 1st of the month as convention for month-only dates,
+    and Jan 1st for year-only dates. Returns (None, None) if unparseable.
+    """
+    s = date_str.strip()
+    try:
+        dt = datetime.strptime(s, '%Y-%m-%d')
+        return dt, dt.strftime('%a, %d %b %Y 00:00:00 +0000')
+    except ValueError:
+        pass
+    for fmt in ('%b %Y', '%B %Y'):
+        try:
+            dt = datetime.strptime(s, fmt)
+            return dt, dt.strftime('%a, %d %b %Y 00:00:00 +0000')
+        except ValueError:
+            pass
+    try:
+        dt = datetime(int(s), 1, 1)
+        return dt, dt.strftime('%a, %d %b %Y 00:00:00 +0000')
+    except ValueError:
+        pass
+    return None, None
+
+
+
+
+def _abs_url(src, site_url):
+    """Make a src path absolute. Prepends site_url for relative/root-relative paths."""
+    if not src or src.startswith('http'):
+        return src
+    return site_url.rstrip('/') + '/' + src.lstrip('/')
+
+
+def _first_project_image(md):
+    """Return the src of the first ![...](src) found in a project markdown file."""
+    for line in md.strip().split('\n'):
+        m = _IMG_RE.match(line.strip())
+        if m:
+            return m.group(2)
+    return None
+
+
+def _feed_item(title, link, desc, date_str, guid, image_url=None):
+    """Build a single RSS <item> block. Returns (datetime, xml_str) for sorting."""
+    dt, pub = _to_pubdate(date_str) if date_str else (None, None)
+    media = f'      <media:content url="{escape(image_url)}" medium="image"/>\n' if image_url else ''
+    xml = (
+        '    <item>\n'
+        f'      <title>{escape(title)}</title>\n'
+        f'      <link>{escape(link)}</link>\n'
+        + (f'      <description>{escape(desc)}</description>\n' if desc else '')
+        + (f'      <pubDate>{pub}</pubDate>\n' if pub else '')
+        + f'      <guid isPermaLink="{"true" if link == guid else "false"}">{escape(guid)}</guid>\n'
+        + media
+        + '    </item>'
+    )
+    return dt or datetime.min, xml
+
+
+def render_feed(articles_md, project_mds, lately_archive_md, playground_md, meta_md):
+    """Generate RSS 2.0 feed XML aggregating articles, projects, lately, and playground."""
+    meta = dict(parse_kv_list(meta_md))
+    site_url = meta.get('url', '').rstrip('/')
+    site_title = meta.get('title', '')
+    site_desc = meta.get('description', '')
+
+    entries = []  # list of (datetime, xml_str)
+
+    # --- Articles ---
+    lines = articles_md.strip().split('\n')
+    current = None
+    for line in lines:
+        stripped = line.strip()
+        if stripped.startswith('## '):
+            if current:
+                entries.append(_feed_item(
+                    title=current['name'],
+                    link=current['url'],
+                    desc=' · '.join(filter(None, [current['publisher'], current['tags']])),
+                    date_str=current['date'],
+                    guid=current['url'],
+                ))
+            current = {'name': stripped[3:], 'publisher': '', 'date': '', 'tags': '', 'url': ''}
+        elif stripped.startswith('- ') and current:
+            key, _, value = stripped[2:].partition(':')
+            key, value = key.strip(), value.strip()
+            if key in ('publisher', 'date', 'tags', 'url'):
+                current[key] = value
+    if current:
+        entries.append(_feed_item(
+            title=current['name'],
+            link=current['url'],
+            desc=' · '.join(filter(None, [current['publisher'], current['tags']])),
+            date_str=current['date'],
+            guid=current['url'],
+        ))
+
+    # --- Projects ---
+    for md in project_mds:
+        p = {'org': '', 'problem': '', 'tags': '', 'slug': '', 'added': ''}
+        for line in md.strip().split('\n'):
+            s = line.strip()
+            if s.startswith('## '):
+                break
+            if s.startswith('- '):
+                key, _, val = s[2:].partition(':')
+                key, val = key.strip(), val.strip()
+                if key in ('org', 'problem', 'tags', 'slug', 'added'):
+                    p[key] = val
+                    if key == 'org' and not p['slug']:
+                        p['slug'] = slugify(val)
+        if not p['added'] or not p['slug']:
+            continue
+        link = f'{site_url}/work/{p["slug"]}/'
+        img_src = _first_project_image(md)
+        entries.append(_feed_item(
+            title=f'new case study: {p["org"]}',
+            link=link,
+            desc=p['problem'],
+            date_str=p['added'],
+            guid=link,
+            image_url=_abs_url(img_src, site_url) if img_src else None,
+        ))
+
+    # --- Lately (from archive: ## Mon YYYY sections → items) ---
+    label_map = {
+        'read': 'reading', 'listened': 'listening to', 'watched': 'watching',
+        'cooked': 'cooking', 'explored': 'exploring', 'played': 'playing',
+        'built': 'building', 'learned': 'learning', 'ran': 'running',
+        'cycled': 'cycling', 'photographed': 'photographing', 'brewed': 'brewing',
+        'visited': 'visiting', 'wrote': 'writing',
+    }
+    current_date = ''
+    for line in lately_archive_md.strip().split('\n'):
+        s = line.strip()
+        if s.startswith('## '):
+            current_date = s[3:].strip()
+            continue
+        if not s.startswith('- ') or not current_date:
+            continue
+        key, _, raw = s[2:].partition(':')
+        key, raw = key.strip(), raw.strip()
+        if key not in label_map or not raw:
+            continue
+        m = re.match(r'\[(.+?)\]\((.+?)\)', raw)
+        if m:
+            display, url = m.group(1), m.group(2)
+        else:
+            display, url = raw, site_url
+        label = label_map[key]
+        entries.append(_feed_item(
+            title=f'lately {label}: {display}',
+            link=url,
+            desc='',
+            date_str=current_date,
+            guid=f'lately:{key}:{url}',
+        ))
+
+    # --- Playground ---
+    for line in playground_md.strip().split('\n'):
+        s = line.strip()
+        if '|' not in s or s.startswith('#'):
+            continue
+        parts = [p.strip() for p in s.split('|', 3)]
+        if len(parts) < 3:
+            continue
+        m = re.match(r'\[(.+?)\]\((.+?)\)', parts[0])
+        if not m:
+            continue
+        name, url = m.group(1), m.group(2)
+        img_file = parts[1]
+        desc = parts[2]
+        year = parts[3] if len(parts) == 4 else ''
+        entries.append(_feed_item(
+            title=f'playground: {name}',
+            link=url,
+            desc=desc,
+            date_str=year,
+            guid=url,
+            image_url=_abs_url(f'/assets/playground/{img_file}', site_url),
+        ))
+
+    # Sort newest first
+    entries.sort(key=lambda e: e[0], reverse=True)
+
+    now_rfc822 = datetime.utcnow().strftime('%a, %d %b %Y %H:%M:%S +0000')
+    feed_url = f'{site_url}/feed.xml'
+    items_xml = '\n'.join(xml for _, xml in entries)
+
+    return (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">\n'
+        '  <channel>\n'
+        f'    <title>{escape(site_title)}</title>\n'
+        f'    <link>{escape(site_url)}</link>\n'
+        f'    <description>{escape(site_desc)}</description>\n'
+        '    <language>en</language>\n'
+        f'    <lastBuildDate>{now_rfc822}</lastBuildDate>\n'
+        f'    <atom:link href="{escape(feed_url)}" rel="self" type="application/rss+xml"/>\n'
+        f'{items_xml}\n'
+        '  </channel>\n'
+        '</rss>\n'
     )
 
 
@@ -923,6 +1199,7 @@ def render_page(template, css, js, meta_html, footer_html, body_html, active_nav
     html = html.replace('{{footer}}', footer_html)
     html = html.replace('{{toast_email_copied}}', (labels or {}).get('email-copied', 'email copied'))
     html = html.replace('{{season_info}}', (labels or {}).get('season-info', ''))
+    html = html.replace('{{feed_title}}', (labels or {}).get('feed-title', 'RSS Feed'))
 
     # Nav active states
     html = html.replace('{{nav_root}}', prefix)
@@ -975,6 +1252,55 @@ def minify_js(js):
     return '\n'.join(lines) + '\n'
 
 
+def check_content(project_mds, playground_md):
+    """Validate image references in project and playground markdown.
+
+    Resolves root-relative paths (e.g. /assets/projects/foo.webp) against BASE.
+    Prints a warning for each missing file. Never halts the build.
+    Returns the number of warnings emitted.
+    """
+    warnings = []
+
+    for md in project_mds:
+        # Extract slug for readable warning labels
+        slug = ''
+        for line in md.strip().split('\n'):
+            s = line.strip()
+            if s.startswith('- slug:'):
+                slug = s[7:].strip()
+                break
+            if s.startswith('## '):
+                break
+
+        for line in md.strip().split('\n'):
+            m = _IMG_RE.match(line.strip())
+            if not m:
+                continue
+            src = m.group(2)
+            if src.startswith('http'):
+                continue  # external URLs — skip
+            path = BASE / src.lstrip('/')
+            if not path.exists():
+                label = f'[{slug}]' if slug else '[project]'
+                warnings.append(f'Warning: missing asset {label}: {src}')
+
+    for line in playground_md.strip().split('\n'):
+        s = line.strip()
+        if '|' not in s or s.startswith('#'):
+            continue
+        parts = [p.strip() for p in s.split('|', 3)]
+        if len(parts) < 2:
+            continue
+        img_file = parts[1]
+        path = BASE / 'assets' / 'playground' / img_file
+        if not path.exists():
+            warnings.append(f'Warning: missing playground asset: assets/playground/{img_file}')
+
+    for w in warnings:
+        print(w)
+    return len(warnings)
+
+
 def build():
     template = read(BASE / 'template.html')
     css = read(BASE / 'style.css')
@@ -990,11 +1316,12 @@ def build():
     projects_heading_md = read(CONTENT / 'work' / 'projects.md')
     articles_md         = read(CONTENT / 'work' / 'articles.md')
 
-    play_intro_md   = read(CONTENT / 'play' / 'intro.md')
-    lately_md       = read(CONTENT / 'play' / 'lately.md')
-    playground_md   = read(CONTENT / 'play' / 'playground.md')
-    ideas_md        = read(CONTENT / 'play' / 'ideas.md')
-    interests_md    = read(CONTENT / 'play' / 'interests.md')
+    play_intro_md       = read(CONTENT / 'play' / 'intro.md')
+    lately_md           = read(CONTENT / 'play' / 'lately.md')
+    lately_archive_md   = read(CONTENT / 'play' / 'lately-archive.md')
+    playground_md       = read(CONTENT / 'play' / 'playground.md')
+    ideas_md            = read(CONTENT / 'play' / 'ideas.md')
+    interests_md        = read(CONTENT / 'play' / 'interests.md')
 
     labels = parse_labels(read(CONTENT / 'labels.md'))
 
@@ -1006,18 +1333,44 @@ def build():
     fetch_icon_font()
 
     # Project files (shared by grid cards and detail pages)
-    project_detail_files = sorted((CONTENT / 'work' / 'projects').glob('*.md'))
-    project_mds = [read(f) for f in project_detail_files]
+    project_detail_files = list((CONTENT / 'work' / 'projects').glob('*.md'))
+    project_mds_all = [read(f) for f in project_detail_files]
+
+    # Validate image references before building
+    check_content(project_mds_all, playground_md)
 
     # Page bodies
     home_body = render_hero(hero_md)
-    work_body = render_work_body(work_intro_md, about_md, toolkit_md, projects_heading_md, project_mds, articles_md, labels)
     play_body = render_play_body(play_intro_md, lately_md, playground_md, interests_md, ideas_md)
 
-    # Project detail pages
+    # Project detail pages — use the slug parsed from the markdown (same slug the card links use)
+    def _project_slug(md):
+        slug = ''
+        org = ''
+        for line in md.strip().split('\n'):
+            s = line.strip()
+            if s.startswith('- '):
+                key, _, val = s[2:].partition(':')
+                key, val = key.strip(), val.strip()
+                if key == 'slug':
+                    slug = val
+                elif key == 'org' and not org:
+                    org = val
+            elif s.startswith('## '):
+                break
+        return slug or slugify(org)
+
+    # Order projects by content/work/project-order.md (one slug per line).
+    # Projects not listed appear after ordered ones.
+    _order_md = read(CONTENT / 'work' / 'project-order.md')
+    _order_slugs = [l.strip()[2:].strip() for l in _order_md.splitlines() if l.strip().startswith('- ')]
+    project_mds = sorted(project_mds_all, key=lambda md: _order_slugs.index(_project_slug(md)) if _project_slug(md) in _order_slugs else len(_order_slugs))
+
+    work_body = render_work_body(work_intro_md, about_md, toolkit_md, projects_heading_md, project_mds, articles_md, labels)
+
     project_pages = [
-        (f'work/{f.stem}/index.html', render_project_page(md, labels), 'work', 2)
-        for f, md in zip(project_detail_files, project_mds)
+        (f'work/{_project_slug(md)}/index.html', render_project_page(md, labels), 'work', 2)
+        for md in project_mds
     ]
 
     # Copy pre-generated monthly OG image
@@ -1058,6 +1411,11 @@ def build():
             shutil.rmtree(assets_dst)
         shutil.copytree(assets_src, assets_dst, ignore=shutil.ignore_patterns('README.md', 'monthly'))
 
+    # Generate RSS feed
+    feed_xml = render_feed(articles_md, project_mds, lately_archive_md, playground_md, meta_md)
+    (DIST / 'feed.xml').write_text(feed_xml)
+    print(f'Built dist/feed.xml ({len(feed_xml)} bytes)')
+
     # Copy CNAME for GitHub Pages
     cname = BASE / 'CNAME'
     if cname.exists():
@@ -1084,8 +1442,64 @@ def generate_monthly_assets():
     print('Done — all 12 monthly OG images generated.')
 
 
+def optimize_images():
+    """Convert all PNG/JPG/JPEG in assets/ to WebP and delete the originals.
+
+    Skips: assets/monthly/ (source OG images), assets/fonts/, favicon.png.
+    Already-WebP files are ignored. Run once after adding new raster images.
+    """
+    from PIL import Image
+
+    SKIP_FILES = {'favicon.png', 'og-image.png'}
+    SKIP_DIRS = {'monthly', 'fonts'}
+    EXTENSIONS = {'.png', '.jpg', '.jpeg'}
+    TARGET_W = 1200
+    QUALITY = 82
+
+    assets = BASE / 'assets'
+    candidates = [
+        p for p in assets.rglob('*')
+        if p.suffix.lower() in EXTENSIONS
+        and p.name not in SKIP_FILES
+        and not any(part in SKIP_DIRS for part in p.parts)
+    ]
+
+    if not candidates:
+        print('No images to optimise.')
+        return
+
+    for src in sorted(candidates):
+        img = Image.open(src)
+        # Flatten alpha to white
+        if img.mode in ('RGBA', 'LA', 'P'):
+            if img.mode == 'P':
+                img = img.convert('RGBA')
+            bg = Image.new('RGB', img.size, (255, 255, 255))
+            bg.paste(img, mask=img.split()[-1] if img.mode == 'RGBA' else None)
+            img = bg
+        elif img.mode != 'RGB':
+            img = img.convert('RGB')
+
+        # Downscale if wider than target
+        w, h = img.size
+        if w > TARGET_W:
+            img = img.resize((TARGET_W, round(h * TARGET_W / w)), Image.LANCZOS)
+
+        out = src.with_suffix('.webp')
+        img.save(out, 'WEBP', quality=QUALITY, method=6)
+        orig_kb = src.stat().st_size / 1024
+        new_kb = out.stat().st_size / 1024
+        src.unlink()
+        rel = src.relative_to(BASE)
+        print(f'{rel}  {orig_kb:.0f}KB → {out.name}  {new_kb:.0f}KB  ({new_kb/orig_kb*100:.0f}%)')
+
+    print('Done — all images optimised.')
+
+
 if __name__ == '__main__':
     if '--gen-monthly' in sys.argv:
         generate_monthly_assets()
+    elif '--optimize-images' in sys.argv:
+        optimize_images()
     else:
         build()

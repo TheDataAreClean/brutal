@@ -4,3 +4,4 @@
 - show-more: show more
 - email-copied: email copied
 - season-info: colours from bengaluru's seasonal blooms
+- feed-title: arpit's universe

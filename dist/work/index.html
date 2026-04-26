@@ -19,6 +19,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700&display=swap" as="style">
   <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="alternate" type="application/rss+xml" title="arpit's universe" href="../feed.xml">
   <style>
     @font-face {
       font-family: 'Material Symbols Sharp';
@@ -217,7 +218,7 @@
       display: flex;
       align-items: center;
       gap: var(--inner-gap);
-      padding: var(--tag-pad);
+      padding: var(--inner-gap);
       cursor: pointer;
       background: none;
       border: none;
@@ -243,7 +244,7 @@
       flex-shrink: 0;
     }
     .season-info {
-      padding: var(--tag-pad);
+      padding: var(--inner-gap);
       opacity: 0.5;
       border-top: 1px solid currentColor;
       white-space: normal;
@@ -378,7 +379,7 @@
     }
     .project-header-tags {
       display: flex;
-      align-items: center;
+      align-items: flex-end;
       justify-content: space-between;
       gap: var(--box-gap);
     }
@@ -392,6 +393,25 @@
     }
     .project-visit-btn.bar-box {
       flex-shrink: 0;
+    }
+    .project-section {
+      padding-top: var(--space-md);
+      padding-bottom: 0;
+    }
+    .project-section .section-title {
+      font-size: var(--text-ui);
+      font-weight: 500;
+      letter-spacing: var(--ls-ui);
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: var(--space-sm);
+      line-height: 1.4;
+    }
+    .project-detail-text {
+      max-width: 68ch;
+    }
+    .project-back-section {
+      padding-top: var(--space-md);
     }
     section {
       padding: var(--space-lg) var(--padding);
@@ -572,20 +592,31 @@
         color: var(--on-accent);
       }
     }
+    .project-detail-text a {
+      color: var(--accent);
+      text-decoration: none;
+    }
     .project-detail-text p {
       font-size: var(--text-body);
-      line-height: 1.5;
+      line-height: 1.6;
       margin-bottom: var(--space-sm);
+    }
+    .project-detail-text p:last-child {
+      margin-bottom: 0;
+    }
+    .project-detail-text p + .project-figure {
+      margin-top: 0;
     }
     .project-detail-list {
       list-style: none;
       display: flex;
       flex-direction: column;
-      gap: var(--inner-gap);
+      gap: 4px;
+      margin-bottom: var(--space-sm);
     }
     .project-detail-list li {
       font-size: var(--text-body);
-      line-height: 1.5;
+      line-height: 1.6;
       padding-left: var(--btn-pad-x);
       position: relative;
     }
@@ -594,6 +625,34 @@
       position: absolute;
       left: 0;
       color: var(--accent);
+    }
+    .project-figure {
+      margin: var(--space-md) 0;
+      border: 1px solid var(--black);
+    }
+    .project-figure img {
+      width: 100%;
+      display: block;
+    }
+    .project-figcaption {
+      padding: var(--inner-gap) var(--box-gap);
+      font-size: var(--text-small);
+      letter-spacing: var(--ls-label);
+      border-top: 1px solid var(--black);
+    }
+    .project-figure + .project-figure {
+      margin-top: 0;
+    }
+    .project-subheading {
+      font-size: var(--text-ui);
+      font-weight: 500;
+      letter-spacing: var(--ls-ui);
+      text-transform: uppercase;
+      margin-top: var(--space-md);
+      margin-bottom: var(--space-sm);
+    }
+    .project-subheading:first-child {
+      margin-top: 0;
     }
     .project-highlights {
       display: flex;
@@ -611,9 +670,6 @@
       font-size: var(--text-ui);
       font-weight: 700;
       letter-spacing: var(--ls-ui);
-    }
-    .project-back-section {
-      padding-top: 0;
     }
     .articles {
       display: grid;
@@ -1022,15 +1078,30 @@
       <span class="highlight">currently</span> working on
     </h2>
     <div class="projects">
-      <a class="project" href="../work/data-for-india/">
-        <p class="project-problem">How do you make a data-first platform actually reach the people the data is about?</p>
-        <span class="project-meta"><span class="project-org">Data For India</span> <span class="project-year">2024</span></span>
-        <span class="project-tags"><span class="project-tag">product</span><span class="project-tag">audience</span></span>
+      <a class="project" href="../work/data-for-india-product/">
+        <p class="project-problem">How do you build a digital platform that advances understanding of India through data?</p>
+        <span class="project-meta"><span class="project-org">Data For India</span> <span class="project-year">2024-ongoing</span></span>
+        <span class="project-tags"><span class="project-tag">product</span><span class="project-tag">design</span><span class="project-tag">ux</span></span>
       </a>
-      <a class="project" href="../work/vizchitra/">
-        <p class="project-problem">How do you build a lasting community for data visualisation practitioners in India?</p>
-        <span class="project-meta"><span class="project-org">VizChitra</span> <span class="project-year">2024</span></span>
+      <a class="project" href="../work/data-for-india-viz/">
+        <p class="project-problem">How do you create a data visualisation system that extends seamlessly across mediums?</p>
+        <span class="project-meta"><span class="project-org">Data For India</span> <span class="project-year">2024–2025</span></span>
+        <span class="project-tags"><span class="project-tag">data viz</span><span class="project-tag">info design</span><span class="project-tag">systems</span></span>
+      </a>
+      <a class="project" href="../work/vizchitra-editorial/">
+        <p class="project-problem">How do you curate the lineup for India&#x27;s premier data visualization conference and community?</p>
+        <span class="project-meta"><span class="project-org">VizChitra</span> <span class="project-year">2025–ongoing</span></span>
+        <span class="project-tags"><span class="project-tag">data viz</span><span class="project-tag">community</span><span class="project-tag">editorial</span></span>
+      </a>
+      <a class="project" href="../work/vizchitra-bengaluru/">
+        <p class="project-problem">How do you build a local data viz community to foster creation and connection?</p>
+        <span class="project-meta"><span class="project-org">VizChitra</span> <span class="project-year">2025–ongoing</span></span>
         <span class="project-tags"><span class="project-tag">community</span><span class="project-tag">events</span></span>
+      </a>
+      <a class="project" href="../work/vyapaar-mne/">
+        <p class="project-problem">How do you measure which interventions effectively strengthen nano‑entrepreneurs&#x27; livelihoods?</p>
+        <span class="project-meta"><span class="project-org">Udhyam Vyapaar</span> <span class="project-year">2022–2024</span></span>
+        <span class="project-tags"><span class="project-tag">monitoring & evaluation</span><span class="project-tag">product</span><span class="project-tag">impact</span></span>
       </a>
     </div>
   </section>

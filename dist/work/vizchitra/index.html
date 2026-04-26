@@ -217,7 +217,7 @@
       display: flex;
       align-items: center;
       gap: var(--inner-gap);
-      padding: var(--tag-pad);
+      padding: var(--inner-gap);
       cursor: pointer;
       background: none;
       border: none;
@@ -243,7 +243,7 @@
       flex-shrink: 0;
     }
     .season-info {
-      padding: var(--tag-pad);
+      padding: var(--inner-gap);
       opacity: 0.5;
       border-top: 1px solid currentColor;
       white-space: normal;
@@ -392,6 +392,25 @@
     }
     .project-visit-btn.bar-box {
       flex-shrink: 0;
+    }
+    .project-section {
+      padding-top: var(--space-md);
+      padding-bottom: 0;
+    }
+    .project-section .section-title {
+      font-size: var(--text-ui);
+      font-weight: 500;
+      letter-spacing: var(--ls-ui);
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: var(--space-sm);
+      line-height: 1.4;
+    }
+    .project-detail-text {
+      max-width: 68ch;
+    }
+    .project-back-section {
+      padding-top: var(--space-md);
     }
     section {
       padding: var(--space-lg) var(--padding);
@@ -574,18 +593,22 @@
     }
     .project-detail-text p {
       font-size: var(--text-body);
-      line-height: 1.5;
+      line-height: 1.6;
       margin-bottom: var(--space-sm);
+    }
+    .project-detail-text p:last-child {
+      margin-bottom: 0;
     }
     .project-detail-list {
       list-style: none;
       display: flex;
       flex-direction: column;
-      gap: var(--inner-gap);
+      gap: 4px;
+      margin-bottom: var(--space-sm);
     }
     .project-detail-list li {
       font-size: var(--text-body);
-      line-height: 1.5;
+      line-height: 1.6;
       padding-left: var(--btn-pad-x);
       position: relative;
     }
@@ -594,6 +617,36 @@
       position: absolute;
       left: 0;
       color: var(--accent);
+    }
+    .project-figure {
+      margin: 0;
+      border: 1px solid var(--black);
+    }
+    .project-figure img {
+      width: 100%;
+      display: block;
+    }
+    .project-figcaption {
+      padding: var(--inner-gap) var(--box-gap);
+      font-size: var(--text-small);
+      letter-spacing: var(--ls-label);
+      border-top: 1px solid var(--black);
+    }
+    .project-figure-pair {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--box-gap);
+    }
+    .project-subheading {
+      font-size: var(--text-ui);
+      font-weight: 500;
+      letter-spacing: var(--ls-ui);
+      text-transform: uppercase;
+      margin-top: var(--space-md);
+      margin-bottom: var(--space-sm);
+    }
+    .project-subheading:first-child {
+      margin-top: 0;
     }
     .project-highlights {
       display: flex;
@@ -611,9 +664,6 @@
       font-size: var(--text-ui);
       font-weight: 700;
       letter-spacing: var(--ls-ui);
-    }
-    .project-back-section {
-      padding-top: 0;
     }
     .articles {
       display: grid;
@@ -854,6 +904,9 @@
       .playground-grid {
         grid-template-columns: 1fr;
       }
+      .project-figure-pair {
+        grid-template-columns: 1fr;
+      }
       .article {
         grid-template-rows: auto auto auto;
       }
@@ -983,10 +1036,10 @@
     <div class="project-header-tags"><span class="project-tags"><span class="project-tag">community</span><span class="project-tag">events</span></span><a class="bar-box project-visit-btn" href="https://vizchitra.com/" target="_blank" rel="noopener" aria-label="visit site"><span class="material-symbols-sharp">arrow_outward</span></a></div>
   </section>
 
-  <section>
+  <section class="project-section">
     <h2 class="section-title">overview</h2>
     <div class="project-detail-text">
-        <p>case study coming soon.</p>
+    <p>case study coming soon.</p>
     </div>
   </section>
 
