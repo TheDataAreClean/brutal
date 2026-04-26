@@ -5,8 +5,20 @@
     <link>https://thedataareclean.com</link>
     <description>hello, i am arpit — i am curious about everything.</description>
     <language>en</language>
-    <lastBuildDate>Sun, 26 Apr 2026 17:18:57 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 26 Apr 2026 17:21:13 +0000</lastBuildDate>
     <atom:link href="https://thedataareclean.com/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>lately reading: The Medium is the Massage by Marshall McLuhan and Quentin Fiore</title>
+      <link>https://en.wikipedia.org/wiki/The_Medium_Is_the_Massage</link>
+      <pubDate>Sun, 26 Apr 2026 00:00:00 +0000</pubDate>
+      <guid isPermaLink="false">lately:read:https://en.wikipedia.org/wiki/The_Medium_Is_the_Massage</guid>
+    </item>
+    <item>
+      <title>lately brewing: Ethiopia Elto Coffee Sama Washed by Archers Coffee</title>
+      <link>https://archerscoffee.com/products/ethiopia-elto-coffee-sama-washed</link>
+      <pubDate>Sun, 26 Apr 2026 00:00:00 +0000</pubDate>
+      <guid isPermaLink="false">lately:brewed:https://archerscoffee.com/products/ethiopia-elto-coffee-sama-washed</guid>
+    </item>
     <item>
       <title>lately reading: Luru Magazine, Issue 03: The Games We Play</title>
       <link>https://www.lurumagazine.com/products/issue-03-the-games-we-play</link>

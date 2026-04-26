@@ -6,13 +6,19 @@ Reverse-chronological. Versioning: **major** = redesign · **minor** = new featu
 
 ## UNRELEASED
 
+---
+
+## v4.1.0 — 2026-04-26
+
+Five case study pages, RSS feed, project ordering, lately archive automation, docs overhaul.
+
+- Five case study pages: `data-for-india-product`, `data-for-india-viz`, `vizchitra-editorial`, `vizchitra-bengaluru`, `vyapaar-mne` (split from two placeholder files)
+- `render_project_page` rebuilt: generic section parser with bold, italic, inline links, images, sub-headings, numbered lists
 - RSS 2.0 feed (`dist/feed.xml`) aggregating articles, projects, lately archive, and playground
 - Lately archive (`content/play/lately-archive.md`) with `## YYYY-MM-DD` date sections
 - Pre-commit hook (`scripts/archive_lately.py`) auto-logs lately changes to archive on commit
 - Project ordering via `content/work/project-order.md` (replaces alphabetical filename sort)
 - Image optimisation flag (`--optimize-images`) converts PNG/JPG to WebP in-place
-- Five separate case study pages: `data-for-india-product`, `data-for-india-viz`, `vizchitra-editorial`, `vizchitra-bengaluru`, `vyapaar-mne` (split from two placeholder files)
-- `render_project_page` rebuilt: generic section parser with bold, italic, inline links, images, sub-headings, numbered lists
 - Documentation overhaul: README, APP.md, COMMANDS.md, CHANGELOG.md, FUTURE.md, CLAUDE.md
 
 ---
