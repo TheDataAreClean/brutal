@@ -8,6 +8,12 @@ Reverse-chronological. Versioning: **major** = redesign · **minor** = new featu
 
 ---
 
+## v4.1.1 — 2026-05-10
+
+- `check_content` now detects duplicate project slugs at build time
+
+---
+
 ## v4.1.0 — 2026-04-26
 
 Five case study pages, RSS feed, project ordering, lately archive automation, docs overhaul.

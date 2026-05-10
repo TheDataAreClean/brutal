@@ -1253,13 +1253,14 @@ def minify_js(js):
 
 
 def check_content(project_mds, playground_md):
-    """Validate image references in project and playground markdown.
+    """Validate project and playground content.
 
-    Resolves root-relative paths (e.g. /assets/projects/foo.webp) against BASE.
-    Prints a warning for each missing file. Never halts the build.
+    Checks for duplicate slugs, missing image assets, and missing playground assets.
+    Prints a warning for each issue. Never halts the build.
     Returns the number of warnings emitted.
     """
     warnings = []
+    seen_slugs = {}
 
     for md in project_mds:
         # Extract slug for readable warning labels
@@ -1271,6 +1272,12 @@ def check_content(project_mds, playground_md):
                 break
             if s.startswith('## '):
                 break
+
+        if slug:
+            if slug in seen_slugs:
+                warnings.append(f'Warning: duplicate slug "{slug}"')
+            else:
+                seen_slugs[slug] = True
 
         for line in md.strip().split('\n'):
             m = _IMG_RE.match(line.strip())
