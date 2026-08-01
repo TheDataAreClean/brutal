@@ -1,12 +1,12 @@
 # **lately**, i have been
 
-- read: [The Medium is the Massage by Marshall McLuhan and Quentin Fiore](https://en.wikipedia.org/wiki/The_Medium_Is_the_Massage)
+- read: [Godaan by Munshi Premchand](https://en.wikipedia.org/wiki/Godaan)
 - listened: 
-- watched: [Lectures on Digital Photography by Marc Levoy](https://www.youtube.com/playlist?list=PL7ddpXYvFXspUN0N-gObF1GXoCA-DA-7i)
+- watched: [Avatar: The Legend of Korra](https://en.wikipedia.org/wiki/The_Legend_of_Korra)
 - learned: 
 - explored: 
 - wrote: 
-- brewed: [Ethiopia Elto Coffee Sama Washed by Archers Coffee](https://archerscoffee.com/products/ethiopia-elto-coffee-sama-washed)
+- brewed: [Sugarcane Honey by Black Baza Coffee Co. ](https://www.blackbazacoffee.com/products/sugarcane-honey)
 - photographed: 
 - cycled: 
 - visited: 

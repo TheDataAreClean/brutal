@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">
   <channel>
-    <title>arpit | curious about everything | thedataareclean</title>
+    <title>arpit | thedataareclean</title>
     <link>https://thedataareclean.com</link>
-    <description>hello, i am arpit — i am curious about everything.</description>
+    <description>hello, i am arpit. i am curious about everything.</description>
     <language>en</language>
-    <lastBuildDate>Sun, 10 May 2026 16:36:46 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 01 Aug 2026 05:24:50 +0000</lastBuildDate>
     <atom:link href="https://thedataareclean.com/feed.xml" rel="self" type="application/rss+xml"/>
     <item>
       <title>lately reading: The Medium is the Massage by Marshall McLuhan and Quentin Fiore</title>
@@ -32,7 +32,7 @@
       <guid isPermaLink="false">lately:watched:https://www.youtube.com/playlist?list=PL7ddpXYvFXspUN0N-gObF1GXoCA-DA-7i</guid>
     </item>
     <item>
-      <title>lately brewing: Kombucha Honey by Black Baza Coffee</title>
+      <title>lately brewing: Kombucha Honey by Black Baza Coffee Co.</title>
       <link>https://www.blackbazacoffee.com/products/kombucha-honey</link>
       <pubDate>Tue, 07 Apr 2026 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">lately:brewed:https://www.blackbazacoffee.com/products/kombucha-honey</guid>

@@ -65,4 +65,4 @@ Versioning: **major** = redesign · **minor** = new feature/section/page · **pa
 - **No pushing without tagging** — tag every meaningful commit after pushing.
 - **No hardcoded letter-spacing** — use `var(--ls-ui)` (1px) or `var(--ls-label)` (0.5px).
 - **No hardcoded tag padding or gap** — use `var(--tag-pad)` and `var(--tag-gap)`.
-- **No unoptimised images** — all raster images in `assets/` must be WebP. Run `python3 build.py --optimize-images` after adding any PNG/JPG. Exceptions: `favicon.png`, `og-image.png`, `assets/monthly/`.
+- **No unoptimised images** — all raster images in `assets/` must be WebP. Run `python3 build.py --optimize-images` after adding any PNG/JPG. Exceptions: `favicon.png`, `og-image.png`, `assets/monthly/`, `assets/og/`.

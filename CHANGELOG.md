@@ -8,6 +8,18 @@ Reverse-chronological. Versioning: **major** = redesign · **minor** = new featu
 
 ---
 
+## v4.2.0 — 2026-08-01
+
+Per-page OG images, reshaped meta.md, build smoke check.
+
+- Per-page OG images and meta tags — work, play, and every project case study now get their own Open Graph image and `<title>`/description, instead of sharing the homepage's
+- `content/meta.md` reshaped: site-wide `url`/`site-name`/`favicon` plus a `## pagename` section per page (`title`, `description`, and for work/play, `heading`/`tagline`)
+- OG images saved at 2400x1260 (2x the 1200x630 spec) for retina crispness; headline uses the font's real Bold weight instance (Schibsted Grotesk's variable font, swapped in for the previously-bundled static Regular)
+- Domain label added to every OG image, colour-matched to the seasonal accent
+- `smoke_check()` verifies every expected `dist/` file exists and is non-empty at the end of every build, failing loudly instead of shipping partial output
+
+---
+
 ## v4.1.1 — 2026-05-10
 
 - `check_content` now detects duplicate project slugs at build time

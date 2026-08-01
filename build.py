@@ -84,24 +84,93 @@ def draw_segments(draw, x, y, segments, font, base_color, accent_color):
         cursor_x += bbox[2] - bbox[0]
 
 
-def generate_og_image(accent_hex, hero_md, output_path):
-    """Generate OG image matching the site's viewport-box layout."""
-    from PIL import Image, ImageDraw, ImageFont
-
-    width, height = 1200, 630
-    margin = 40       # outer margin (viewport edge to box)
-    box_pad = 60      # padding inside the box
-    bar_h = 32        # top/bottom bar height
-
-    # Parse hero content (keep ** markers for segment parsing)
-    lines = [l.strip() for l in hero_md.strip().split('\n') if l.strip()]
-    heading_raw = ''
-    tagline_raw = ''
+def parse_heading_tagline(md):
+    """Parse a '# heading' line + plain tagline line, as used by hero.md."""
+    lines = [l.strip() for l in md.strip().split('\n') if l.strip()]
+    heading = ''
+    tagline = ''
     for line in lines:
         if line.startswith('# '):
-            heading_raw = line[2:]
+            heading = line[2:]
         else:
-            tagline_raw = line
+            tagline = line
+    return heading, tagline
+
+
+def _wrap_segments(draw, raw_text, font, max_width):
+    """Word-wrap **bold**-tagged text into lines, each a list of (text, is_bold) segments
+    that fit max_width — so headline/tagline sizing can stay fixed everywhere and long
+    copy (e.g. a project's problem statement) wraps instead of shrinking."""
+    space_w = draw.textbbox((0, 0), ' ', font=font)[2]
+    lines = []
+    current = []
+    current_width = 0
+
+    def word_width(word):
+        bbox = draw.textbbox((0, 0), word, font=font)
+        return bbox[2] - bbox[0]
+
+    def place(word, is_bold, w_width):
+        nonlocal current, current_width
+        extra = (space_w if current else 0) + w_width
+        if current and current_width + extra > max_width:
+            lines.append(current)
+            current = []
+            current_width = 0
+            extra = w_width
+        current.append((f' {word}' if current else word, is_bold))
+        current_width += extra
+
+    for chunk, is_bold in parse_bold_segments(raw_text):
+        for word in chunk.split(' '):
+            if not word:
+                continue
+            w_width = word_width(word)
+            if w_width <= max_width:
+                place(word, is_bold, w_width)
+                continue
+            # Word alone is wider than the box (e.g. one long unbroken org name) — hard-break
+            # it into pieces that each fit, instead of letting it overflow the right edge.
+            piece = ''
+            for ch in word:
+                candidate = piece + ch
+                if piece and word_width(candidate) > max_width:
+                    place(piece, is_bold, word_width(piece))
+                    piece = ch
+                else:
+                    piece = candidate
+            if piece:
+                place(piece, is_bold, word_width(piece))
+    if current:
+        lines.append(current)
+    return lines or [[('', False)]]
+
+
+def generate_og_image(accent_hex, heading_raw, tagline_raw, domain_text, site_name, output_path):
+    """Generate OG image matching the site's viewport-box layout.
+
+    Saved at 2x the 1200x630 OG spec (2400x1260, same aspect ratio) — the spec size is a floor,
+    and at native pixel density it gets upscaled (by browsers, Mac Preview, chat/social unfurl
+    previews) on any retina/high-DPI display, which reads as blur no matter how clean the source
+    pixels are. The border and accent cube are flat 1px-at-1x shapes — drawn straight at that 2x
+    output resolution (not further supersampled) so they stay pixel-perfect. Text is drawn on a
+    separate, more highly supersampled transparent layer and downsampled with LANCZOS onto the 2x
+    base for smooth anti-aliased edges (also needed for the faux-bold headline stroke, which
+    looked like a soft grey halo without it). Supersampling shapes too, tried first, blurred the
+    border into a multi-pixel grey smear on downsample — so shapes and text are on separate layers.
+    """
+    from PIL import Image, ImageDraw, ImageFont
+
+    OUT = 2   # final output scale vs the 1200x630 OG spec — ships crisp on retina/high-DPI
+    width, height = 1200 * OUT, 630 * OUT
+    margin = 40 * OUT       # outer margin (viewport edge to box)
+    box_pad = 60 * OUT      # padding inside the box, around the heading/tagline block
+    corner_pad = 16 * OUT   # inset for the domain label from the top-right corner
+    bar_h = 32 * OUT        # top/bottom bar height
+
+    # Schibsted Grotesk has no glyph for hyphen/non-breaking-hyphen variants — normalize to ASCII
+    heading_raw = heading_raw.replace('‐', '-').replace('‑', '-')
+    tagline_raw = tagline_raw.replace('‐', '-').replace('‑', '-')
 
     accent = tuple(int(accent_hex[i:i+2], 16) for i in (1, 3, 5))
     black = (0x1a, 0x1a, 0x1a)
@@ -113,38 +182,88 @@ def generate_og_image(accent_hex, hero_md, output_path):
     # Draw content viewport box
     box_top = margin
     box_bottom = height - margin
-    draw.rectangle([margin, box_top, width - margin, box_bottom], outline=black, width=1)
+    draw.rectangle([margin, box_top, width - margin, box_bottom], outline=black, width=OUT)
 
     # Draw accent cube inside viewport box, top-left
     cube_size = bar_h
-    cube_x = margin + 1
-    cube_y = box_top + 1
+    cube_x = margin + OUT
+    cube_y = box_top + OUT
     draw.rectangle([cube_x, cube_y, cube_x + cube_size, cube_y + cube_size], fill=accent)
 
-    # Load Schibsted Grotesk at two sizes
-    font_lg = ImageFont.truetype(str(FONT_PATH), 64)
-    font_sm = ImageFont.truetype(str(FONT_PATH), 24)
+    # --- Text layer: drawn supersampled on transparent, then downsampled onto the 2x base
+    # for smooth anti-aliasing ---
+    SS = 3
+    text_layer = Image.new('RGBA', (width * SS, height * SS), (255, 255, 255, 0))
+    tdraw = ImageDraw.Draw(text_layer)
+    margin_ss, box_pad_ss, corner_pad_ss = margin * SS, box_pad * SS, corner_pad * SS
+    cube_size_ss, cube_y_ss = cube_size * SS, cube_y * SS
+    box_bottom_ss = box_bottom * SS
 
-    # Strip ** for measurement
-    heading_plain = heading_raw.replace('**', '')
-    tagline_plain = tagline_raw.replace('**', '')
+    # Domain label, top-right, padded snug into the corner to mirror the cube on the left.
+    # Site-name portion (e.g. "thedataareclean") takes the accent colour, the rest (".com") stays black —
+    # same accent-on-bold rule the heading/tagline use.
+    font_domain = ImageFont.truetype(str(FONT_PATH), 20 * OUT * SS)
+    d_bbox = tdraw.textbbox((0, 0), domain_text, font=font_domain)
+    d_w, d_h = d_bbox[2] - d_bbox[0], d_bbox[3] - d_bbox[1]
+    domain_x = width * SS - margin_ss - corner_pad_ss - d_w
+    domain_y = cube_y_ss + (cube_size_ss - d_h) // 2
+    domain_segments = (
+        [(site_name, True), (domain_text[len(site_name):], False)]
+        if site_name and domain_text.startswith(site_name)
+        else [(domain_text, False)]
+    )
+    draw_segments(tdraw, domain_x, domain_y, domain_segments, font_domain, black, accent)
 
-    # Position: bottom-left inside the content box
-    h_bbox = draw.textbbox((0, 0), heading_plain, font=font_lg)
-    h_h = h_bbox[3] - h_bbox[1]
-    t_bbox = draw.textbbox((0, 0), tagline_plain, font=font_sm)
-    t_h = t_bbox[3] - t_bbox[1]
+    # Fixed sizes everywhere — long copy (e.g. a project's problem statement) wraps to
+    # multiple lines instead of shrinking, so headline weight stays consistent across pages.
+    # SchibstedGrotesk.ttf is a variable font — use its real Bold instance for the headline
+    # rather than faking it with a stroke (which read as a soft halo / chunky outline).
+    font_lg = ImageFont.truetype(str(FONT_PATH), 64 * OUT * SS)
+    font_lg.set_variation_by_name('Bold')
+    font_sm = ImageFont.truetype(str(FONT_PATH), 24 * OUT * SS)
+    max_text_width = (width - 2 * margin - 2 * box_pad) * SS
 
-    text_x = margin + box_pad
-    total_h = h_h + 20 + t_h
-    y_start = box_bottom - box_pad - total_h
+    heading_lines = _wrap_segments(tdraw, heading_raw, font_lg, max_text_width)
+    tagline_lines = _wrap_segments(tdraw, tagline_raw, font_sm, max_text_width)
 
-    # Draw heading and tagline with accent on **bold** segments
-    heading_segments = parse_bold_segments(heading_raw)
-    tagline_segments = parse_bold_segments(tagline_raw)
+    # Use fixed font metrics (ascent + descent), not each string's tight glyph bbox — bbox
+    # height varies with which letters are present (descenders like 'y'/'p' vs none), which
+    # would shift the baseline differently per page.
+    t_ascent, t_descent = font_sm.getmetrics()
+    t_line = t_ascent + t_descent
 
-    draw_segments(draw, text_x, y_start, heading_segments, font_lg, black, accent)
-    draw_segments(draw, text_x, y_start + h_h + 20, tagline_segments, font_sm, black, accent)
+    # The line-height already reserves each font's descent as trailing whitespace, which reads
+    # as the gap between lines — no extra gap needed on top of that.
+    line_gap = 4 * OUT * SS
+    text_x = margin_ss + box_pad_ss
+    box_top_ss = box_top * SS
+    available_h = (box_bottom_ss - box_pad_ss) - (box_top_ss + box_pad_ss)
+    min_heading_size = 32 * OUT * SS
+
+    # Safety net for unusually long headings (normal copy never triggers this): shrink and
+    # rewrap the heading until the block fits, rather than letting it clip above the box.
+    while True:
+        h_ascent, h_descent = font_lg.getmetrics()
+        h_line = h_ascent + h_descent
+        total_h = len(heading_lines) * h_line + line_gap + len(tagline_lines) * t_line
+        if total_h <= available_h or font_lg.size <= min_heading_size:
+            break
+        font_lg = ImageFont.truetype(str(FONT_PATH), max(min_heading_size, round(font_lg.size * 0.85)))
+        font_lg.set_variation_by_name('Bold')
+        heading_lines = _wrap_segments(tdraw, heading_raw, font_lg, max_text_width)
+
+    y = box_bottom_ss - box_pad_ss - total_h
+
+    for line in heading_lines:
+        draw_segments(tdraw, text_x, y, line, font_lg, black, accent)
+        y += h_line
+    y += line_gap
+    for line in tagline_lines:
+        draw_segments(tdraw, text_x, y, line, font_sm, black, accent)
+        y += t_line
+
+    text_layer = text_layer.resize((width, height), Image.LANCZOS)
+    img.paste(text_layer, (0, 0), text_layer)
 
     Path(output_path).parent.mkdir(parents=True, exist_ok=True)
     img.save(output_path)
@@ -192,6 +311,22 @@ def slugify(text):
     return text.strip('-')
 
 
+def _project_fields(md):
+    """Extract a project markdown's front-matter (before the first '## section') into a dict."""
+    fields = {'slug': '', 'org': '', 'url': '', 'problem': '', 'year': '', 'tags': '', 'added': ''}
+    for line in md.strip().split('\n'):
+        s = line.strip()
+        if s.startswith('- '):
+            key, _, val = s[2:].partition(':')
+            key, val = key.strip(), val.strip()
+            if key in fields:
+                fields[key] = val
+        elif s.startswith('## '):
+            break
+    fields['slug'] = fields['slug'] or slugify(fields['org'])
+    return fields
+
+
 def parse_inline(text):
     """Convert [text](url) to <a> tags."""
     return re.sub(
@@ -234,42 +369,44 @@ def parse_kv_list(text):
     return items
 
 
-def render_meta(md):
-    items = dict(parse_kv_list(md))
-    title = items.get('title', '')
-    desc = items.get('description', '')
-    url = items.get('url', '')
-    image = items.get('image', '')
-    favicon = items.get('favicon', '')
-    image_url = url.rstrip('/') + '/' + image if image and not image.startswith('http') else image
+def parse_meta(md):
+    """Parse meta.md into (site, pages).
 
+    Top-level '- key: value' lines (before any '## page' header) are site-wide.
+    Each '## page' header starts a per-page block of overrides — title,
+    description, and (for pages without their own hero-style content file)
+    heading/tagline for the OG image.
+    """
+    blocks = re.split(r'(?m)^## (.+)$', md.strip())
+    site = dict(parse_kv_list(blocks[0]))
+    pages = {
+        blocks[i].strip(): dict(parse_kv_list(blocks[i + 1]))
+        for i in range(1, len(blocks), 2)
+    }
+    return site, pages
+
+
+def render_meta(title, description, url, image_url, favicon=''):
+    title = escape(title)
+    description = escape(description)
     return (
         f'  <title>{title}</title>\n'
         + (f'  <link rel="icon" type="image/png" href="{favicon}">\n' if favicon else '')
-        + f'  <meta name="description" content="{desc}">\n'
+        + f'  <meta name="description" content="{description}">\n'
         f'  <meta property="og:type" content="website">\n'
         f'  <meta property="og:title" content="{title}">\n'
-        f'  <meta property="og:description" content="{desc}">\n'
+        f'  <meta property="og:description" content="{description}">\n'
         f'  <meta property="og:url" content="{url}">\n'
         f'  <meta property="og:image" content="{image_url}">\n'
         f'  <meta name="twitter:card" content="summary_large_image">\n'
         f'  <meta name="twitter:title" content="{title}">\n'
-        f'  <meta name="twitter:description" content="{desc}">\n'
+        f'  <meta name="twitter:description" content="{description}">\n'
         f'  <meta name="twitter:image" content="{image_url}">'
     )
 
 
 def render_hero(md):
-    lines = [l for l in md.strip().split('\n') if l.strip()]
-    heading = ''
-    tagline = ''
-    for line in lines:
-        line = line.strip()
-        if line.startswith('# '):
-            heading = line[2:]
-        else:
-            tagline = line
-
+    heading, tagline = parse_heading_tagline(md)
     heading = apply_name(heading)
     tagline = apply_name(tagline)
 
@@ -345,24 +482,7 @@ def render_projects(heading_md, project_mds, labels):
     """Render the projects grid from a list of individual project markdown strings."""
     title = apply_highlight(heading_md.strip().lstrip('# '))
     case_study_label = labels.get('case-study', 'case study')
-    projects = []
-
-    for md in project_mds:
-        p = {'org': '', 'url': '', 'problem': '', 'year': '', 'tags': '', 'slug': ''}
-        for line in md.strip().split('\n'):
-            stripped = line.strip()
-            if stripped.startswith('- ') and not stripped.startswith('## '):
-                key, _, value = stripped[2:].partition(':')
-                key = key.strip()
-                value = value.strip()
-                if key in ('org', 'url', 'problem', 'year', 'tags', 'slug'):
-                    p[key] = value
-                    if key == 'org' and not p['slug']:
-                        p['slug'] = slugify(value)
-            elif stripped.startswith('## '):
-                break  # stop at first section heading
-        if p['org']:
-            projects.append(p)
+    projects = [f for f in (_project_fields(md) for md in project_mds) if f['org']]
 
     proj_parts = []
     for p in projects:
@@ -787,32 +907,10 @@ def render_rolodex(md):
 def render_project_page(md, labels):
     """Parse a project detail markdown file into a case study page body."""
     lines = md.strip().split('\n')
-    org = ''
-    url = ''
-    problem = ''
-    year = ''
-    tags = ''
 
     # --- Pass 1: extract front-matter key-value pairs (before first ## heading) ---
-    in_frontmatter = True
-    for line in lines:
-        stripped = line.strip()
-        if stripped.startswith('## '):
-            in_frontmatter = False
-            break
-        if in_frontmatter and stripped.startswith('- '):
-            key, _, value = stripped[2:].partition(':')
-            key, value = key.strip(), value.strip()
-            if key == 'org':
-                org = value
-            elif key == 'url':
-                url = value
-            elif key == 'problem':
-                problem = value
-            elif key == 'tags':
-                tags = value
-            elif key == 'year':
-                year = value
+    front = _project_fields(md)
+    org, url, problem, tags, year = front['org'], front['url'], front['problem'], front['tags'], front['year']
 
     # --- Pass 2: collect sections generically ---
     # Find the minimum heading level in this file — that becomes the section level.
@@ -1002,6 +1100,11 @@ def _abs_url(src, site_url):
     return site_url.rstrip('/') + '/' + src.lstrip('/')
 
 
+def _domain_text(site_url):
+    """Strip the protocol from a site URL, e.g. 'https://example.com' -> 'example.com'."""
+    return re.sub(r'^https?://', '', site_url).rstrip('/')
+
+
 def _first_project_image(md):
     """Return the src of the first ![...](src) found in a project markdown file."""
     for line in md.strip().split('\n'):
@@ -1028,12 +1131,9 @@ def _feed_item(title, link, desc, date_str, guid, image_url=None):
     return dt or datetime.min, xml
 
 
-def render_feed(articles_md, project_mds, lately_archive_md, playground_md, meta_md):
+def render_feed(articles_md, project_mds, lately_archive_md, playground_md, site_url, site_title, site_desc):
     """Generate RSS 2.0 feed XML aggregating articles, projects, lately, and playground."""
-    meta = dict(parse_kv_list(meta_md))
-    site_url = meta.get('url', '').rstrip('/')
-    site_title = meta.get('title', '')
-    site_desc = meta.get('description', '')
+    site_url = site_url.rstrip('/')
 
     entries = []  # list of (datetime, xml_str)
 
@@ -1068,18 +1168,7 @@ def render_feed(articles_md, project_mds, lately_archive_md, playground_md, meta
 
     # --- Projects ---
     for md in project_mds:
-        p = {'org': '', 'problem': '', 'tags': '', 'slug': '', 'added': ''}
-        for line in md.strip().split('\n'):
-            s = line.strip()
-            if s.startswith('## '):
-                break
-            if s.startswith('- '):
-                key, _, val = s[2:].partition(':')
-                key, val = key.strip(), val.strip()
-                if key in ('org', 'problem', 'tags', 'slug', 'added'):
-                    p[key] = val
-                    if key == 'org' and not p['slug']:
-                        p['slug'] = slugify(val)
+        p = _project_fields(md)
         if not p['added'] or not p['slug']:
             continue
         link = f'{site_url}/work/{p["slug"]}/'
@@ -1308,12 +1397,45 @@ def check_content(project_mds, playground_md):
     return len(warnings)
 
 
+def smoke_check(pages, project_fields):
+    """Verify the build actually produced what it claims to.
+
+    Doesn't check the output is *correct* — just that every expected dist/ file exists and
+    is non-empty, so a swallowed exception or a silently-skipped write fails the build loudly
+    instead of shipping stale or partial output.
+    """
+    expected = [DIST / path for path, *_rest in pages]
+    expected += [
+        DIST / 'feed.xml',
+        DIST / 'assets' / 'favicon.png',
+        DIST / 'assets' / 'og-image.png',
+        DIST / 'assets' / 'og' / 'work.png',
+        DIST / 'assets' / 'og' / 'play.png',
+    ]
+    expected += [DIST / 'assets' / 'og' / 'work' / f'{f["slug"]}.png' for f in project_fields]
+
+    missing = [p for p in expected if not p.exists() or p.stat().st_size == 0]
+    if missing:
+        print('Smoke check FAILED — missing or empty output:')
+        for p in missing:
+            print(f'  {p.relative_to(DIST.parent)}')
+        sys.exit(1)
+    print(f'Smoke check passed — {len(expected)} expected files present.')
+
+
 def build():
     template = read(BASE / 'template.html')
     css = read(BASE / 'style.css')
     js = read(BASE / 'script.js')
 
-    meta_md    = read(CONTENT / 'meta.md')
+    site, meta_pages = parse_meta(read(CONTENT / 'meta.md'))
+    domain_text = _domain_text(site.get('url', ''))
+    site_name = site.get('site-name', '')
+    # .get(page, {}) + .get(key, '') below so an incomplete meta.md (a missing section or
+    # key) degrades to an empty string instead of crashing the build with a KeyError.
+    home_meta = meta_pages.get('home', {})
+    work_meta = meta_pages.get('work', {})
+    play_meta = meta_pages.get('play', {})
     footer_md  = read(CONTENT / 'footer.md')
     hero_md    = read(CONTENT / 'hero.md')
 
@@ -1333,7 +1455,6 @@ def build():
     labels = parse_labels(read(CONTENT / 'labels.md'))
 
     # Shared pieces
-    meta_html = render_meta(meta_md)
     footer_html = render_footer(footer_md)
 
     # Download subsetted icon font
@@ -1350,37 +1471,27 @@ def build():
     home_body = render_hero(hero_md)
     play_body = render_play_body(play_intro_md, lately_md, playground_md, interests_md, ideas_md)
 
-    # Project detail pages — use the slug parsed from the markdown (same slug the card links use)
-    def _project_slug(md):
-        slug = ''
-        org = ''
-        for line in md.strip().split('\n'):
-            s = line.strip()
-            if s.startswith('- '):
-                key, _, val = s[2:].partition(':')
-                key, val = key.strip(), val.strip()
-                if key == 'slug':
-                    slug = val
-                elif key == 'org' and not org:
-                    org = val
-            elif s.startswith('## '):
-                break
-        return slug or slugify(org)
+    # Project detail pages — use the slug parsed from the markdown (same slug the card links use).
+    # Parse each project's front-matter once and carry the result alongside its md everywhere below,
+    # rather than re-parsing per use.
+    project_fields_all = [(md, _project_fields(md)) for md in project_mds_all]
 
     # Order projects by content/work/project-order.md (one slug per line).
     # Projects not listed appear after ordered ones.
     _order_md = read(CONTENT / 'work' / 'project-order.md')
     _order_slugs = [l.strip()[2:].strip() for l in _order_md.splitlines() if l.strip().startswith('- ')]
-    project_mds = sorted(project_mds_all, key=lambda md: _order_slugs.index(_project_slug(md)) if _project_slug(md) in _order_slugs else len(_order_slugs))
+    project_fields_all.sort(key=lambda pair: _order_slugs.index(pair[1]['slug']) if pair[1]['slug'] in _order_slugs else len(_order_slugs))
+    project_mds = [md for md, _ in project_fields_all]
+    project_fields = [f for _, f in project_fields_all]
 
     work_body = render_work_body(work_intro_md, about_md, toolkit_md, projects_heading_md, project_mds, articles_md, labels)
 
     project_pages = [
-        (f'work/{_project_slug(md)}/index.html', render_project_page(md, labels), 'work', 2)
-        for md in project_mds
+        (f'work/{f["slug"]}/index.html', render_project_page(md, labels), 'work', 2)
+        for md, f in zip(project_mds, project_fields)
     ]
 
-    # Copy pre-generated monthly OG image
+    # Copy pre-generated monthly OG image (home)
     month = datetime.now().month  # 1-indexed
     monthly = BASE / 'assets' / 'monthly'
     og_src = monthly / f'og-{month:02d}.png'
@@ -1393,18 +1504,54 @@ def build():
     accent = SEASON_COLORS[month - 1]
     generate_favicon(accent, BASE / 'assets' / 'favicon.png')
 
+    # Generate per-page OG images (work, play, each project) — built fresh every run
+    # so they always match current content, unlike home's precomputed monthly set.
+    og_dir = BASE / 'assets' / 'og'
+    generate_og_image(accent, work_meta.get('heading', ''), work_meta.get('tagline', ''), domain_text, site_name, og_dir / 'work.png')
+    generate_og_image(accent, play_meta.get('heading', ''), play_meta.get('tagline', ''), domain_text, site_name, og_dir / 'play.png')
+    for f in project_fields:
+        year_display = re.sub(r'\s*[-–—]\s*', ' - ', f['year']) if f['year'] else ''
+        org_display = f'**{f["org"]}**' if f['org'] else ''
+        project_tagline = ' · '.join(p for p in [org_display, year_display] if p)
+        generate_og_image(accent, f['problem'], project_tagline, domain_text, site_name, og_dir / 'work' / f'{f["slug"]}.png')
+
+    # Per-page meta tags — title/description/image differ per page instead of being shared site-wide
+    site_url = site.get('url', '').rstrip('/')
+    favicon = site.get('favicon', '')
+
+    home_meta_html = render_meta(
+        home_meta.get('title', ''), home_meta.get('description', ''), site_url + '/',
+        _abs_url('assets/og-image.png', site_url), favicon,
+    )
+    work_meta_html = render_meta(
+        work_meta.get('title', ''), work_meta.get('description', ''), site_url + '/work/',
+        _abs_url('assets/og/work.png', site_url), favicon,
+    )
+    play_meta_html = render_meta(
+        play_meta.get('title', ''), play_meta.get('description', ''), site_url + '/play/',
+        _abs_url('assets/og/play.png', site_url), favicon,
+    )
+
+    def _project_meta_html(f):
+        title = f'{f["org"]} | {site_name}' if f['org'] else home_meta.get('title', '')
+        return render_meta(
+            title, f['problem'], site_url + f'/work/{f["slug"]}/',
+            _abs_url(f'assets/og/work/{f["slug"]}.png', site_url), favicon,
+        )
+
     # Build pages
     pages = [
-        ('index.html', home_body, 'home', 0),
-        ('work/index.html', work_body, 'work', 1),
-        ('play/index.html', play_body, 'play', 1),
-        *project_pages,
+        ('index.html', home_meta_html, home_body, 'home', 0),
+        ('work/index.html', work_meta_html, work_body, 'work', 1),
+        ('play/index.html', play_meta_html, play_body, 'play', 1),
+        *[(path, _project_meta_html(f), body, active, depth)
+          for f, (path, body, active, depth) in zip(project_fields, project_pages)],
     ]
 
     DIST.mkdir(exist_ok=True)
 
-    for path, body, active, depth in pages:
-        html = render_page(template, css, js, meta_html, footer_html, body, active, depth, labels=labels)
+    for path, page_meta_html, body, active, depth in pages:
+        html = render_page(template, css, js, page_meta_html, footer_html, body, active, depth, labels=labels)
         out = DIST / path
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(html)
@@ -1419,7 +1566,7 @@ def build():
         shutil.copytree(assets_src, assets_dst, ignore=shutil.ignore_patterns('README.md', 'monthly'))
 
     # Generate RSS feed
-    feed_xml = render_feed(articles_md, project_mds, lately_archive_md, playground_md, meta_md)
+    feed_xml = render_feed(articles_md, project_mds, lately_archive_md, playground_md, site_url, home_meta['title'], home_meta['description'])
     (DIST / 'feed.xml').write_text(feed_xml)
     print(f'Built dist/feed.xml ({len(feed_xml)} bytes)')
 
@@ -1428,6 +1575,7 @@ def build():
     if cname.exists():
         shutil.copy2(cname, DIST / 'CNAME')
 
+    smoke_check(pages, project_fields)
     print(f'Done — og accent: {accent}')
 
 
@@ -1439,12 +1587,15 @@ MONTH_NAMES = [
 
 def generate_monthly_assets():
     """Generate all 12 monthly OG images into assets/monthly/."""
-    hero_md = (CONTENT / 'hero.md').read_text()
+    heading, tagline = parse_heading_tagline((CONTENT / 'hero.md').read_text())
+    site, _ = parse_meta((CONTENT / 'meta.md').read_text())
+    domain_text = _domain_text(site.get('url', ''))
+    site_name = site.get('site-name', '')
     out_dir = BASE / 'assets' / 'monthly'
     out_dir.mkdir(parents=True, exist_ok=True)
     for i, (accent, name) in enumerate(zip(SEASON_COLORS, MONTH_NAMES), start=1):
         og_path = out_dir / f'og-{i:02d}.png'
-        generate_og_image(accent, hero_md, og_path)
+        generate_og_image(accent, heading, tagline, domain_text, site_name, og_path)
         print(f'Generated {name} ({accent}): {og_path.name}')
     print('Done — all 12 monthly OG images generated.')
 
@@ -1458,7 +1609,7 @@ def optimize_images():
     from PIL import Image
 
     SKIP_FILES = {'favicon.png', 'og-image.png'}
-    SKIP_DIRS = {'monthly', 'fonts'}
+    SKIP_DIRS = {'monthly', 'fonts', 'og'}
     EXTENSIONS = {'.png', '.jpg', '.jpeg'}
     TARGET_W = 1200
     QUALITY = 82
