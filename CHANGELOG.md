@@ -8,6 +8,16 @@ Reverse-chronological. Versioning: **major** = redesign · **minor** = new featu
 
 ---
 
+## v4.2.1 — 2026-09-28
+
+- `requirements.txt` comment corrected — Pillow is required for every build (favicon + OG images), not just `--gen-monthly`
+- Pre-commit hook runs `archive_lately.py` with the project `.venv` Python when present
+- `archive_lately.py` no longer duplicates items when the hook runs more than once on the same day
+- RSS `lastBuildDate` uses `datetime.now(timezone.utc)` instead of the deprecated `datetime.utcnow()`
+- September seasonal accent applied to OG images; lately updated
+
+---
+
 ## v4.2.0 — 2026-08-01
 
 Per-page OG images, reshaped meta.md, build smoke check.

@@ -1,3 +1,8 @@
+## 2026-09-28
+- read: [The Blue Book: An Anti-Caste Graphic Novel by Siddhesh Gautam](https://www.goodreads.com/book/show/255086143-the-blue-book)
+- watched: [Lanterns](https://en.wikipedia.org/wiki/Lanterns_(TV_series))
+- brewed: [Excelsa by Mooleh Manay Estate, Blue Tokai Coffee](https://bluetokaicoffee.com/collections/roasted-and-ground-coffee-beans/products/excelsa-by-mooleh-manay-estate)
+
 ## 2026-08-01
 - read: [Godaan by Munshi Premchand](https://en.wikipedia.org/wiki/Godaan)
 - watched: [Avatar: The Legend of Korra](https://en.wikipedia.org/wiki/The_Legend_of_Korra)

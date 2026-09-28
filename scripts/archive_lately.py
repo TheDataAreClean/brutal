@@ -67,11 +67,14 @@ def main():
                 # Collect the whole section
                 result.append(lines[i])
                 i += 1
+                existing = []
                 while i < len(lines) and not lines[i].startswith('## '):
                     if lines[i].strip():
-                        result.append(lines[i])
+                        existing.append(lines[i])
                     i += 1
-                result.extend(new_lines)
+                result.extend(existing)
+                # Skip items already logged today so re-runs don't duplicate
+                result.extend(l for l in new_lines if l not in existing)
                 result.append('')
             else:
                 result.append(lines[i])

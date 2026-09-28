@@ -1,4 +1,3 @@
-# Pillow is only needed to regenerate monthly assets:
-#   python3 build.py --gen-monthly
-# Not required for normal builds or CI.
+# Pillow is required for every build — it generates favicon.png and the
+# OG images in assets/og/ (and assets/monthly/ via --gen-monthly).
 Pillow>=10.0.0

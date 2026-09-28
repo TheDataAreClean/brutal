@@ -1,2 +1,5 @@
 #!/bin/sh
-python3 "$(git rev-parse --show-toplevel)/scripts/archive_lately.py"
+ROOT="$(git rev-parse --show-toplevel)"
+PY="$ROOT/.venv/bin/python3"
+[ -x "$PY" ] || PY=python3
+"$PY" "$ROOT/scripts/archive_lately.py"

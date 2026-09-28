@@ -17,7 +17,7 @@ import re
 import shutil
 import sys
 import urllib.request
-from datetime import datetime
+from datetime import datetime, timezone
 from html import escape
 from pathlib import Path
 
@@ -1243,7 +1243,7 @@ def render_feed(articles_md, project_mds, lately_archive_md, playground_md, site
     # Sort newest first
     entries.sort(key=lambda e: e[0], reverse=True)
 
-    now_rfc822 = datetime.utcnow().strftime('%a, %d %b %Y %H:%M:%S +0000')
+    now_rfc822 = datetime.now(timezone.utc).strftime('%a, %d %b %Y %H:%M:%S +0000')
     feed_url = f'{site_url}/feed.xml'
     items_xml = '\n'.join(xml for _, xml in entries)
 
