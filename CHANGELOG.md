@@ -8,6 +8,12 @@ Reverse-chronological. Versioning: **major** = redesign · **minor** = new featu
 
 ---
 
+## v4.2.2 — 2026-09-28
+
+- Markdown links whose URL contains balanced parentheses (e.g. Wikipedia's `Foo_(bar)`) no longer get truncated at the first `)` — all link parsing now shares one `_LINK_RE` pattern
+
+---
+
 ## v4.2.1 — 2026-09-28
 
 - `requirements.txt` comment corrected — Pillow is required for every build (favicon + OG images), not just `--gen-monthly`

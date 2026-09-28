@@ -58,6 +58,8 @@ _ITALIC_RE = re.compile(r'(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)')
 _NUM_LIST_RE = re.compile(r'^\d+\.\s+')
 _SECTION_HDG_RE = re.compile(r'^(#{2,4})(\s|$)')
 _IMG_RE = re.compile(r'^!\[([^\]]*)\]\(([^)]+)\)$')
+# [text](url) — url may contain one level of balanced parens, e.g. Wikipedia's Foo_(bar)
+_LINK_RE = re.compile(r'\[(.+?)\]\(((?:[^()\s]|\([^()\s]*\))+)\)')
 
 
 def parse_bold_segments(text):
@@ -329,8 +331,7 @@ def _project_fields(md):
 
 def parse_inline(text):
     """Convert [text](url) to <a> tags."""
-    return re.sub(
-        r'\[(.+?)\]\((.+?)\)',
+    return _LINK_RE.sub(
         r'<a href="\2" target="_blank" rel="noopener">\1</a>',
         text,
     )
@@ -354,7 +355,7 @@ def render_inline(text):
     text = escape(text)
     text = _BOLD_RE.sub(r'<strong>\1</strong>', text)
     text = _ITALIC_RE.sub(r'<em>\1</em>', text)
-    text = re.sub(r'\[(.+?)\]\((.+?)\)', r'<a href="\2" target="_blank" rel="noopener">\1</a>', text)
+    text = _LINK_RE.sub(r'<a href="\2" target="_blank" rel="noopener">\1</a>', text)
     return text
 
 
@@ -635,7 +636,7 @@ def render_lately(md):
             continue
         icon, label = label_map[key]
         # Extract URL and display text from [text](url), fall back to plain text
-        m = re.match(r'\[(.+?)\]\((.+?)\)', raw)
+        m = _LINK_RE.match(raw)
         if m:
             display, url = m.group(1), m.group(2)
             parts.append(
@@ -762,7 +763,7 @@ def render_playground(md):
         elif '|' in line:
             parts = [p.strip() for p in line.split('|', 3)]
             if len(parts) >= 3:
-                m = re.match(r'\[(.+?)\]\((.+?)\)', parts[0])
+                m = _LINK_RE.match(parts[0])
                 if m:
                     cards.append({
                         'name': m.group(1), 'url': m.group(2),
@@ -871,7 +872,7 @@ def render_rolodex(md):
         if stripped.startswith('# '):
             title = stripped[2:]
         elif stripped.startswith('- '):
-            m = re.match(r'\[(.+?)\]\((.+?)\)', stripped[2:].strip())
+            m = _LINK_RE.match(stripped[2:].strip())
             if m:
                 items.append({'name': m.group(1), 'url': m.group(2)})
 
@@ -1202,7 +1203,7 @@ def render_feed(articles_md, project_mds, lately_archive_md, playground_md, site
         key, raw = key.strip(), raw.strip()
         if key not in label_map or not raw:
             continue
-        m = re.match(r'\[(.+?)\]\((.+?)\)', raw)
+        m = _LINK_RE.match(raw)
         if m:
             display, url = m.group(1), m.group(2)
         else:
@@ -1224,7 +1225,7 @@ def render_feed(articles_md, project_mds, lately_archive_md, playground_md, site
         parts = [p.strip() for p in s.split('|', 3)]
         if len(parts) < 3:
             continue
-        m = re.match(r'\[(.+?)\]\((.+?)\)', parts[0])
+        m = _LINK_RE.match(parts[0])
         if not m:
             continue
         name, url = m.group(1), m.group(2)
