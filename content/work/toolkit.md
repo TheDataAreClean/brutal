@@ -1,12 +1,13 @@
 # **toolkit** at work
 
-- data visualisation
 - data storytelling
+- data visualisation
+- information design
 - data journalism
-- audience research
-- audience strategy
+- audience research and strategy
 - product strategy
+- data systems design
+- monitoring & evaluation
+- editorial curation
 - community building
-- data viz workshops
-- data capacity trainings
-- data systems strategy
+- data training and workshops
