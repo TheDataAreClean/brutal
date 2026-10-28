@@ -2,4 +2,4 @@
 
 i help people understand their data — through products, research and stories.
 
-after a decade of working on data-focussed solutions across sectors, i've learned that the biggest challenge is **communicating data to the people who need it**.
+i've spent a decade working with data across sectors. the biggest challenge was never analysis. it's **making data useful to the people who need it most.**
