@@ -12,12 +12,14 @@ Usage:
                                        and delete the originals (requires: pip install Pillow)
 """
 
+import hashlib
+import inspect
 import json
 import re
 import shutil
 import sys
 import urllib.request
-from datetime import datetime, timezone
+from datetime import datetime
 from html import escape
 from pathlib import Path
 
@@ -44,6 +46,35 @@ SEASON_COLORS = [
 FONT_PATH = BASE / 'assets' / 'fonts' / 'SchibstedGrotesk.ttf'
 ICON_FONT_PATH = BASE / 'assets' / 'fonts' / 'MaterialSymbolsSharp.woff2'
 
+CACHE_PATH = BASE / '.build-cache.json'
+
+# Material Symbols icon per lately key; the verb shown next to it lives in labels.md (lately-<key>).
+LATELY_ICONS = {
+    'read': 'menu_book', 'listened': 'headphones', 'watched': 'movie',
+    'cooked': 'skillet', 'explored': 'explore', 'played': 'sports_esports',
+    'built': 'construction', 'learned': 'school', 'ran': 'directions_run',
+    'cycled': 'pedal_bike', 'photographed': 'photo_camera', 'brewed': 'coffee',
+    'visited': 'place', 'wrote': 'edit_note',
+}
+
+# labels.md keys that script.js reads (via the site-labels JSON block). Comma-separated values
+# are split into lists.
+JS_LABEL_KEYS = (
+    'season-names', 'month-names', 'time-suffix',
+    'aqi-good', 'aqi-moderate', 'aqi-sensitive', 'aqi-unhealthy', 'aqi-poor',
+)
+JS_LABEL_LISTS = ('season-names', 'month-names')
+
+# Every labels.md key build.py or template.html reads. Missing ones are reported at build time.
+REQUIRED_LABEL_KEYS = (
+    'case-study', 'visit-site', 'back-to-work', 'show-more', 'email-copied', 'season-info',
+    'feed-title', 'skip-to-content', 'nav-home', 'change-accent', 'copy-email', 'toggle-dark',
+    'nav-work', 'nav-play', 'shuffle', 'aqi',
+    *JS_LABEL_KEYS,
+    *(f'lately-{k}' for k in LATELY_ICONS),
+)
+
+
 ICON_NAMES = [
     'arrow_outward', 'close', 'coffee', 'construction', 'dark_mode',
     'directions_run', 'edit_note', 'explore', 'headphones', 'info',
@@ -60,6 +91,19 @@ _SECTION_HDG_RE = re.compile(r'^(#{2,4})(\s|$)')
 _IMG_RE = re.compile(r'^!\[([^\]]*)\]\(([^)]+)\)$')
 # [text](url) — url may contain one level of balanced parens, e.g. Wikipedia's Foo_(bar)
 _LINK_RE = re.compile(r'\[(.+?)\]\(((?:[^()\s]|\([^()\s]*\))+)\)')
+
+
+def _link_parts(raw):
+    """Split a lately/feed value into (display text, url).
+
+    A value may be plain text, a bare '[text](url)', or text around one or more links
+    ('[Dune](url) by Frank Herbert'). Links are reduced to their text, and url is the first
+    link's target ('' when there is no link), so trailing or leading text is never dropped.
+    """
+    first = _LINK_RE.search(raw)
+    if not first:
+        return raw, ''
+    return _LINK_RE.sub(r'\1', raw), first.group(2)
 
 
 def parse_bold_segments(text):
@@ -301,6 +345,21 @@ def read(path):
     return Path(path).read_text()
 
 
+def _load_cache():
+    try:
+        return json.loads(CACHE_PATH.read_text())
+    except (OSError, ValueError):
+        return {}
+
+
+def _save_cache(cache):
+    CACHE_PATH.write_text(json.dumps(cache, indent=1, sort_keys=True) + '\n')
+
+
+def _label(labels, key):
+    return (labels or {}).get(key, '')
+
+
 def parse_labels(md):
     """Parse labels.md into a dict of key: value pairs."""
     labels = {}
@@ -335,14 +394,6 @@ def _project_fields(md):
             break
     fields['slug'] = fields['slug'] or slugify(fields['org'])
     return fields
-
-
-def parse_inline(text):
-    """Convert [text](url) to <a> tags."""
-    return _LINK_RE.sub(
-        r'<a href="\2" target="_blank" rel="noopener">\1</a>',
-        text,
-    )
 
 
 def _apply_span(text, cls):
@@ -490,7 +541,6 @@ def render_about(md):
 def render_projects(heading_md, project_mds, labels):
     """Render the projects grid from a list of individual project markdown strings."""
     title = apply_highlight(heading_md.strip().lstrip('# '))
-    case_study_label = labels.get('case-study', 'case study')
     projects = [f for f in (_project_fields(md) for md in project_mds) if f['org']]
 
     proj_parts = []
@@ -503,7 +553,7 @@ def render_projects(heading_md, project_mds, labels):
         tags_html = ''
         if p['tags']:
             tag_spans = ''.join(
-                f'<span class="project-tag">{t.strip()}</span>'
+                f'<span class="project-tag">{escape(t.strip())}</span>'
                 for t in p['tags'].split(',') if t.strip()
             )
             if tag_spans:
@@ -560,11 +610,11 @@ def render_articles(md, labels):
     initial = 6
     parts = []
     for idx, a in enumerate(articles):
-        date_html = f' <span class="article-date">{a["date"]}</span>' if a['date'] else ''
+        date_html = f' <span class="article-date">{escape(a["date"])}</span>' if a['date'] else ''
         tags_html = ''
         if a.get('tags'):
             tag_spans = ''.join(
-                f'<span class="article-tag">{t.strip()}</span>'
+                f'<span class="article-tag">{escape(t.strip())}</span>'
                 for t in a['tags'].split(',')
                 if t.strip()
             )
@@ -572,16 +622,16 @@ def render_articles(md, labels):
                 tags_html = f'\n        <span class="article-tags">{tag_spans}</span>'
         hidden = ' article-hidden' if idx >= initial else ''
         parts.append(
-            f'      <a class="article{hidden}" href="{a["url"]}" target="_blank" rel="noopener">\n'
-            f'        <span class="article-name">{a["name"]}</span>\n'
-            f'        <span class="article-meta"><span class="article-publisher">{a["publisher"]}</span>{date_html}</span>{tags_html}\n'
+            f'      <a class="article{hidden}" href="{escape(a["url"])}" target="_blank" rel="noopener">\n'
+            f'        <span class="article-name">{escape(a["name"])}</span>\n'
+            f'        <span class="article-meta"><span class="article-publisher">{escape(a["publisher"])}</span>{date_html}</span>{tags_html}\n'
             '        <span class="article-arrow"><span class="material-symbols-sharp">arrow_outward</span></span>\n'
             '      </a>'
         )
 
     articles_inner = '\n'.join(parts)
 
-    show_more_label = labels.get('show-more', 'show more')
+    show_more_label = escape(_label(labels, 'show-more'))
     has_more = len(articles) > initial
     show_more = (
         f'    <button type="button" class="bar-box articles-show-more" id="articles-show-more" aria-label="{show_more_label}">'
@@ -608,7 +658,7 @@ def render_articles(md, labels):
     )
 
 
-def render_lately(md):
+def render_lately(md, labels):
     lines = md.strip().split('\n')
     title = ''
     kv_lines = []
@@ -620,37 +670,20 @@ def render_lately(md):
             kv_lines.append(line)
     title = apply_highlight(title)
     items = parse_kv_list('\n'.join(kv_lines))
-    label_map = {
-        'read': ('menu_book', 'reading'),
-        'listened': ('headphones', 'listening to'),
-        'watched': ('movie', 'watching'),
-        'cooked': ('skillet', 'cooking'),
-        'explored': ('explore', 'exploring'),
-        'played': ('sports_esports', 'playing'),
-        'built': ('construction', 'building'),
-        'learned': ('school', 'learning'),
-        'ran': ('directions_run', 'running'),
-        'cycled': ('pedal_bike', 'cycling'),
-        'photographed': ('photo_camera', 'photographing'),
-        'brewed': ('coffee', 'brewing'),
-        'visited': ('place', 'visiting'),
-        'wrote': ('edit_note', 'writing'),
-    }
 
     parts = []
     for key, raw in items:
         raw = raw.strip()
-        if not raw or key not in label_map:
+        if not raw or key not in LATELY_ICONS:
             continue
-        icon, label = label_map[key]
-        # Extract URL and display text from [text](url), fall back to plain text
-        m = _LINK_RE.match(raw)
-        if m:
-            display, url = m.group(1), m.group(2)
+        icon = LATELY_ICONS[key]
+        label = escape(_label(labels, f'lately-{key}'))
+        display, url = _link_parts(raw)
+        if url:
             parts.append(
-                f'      <a class="lately-item" href="{url}" target="_blank" rel="noopener">\n'
+                f'      <a class="lately-item" href="{escape(url)}" target="_blank" rel="noopener">\n'
                 f'        <span class="lately-label"><span class="material-symbols-sharp">{icon}</span> {label}</span>\n'
-                f'        <span class="lately-value">{display}</span>\n'
+                f'        <span class="lately-value">{escape(display)}</span>\n'
                 '        <span class="lately-arrow"><span class="material-symbols-sharp">arrow_outward</span></span>\n'
                 '      </a>'
             )
@@ -658,7 +691,7 @@ def render_lately(md):
             parts.append(
                 '      <div class="lately-item">\n'
                 f'        <span class="lately-label"><span class="material-symbols-sharp">{icon}</span> {label}</span>\n'
-                f'        <span class="lately-value">{raw}</span>\n'
+                f'        <span class="lately-value">{escape(raw)}</span>\n'
                 '      </div>'
             )
 
@@ -673,19 +706,19 @@ def render_lately(md):
     )
 
 
-def render_footer(footer_md):
+def render_footer(footer_md, labels):
     items = dict(parse_kv_list(footer_md))
-    location = items.get('location', '')
-    designed = parse_inline(items.get('designed', ''))
-    developed = parse_inline(items.get('developed', ''))
-    license_text = parse_inline(items.get('license', ''))
+    location = escape(items.get('location', ''))
+    designed = render_inline(items.get('designed', ''))
+    developed = render_inline(items.get('developed', ''))
+    license_text = render_inline(items.get('license', ''))
 
     return (
         '    <div class="footer-meta">\n'
         f'      <span>{location}</span>\n'
         '      <span id="local-time">--:--</span>\n'
         '      <span id="temperature">--</span>\n'
-        '      <span>AQI <span id="aqi">--</span></span>\n'
+        f'      <span>{escape(_label(labels, "aqi"))} <span id="aqi">--</span></span>\n'
         '    </div>\n'
         '\n'
         '    <div class="footer-bottom">\n'
@@ -712,7 +745,7 @@ def render_toolkit(md):
     title = apply_highlight(title)
 
     boxes = '\n'.join(
-        f'      <span class="offering-tag">{s}</span>'
+        f'      <span class="offering-tag">{escape(s)}</span>'
         for s in items
     )
 
@@ -727,18 +760,24 @@ def render_toolkit(md):
     )
 
 
-def fetch_icon_font():
-    """Download a subsetted Material Symbols Sharp woff2 via Google Fonts icon_names API."""
+def fetch_icon_font(cache):
+    """Download a subsetted Material Symbols Sharp woff2 via Google Fonts icon_names API.
+
+    Skipped when the font file exists and was fetched for the current ICON_NAMES (tracked in
+    the build cache), so ordinary rebuilds don't hit the network or touch the file.
+    """
     icons = ','.join(sorted(ICON_NAMES))
+    icons_key = hashlib.sha256(icons.encode()).hexdigest()
+    if ICON_FONT_PATH.exists() and cache.get('icon_font') == icons_key:
+        return
     css_url = (
         'https://fonts.googleapis.com/css2?'
         'family=Material+Symbols+Sharp:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200'
         f'&icon_names={icons}&display=swap'
     )
+    headers = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120.0 Safari/537.36'}
     try:
-        req = urllib.request.Request(css_url, headers={
-            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120.0 Safari/537.36',
-        })
+        req = urllib.request.Request(css_url, headers=headers)
         with urllib.request.urlopen(req, timeout=10) as resp:
             css = resp.read().decode('utf-8')
 
@@ -748,9 +787,12 @@ def fetch_icon_font():
             return
 
         woff2_url = m.group(1).strip("'\"")
+        with urllib.request.urlopen(urllib.request.Request(woff2_url, headers=headers), timeout=10) as resp:
+            font_bytes = resp.read()
         ICON_FONT_PATH.parent.mkdir(parents=True, exist_ok=True)
-        urllib.request.urlretrieve(woff2_url, ICON_FONT_PATH)
-        print(f'Downloaded icon font ({ICON_FONT_PATH.stat().st_size:,} bytes)')
+        ICON_FONT_PATH.write_bytes(font_bytes)
+        cache['icon_font'] = icons_key
+        print(f'Downloaded icon font ({len(font_bytes):,} bytes)')
 
     except Exception as e:
         print(f'Warning: icon font download failed ({e}), keeping existing file.')
@@ -854,10 +896,10 @@ def render_interests(md):
     title = apply_highlight(title)
 
     tag_html = '\n'.join(
-        f'      <span class="interest-tag">{t}</span>'
+        f'      <span class="interest-tag">{escape(t)}</span>'
         for t in tags
     )
-    subtitle_html = f'    <p class="section-subtitle">{subtitle}</p>\n' if subtitle else ''
+    subtitle_html = f'    <p class="section-subtitle">{escape(subtitle)}</p>\n' if subtitle else ''
 
     return (
         '  <!-- INTERESTS -->\n'
@@ -871,7 +913,7 @@ def render_interests(md):
     )
 
 
-def render_rolodex(md):
+def render_rolodex(md, labels):
     """Parse ideas.md into a hidden list, JS picks 5 random on each load."""
     title = ''
     items = []
@@ -885,14 +927,15 @@ def render_rolodex(md):
                 items.append({'name': m.group(1), 'url': m.group(2)})
 
     title = apply_highlight(title)
-    items_json = json.dumps(items)
+    # '<' escaped so a name containing '</script>' can't close the inline script block
+    items_json = json.dumps(items).replace('<', '\\u003c')
 
     return (
         '  <!-- ROLODEX -->\n'
         '  <section>\n'
         '    <div class="rolodex-header">\n'
         f'      <h2 class="section-title">{title}</h2>\n'
-        '      <button type="button" class="bar-box" id="rolodex-refresh" aria-label="Shuffle">'
+        f'      <button type="button" class="bar-box" id="rolodex-refresh" aria-label="{escape(_label(labels, "shuffle"))}">'
         '<span class="material-symbols-sharp">refresh</span></button>\n'
         '    </div>\n'
         '    <div class="rolodex" id="rolodex"></div>\n'
@@ -1034,14 +1077,14 @@ def render_project_page(md, labels):
 
     content_sections = [s for sec in sections for s in [_render_section(sec)] if s]
 
-    visit_label = labels.get('visit-site', 'visit site')
-    back_label = labels.get('back-to-work', '← back to work')
+    visit_label = escape(_label(labels, 'visit-site'))
+    back_label = escape(_label(labels, 'back-to-work'))
 
     meta_parts = [escape(p) for p in [org, year] if p]
     meta_html = ' · '.join(meta_parts)
 
     visit_btn = (
-        f'<a class="bar-box project-visit-btn" href="{url}" target="_blank" rel="noopener" aria-label="{visit_label}">'
+        f'<a class="bar-box project-visit-btn" href="{escape(url)}" target="_blank" rel="noopener" aria-label="{visit_label}">'
         f'<span class="material-symbols-sharp">arrow_outward</span></a>'
     ) if url else ''
 
@@ -1050,7 +1093,7 @@ def render_project_page(md, labels):
     heading = escape(problem) if problem else escape(org)
 
     tag_spans = ''.join(
-        f'<span class="project-tag">{t.strip()}</span>'
+        f'<span class="project-tag">{escape(t.strip())}</span>'
         for t in tags.split(',') if t.strip()
     ) if tags else ''
     tags_row = (
@@ -1140,7 +1183,7 @@ def _feed_item(title, link, desc, date_str, guid, image_url=None):
     return dt or datetime.min, xml
 
 
-def render_feed(articles_md, project_mds, lately_archive_md, playground_md, site_url, site_title, site_desc):
+def render_feed(articles_md, project_mds, lately_archive_md, playground_md, site_url, site_title, site_desc, labels):
     """Generate RSS 2.0 feed XML aggregating articles, projects, lately, and playground."""
     site_url = site_url.rstrip('/')
 
@@ -1192,13 +1235,7 @@ def render_feed(articles_md, project_mds, lately_archive_md, playground_md, site
         ))
 
     # --- Lately (from archive: ## Mon YYYY sections → items) ---
-    label_map = {
-        'read': 'reading', 'listened': 'listening to', 'watched': 'watching',
-        'cooked': 'cooking', 'explored': 'exploring', 'played': 'playing',
-        'built': 'building', 'learned': 'learning', 'ran': 'running',
-        'cycled': 'cycling', 'photographed': 'photographing', 'brewed': 'brewing',
-        'visited': 'visiting', 'wrote': 'writing',
-    }
+    lately_labels = {k: _label(labels, f'lately-{k}') for k in LATELY_ICONS}
     current_date = ''
     for line in lately_archive_md.strip().split('\n'):
         s = line.strip()
@@ -1209,20 +1246,17 @@ def render_feed(articles_md, project_mds, lately_archive_md, playground_md, site
             continue
         key, _, raw = s[2:].partition(':')
         key, raw = key.strip(), raw.strip()
-        if key not in label_map or not raw:
+        if key not in lately_labels or not raw:
             continue
-        m = _LINK_RE.match(raw)
-        if m:
-            display, url = m.group(1), m.group(2)
-        else:
-            display, url = raw, site_url
-        label = label_map[key]
+        display, url = _link_parts(raw)
+        url = url or site_url
+        label = lately_labels[key]
         entries.append(_feed_item(
             title=f'lately {label}: {display}',
             link=url,
             desc='',
             date_str=current_date,
-            guid=f'lately:{key}:{url}',
+            guid=f'lately:{current_date}:{key}:{display}',
         ))
 
     # --- Playground ---
@@ -1252,7 +1286,9 @@ def render_feed(articles_md, project_mds, lately_archive_md, playground_md, site
     # Sort newest first
     entries.sort(key=lambda e: e[0], reverse=True)
 
-    now_rfc822 = datetime.now(timezone.utc).strftime('%a, %d %b %Y %H:%M:%S +0000')
+    # Newest entry's date, not the wall clock, so a rebuild with unchanged content writes an identical feed.
+    newest = entries[0][0] if entries else datetime.min
+    last_build_rfc822 = newest.strftime('%a, %d %b %Y 00:00:00 +0000')
     feed_url = f'{site_url}/feed.xml'
     items_xml = '\n'.join(xml for _, xml in entries)
 
@@ -1264,7 +1300,7 @@ def render_feed(articles_md, project_mds, lately_archive_md, playground_md, site
         f'    <link>{escape(site_url)}</link>\n'
         f'    <description>{escape(site_desc)}</description>\n'
         '    <language>en</language>\n'
-        f'    <lastBuildDate>{now_rfc822}</lastBuildDate>\n'
+        f'    <lastBuildDate>{last_build_rfc822}</lastBuildDate>\n'
         f'    <atom:link href="{escape(feed_url)}" rel="self" type="application/rss+xml"/>\n'
         f'{items_xml}\n'
         '  </channel>\n'
@@ -1272,12 +1308,12 @@ def render_feed(articles_md, project_mds, lately_archive_md, playground_md, site
     )
 
 
-def render_play_body(intro_md, lately_md, playground_md, interests_md, rolodex_md):
+def render_play_body(intro_md, lately_md, playground_md, interests_md, rolodex_md, labels):
     """Play page body: intro + lately + playground + ideas + interests."""
     intro_html = render_page_intro(intro_md.strip())
-    lately_html = render_lately(lately_md)
+    lately_html = render_lately(lately_md, labels)
     playground_html = render_playground(playground_md)
-    rolodex_html = render_rolodex(rolodex_md)
+    rolodex_html = render_rolodex(rolodex_md, labels)
     interests_html = render_interests(interests_md)
     parts = [intro_html, lately_html]
     if playground_html:
@@ -1285,6 +1321,15 @@ def render_play_body(intro_md, lately_md, playground_md, interests_md, rolodex_m
     parts.append(rolodex_html)
     parts.append(interests_html)
     return '\n\n'.join(parts)
+
+
+def _js_labels_json(labels):
+    """labels.md values script.js needs, as JSON safe to inline in a <script> block."""
+    out = {}
+    for key in JS_LABEL_KEYS:
+        value = _label(labels, key)
+        out[key] = [v.strip() for v in value.split(',')] if key in JS_LABEL_LISTS else value
+    return json.dumps(out, ensure_ascii=False).replace('<', '\\u003c')
 
 
 def render_page(template, css, js, meta_html, footer_html, body_html, active_nav, depth=0, labels=None):
@@ -1295,9 +1340,16 @@ def render_page(template, css, js, meta_html, footer_html, body_html, active_nav
     html = html.replace('{{meta}}', meta_html)
     html = html.replace('{{body}}', body_html)
     html = html.replace('{{footer}}', footer_html)
-    html = html.replace('{{toast_email_copied}}', (labels or {}).get('email-copied', 'email copied'))
-    html = html.replace('{{season_info}}', (labels or {}).get('season-info', ''))
-    html = html.replace('{{feed_title}}', (labels or {}).get('feed-title', 'RSS Feed'))
+    # Label placeholders land in text and attribute values, so they're escaped.
+    for placeholder, key in (
+        ('toast_email_copied', 'email-copied'), ('season_info', 'season-info'),
+        ('feed_title', 'feed-title'), ('label_skip', 'skip-to-content'),
+        ('label_home', 'nav-home'), ('label_accent', 'change-accent'),
+        ('label_email', 'copy-email'), ('label_dark', 'toggle-dark'),
+        ('label_work', 'nav-work'), ('label_play', 'nav-play'),
+    ):
+        html = html.replace('{{' + placeholder + '}}', escape(_label(labels, key)))
+    html = html.replace('{{labels_json}}', _js_labels_json(labels))
 
     # Nav active states
     html = html.replace('{{nav_root}}', prefix)
@@ -1350,32 +1402,39 @@ def minify_js(js):
     return '\n'.join(lines) + '\n'
 
 
+def _valid_projects(project_mds):
+    """Pair each project markdown with its parsed fields, dropping ones that can't be built.
+
+    A project needs a slug (explicit, or derived from org) that no earlier project already
+    uses. Otherwise its page path would be 'work//index.html' (overwriting the work landing
+    page) or collide with another project's page. Skipped projects are reported, not fatal.
+    """
+    seen = set()
+    valid = []
+    for md in project_mds:
+        fields = _project_fields(md)
+        slug = fields['slug']
+        if not slug:
+            print(f'Warning: skipping project with no slug or org: {fields["problem"] or "(untitled)"}')
+        elif slug in seen:
+            print(f'Warning: skipping project with duplicate slug "{slug}"')
+        else:
+            seen.add(slug)
+            valid.append((md, fields))
+    return valid
+
+
 def check_content(project_mds, playground_md):
     """Validate project and playground content.
 
-    Checks for duplicate slugs, missing image assets, and missing playground assets.
-    Prints a warning for each issue. Never halts the build.
+    Checks for missing image assets and missing playground assets (slugs are checked by
+    _valid_projects). Prints a warning for each issue. Never halts the build.
     Returns the number of warnings emitted.
     """
     warnings = []
-    seen_slugs = {}
 
     for md in project_mds:
-        # Extract slug for readable warning labels
-        slug = ''
-        for line in md.strip().split('\n'):
-            s = line.strip()
-            if s.startswith('- slug:'):
-                slug = s[7:].strip()
-                break
-            if s.startswith('## '):
-                break
-
-        if slug:
-            if slug in seen_slugs:
-                warnings.append(f'Warning: duplicate slug "{slug}"')
-            else:
-                seen_slugs[slug] = True
+        slug = _project_fields(md)['slug']
 
         for line in md.strip().split('\n'):
             m = _IMG_RE.match(line.strip())
@@ -1432,6 +1491,26 @@ def smoke_check(pages, project_fields):
     print(f'Smoke check passed — {len(expected)} expected files present.')
 
 
+def _og_signature():
+    """Fingerprint of everything besides the page text that shapes an OG image: the font file
+    and the drawing code. Changing either invalidates every cached image."""
+    h = hashlib.sha256(FONT_PATH.read_bytes() if FONT_PATH.exists() else b'')
+    for fn in (generate_og_image, _wrap_lines, _wrap_segments, draw_segments, parse_bold_segments):
+        h.update(inspect.getsource(fn).encode())
+    return h.hexdigest()
+
+
+def _og_image(cache, accent, heading, tagline, domain_text, site_name, out_path):
+    """generate_og_image, skipped when the output exists and its inputs are unchanged."""
+    key = hashlib.sha256('\0'.join([_og_signature(), accent, heading, tagline, domain_text, site_name]).encode()).hexdigest()
+    rel = str(Path(out_path).relative_to(BASE))
+    og_cache = cache.setdefault('og', {})
+    if Path(out_path).exists() and og_cache.get(rel) == key:
+        return
+    generate_og_image(accent, heading, tagline, domain_text, site_name, out_path)
+    og_cache[rel] = key
+
+
 def build():
     template = read(BASE / 'template.html')
     css = read(BASE / 'style.css')
@@ -1462,28 +1541,32 @@ def build():
     interests_md        = read(CONTENT / 'play' / 'interests.md')
 
     labels = parse_labels(read(CONTENT / 'labels.md'))
+    for key in REQUIRED_LABEL_KEYS:
+        if not labels.get(key):
+            print(f'Warning: labels.md is missing "{key}"')
+
+    cache = _load_cache()
 
     # Shared pieces
-    footer_html = render_footer(footer_md)
+    footer_html = render_footer(footer_md, labels)
 
-    # Download subsetted icon font
-    fetch_icon_font()
+    # Download subsetted icon font (skipped when already fetched for the current icon set)
+    fetch_icon_font(cache)
 
-    # Project files (shared by grid cards and detail pages)
-    project_detail_files = list((CONTENT / 'work' / 'projects').glob('*.md'))
-    project_mds_all = [read(f) for f in project_detail_files]
-
-    # Validate image references before building
-    check_content(project_mds_all, playground_md)
-
-    # Page bodies
-    home_body = render_hero(hero_md)
-    play_body = render_play_body(play_intro_md, lately_md, playground_md, interests_md, ideas_md)
+    # Project files (shared by grid cards and detail pages), in a stable order
+    project_detail_files = sorted((CONTENT / 'work' / 'projects').glob('*.md'))
 
     # Project detail pages — use the slug parsed from the markdown (same slug the card links use).
     # Parse each project's front-matter once and carry the result alongside its md everywhere below,
     # rather than re-parsing per use.
-    project_fields_all = [(md, _project_fields(md)) for md in project_mds_all]
+    project_fields_all = _valid_projects([read(f) for f in project_detail_files])
+
+    # Validate image references before building
+    check_content([md for md, _ in project_fields_all], playground_md)
+
+    # Page bodies
+    home_body = render_hero(hero_md)
+    play_body = render_play_body(play_intro_md, lately_md, playground_md, interests_md, ideas_md, labels)
 
     # Order projects by content/work/project-order.md (one slug per line).
     # Projects not listed appear after ordered ones.
@@ -1516,13 +1599,13 @@ def build():
     # Generate per-page OG images (work, play, each project) — built fresh every run
     # so they always match current content, unlike home's precomputed monthly set.
     og_dir = BASE / 'assets' / 'og'
-    generate_og_image(accent, work_meta.get('heading', ''), work_meta.get('tagline', ''), domain_text, site_name, og_dir / 'work.png')
-    generate_og_image(accent, play_meta.get('heading', ''), play_meta.get('tagline', ''), domain_text, site_name, og_dir / 'play.png')
+    _og_image(cache, accent, work_meta.get('heading', ''), work_meta.get('tagline', ''), domain_text, site_name, og_dir / 'work.png')
+    _og_image(cache, accent, play_meta.get('heading', ''), play_meta.get('tagline', ''), domain_text, site_name, og_dir / 'play.png')
     for f in project_fields:
         year_display = re.sub(r'\s*[-–—]\s*', ' - ', f['year']) if f['year'] else ''
         org_display = f'**{f["org"]}**' if f['org'] else ''
         project_tagline = ' · '.join(p for p in [org_display, year_display] if p)
-        generate_og_image(accent, f['problem'], project_tagline, domain_text, site_name, og_dir / 'work' / f'{f["slug"]}.png')
+        _og_image(cache, accent, f['problem'], project_tagline, domain_text, site_name, og_dir / 'work' / f'{f["slug"]}.png')
 
     # Per-page meta tags — title/description/image differ per page instead of being shared site-wide
     site_url = site.get('url', '').rstrip('/')
@@ -1575,7 +1658,8 @@ def build():
         shutil.copytree(assets_src, assets_dst, ignore=shutil.ignore_patterns('README.md', 'monthly'))
 
     # Generate RSS feed
-    feed_xml = render_feed(articles_md, project_mds, lately_archive_md, playground_md, site_url, home_meta['title'], home_meta['description'])
+    feed_xml = render_feed(articles_md, project_mds, lately_archive_md, playground_md, site_url,
+                           home_meta.get('title', ''), home_meta.get('description', ''), labels)
     (DIST / 'feed.xml').write_text(feed_xml)
     print(f'Built dist/feed.xml ({len(feed_xml)} bytes)')
 
@@ -1584,6 +1668,7 @@ def build():
     if cname.exists():
         shutil.copy2(cname, DIST / 'CNAME')
 
+    _save_cache(cache)
     smoke_check(pages, project_fields)
     print(f'Done — og accent: {accent}')
 
@@ -1610,12 +1695,15 @@ def generate_monthly_assets():
 
 
 def optimize_images():
-    """Convert all PNG/JPG/JPEG in assets/ to WebP and delete the originals.
+    """Convert all PNG/JPG/JPEG in assets/ to WebP, delete the originals, and repoint content.
 
-    Skips: assets/monthly/ (source OG images), assets/fonts/, favicon.png.
-    Already-WebP files are ignored. Run once after adding new raster images.
+    Skips: assets/monthly/ (source OG images), assets/fonts/, assets/og/, favicon.png.
+    Already-WebP files are ignored, and an image whose .webp name is already taken is left
+    alone (with a warning) rather than overwriting the other file. EXIF orientation is applied
+    before re-encoding. References in content/**/*.md are rewritten to the new .webp names.
+    Run once after adding new raster images.
     """
-    from PIL import Image
+    from PIL import Image, ImageOps
 
     SKIP_FILES = {'favicon.png', 'og-image.png'}
     SKIP_DIRS = {'monthly', 'fonts', 'og'}
@@ -1628,15 +1716,21 @@ def optimize_images():
         p for p in assets.rglob('*')
         if p.suffix.lower() in EXTENSIONS
         and p.name not in SKIP_FILES
-        and not any(part in SKIP_DIRS for part in p.parts)
+        # relative to assets/, so a checkout living under a folder named 'og' or 'fonts' still works
+        and not any(part in SKIP_DIRS for part in p.relative_to(assets).parts[:-1])
     ]
 
     if not candidates:
         print('No images to optimise.')
         return
 
+    converted = []  # (old path, new path) relative to BASE
     for src in sorted(candidates):
-        img = Image.open(src)
+        out = src.with_suffix('.webp')
+        if out.exists():
+            print(f'Skipping {src.relative_to(BASE)}: {out.name} already exists')
+            continue
+        img = ImageOps.exif_transpose(Image.open(src))
         # Flatten alpha to white
         if img.mode in ('RGBA', 'LA', 'P'):
             if img.mode == 'P':
@@ -1652,15 +1746,34 @@ def optimize_images():
         if w > TARGET_W:
             img = img.resize((TARGET_W, round(h * TARGET_W / w)), Image.LANCZOS)
 
-        out = src.with_suffix('.webp')
         img.save(out, 'WEBP', quality=QUALITY, method=6)
         orig_kb = src.stat().st_size / 1024
         new_kb = out.stat().st_size / 1024
         src.unlink()
         rel = src.relative_to(BASE)
+        converted.append((rel.as_posix(), out.relative_to(BASE).as_posix()))
         print(f'{rel}  {orig_kb:.0f}KB → {out.name}  {new_kb:.0f}KB  ({new_kb/orig_kb*100:.0f}%)')
 
+    _repoint_images(converted)
     print('Done — all images optimised.')
+
+
+def _repoint_images(converted):
+    """Rewrite content/**/*.md references from converted originals to their .webp files.
+
+    Matches the full 'assets/...' path (with or without a leading slash) and, for
+    assets/playground/, the bare filename playground.md uses between '|' separators.
+    """
+    for md_path in sorted(CONTENT.rglob('*.md')):
+        text = md_path.read_text()
+        updated = text
+        for old, new in converted:
+            updated = updated.replace(old, new)
+            if old.startswith('assets/playground/'):
+                updated = re.sub(rf'(\|\s*){re.escape(Path(old).name)}(\s*\|)', rf'\g<1>{Path(new).name}\g<2>', updated)
+        if updated != text:
+            md_path.write_text(updated)
+            print(f'Updated image references in {md_path.relative_to(BASE)}')
 
 
 if __name__ == '__main__':

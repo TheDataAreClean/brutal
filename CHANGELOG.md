@@ -6,6 +6,15 @@ Reverse-chronological. Versioning: **major** = redesign · **minor** = new featu
 
 ## UNRELEASED
 
+- Projects with no slug/org or a duplicate slug are skipped with a warning instead of overwriting another page (including `work/index.html`)
+- Lately values keep text around a link; RSS lately guids include the date and text, so repeated or unlinked entries no longer collapse into one
+- `script.js` survives blocked `sessionStorage`/`localStorage`; season buttons have `type="button"`
+- Remaining hardcoded copy (nav, aria-labels, AQI bands, season/month names, lately verbs, `IST`, `AQI`, `Shuffle`) moved to `labels.md`, passed to `script.js` as JSON
+- List items, article fields, URLs and label attributes are HTML-escaped; rolodex JSON can't close its `<script>`
+- Build no longer redownloads the icon font or regenerates unchanged OG images (`.build-cache.json`); `feed.xml` is reproducible across rebuilds; `build()` no longer crashes on an incomplete `meta.md`
+- `--optimize-images` applies EXIF rotation, won't overwrite an existing `.webp`, checks skip folders relative to `assets/`, and updates content references
+- OG heading supports `<br>` line breaks; work page heading split over two lines
+
 ---
 
 ## v4.2.2 — 2026-09-28
