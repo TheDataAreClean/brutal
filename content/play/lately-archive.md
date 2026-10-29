@@ -2,8 +2,8 @@
 - read: [The Once and Future Riot by Joe Sacco](https://www.goodreads.com/book/show/222376500-the-once-and-future-riot)
 - brewed: [Yeast Natural Pink Bourbon by Zarza Coffee, Moonwake Coffee Roasters](https://www.thewaytocoffee.com/beans/zarza-coffee-jhonatan-gasca-yeast-natural-pink-bourbon/)
 - wrote: [musings](https://musings.thedataareclean.com)
-- photographed: my colleagues in Mangalore
 - visited: [Mangalore](https://en.wikipedia.org/wiki/Mangalore)
+- photographed: sunset on a mangalore beach
 
 ## 2026-09-28
 - read: [The Blue Book: An Anti-Caste Graphic Novel by Siddhesh Gautam](https://www.goodreads.com/book/show/255086143-the-blue-book)
