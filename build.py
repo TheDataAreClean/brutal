@@ -28,19 +28,21 @@ BASE = Path(__file__).parent
 CONTENT = BASE / 'content'
 DIST = BASE / 'dist'
 
-# (light, dark) accent per month, Jan-Dec. script.js gets the same table via the site-data JSON block.
+# (light, dark) accent per month, Jan-Dec. Every light accent is >= 4.5:1 against white (it's both text
+# on white and the fill behind white text) and every dark accent >= 4.5:1 against black (WCAG AA).
+# script.js gets the same table via the site-data JSON block.
 SEASONS = [
     ('#c84520', '#e87040'),  # Jan — Flame of Forest
     ('#7d4abf', '#a878d8'),  # Feb — Jacaranda
-    ('#9870b0', '#b898d0'),  # Mar — Pongamia
-    ('#b89010', '#d8b030'),  # Apr — Golden Shower
+    ('#8f64a9', '#b898d0'),  # Mar — Pongamia
+    ('#90700c', '#d8b030'),  # Apr — Golden Shower
     ('#c83020', '#e86040'),  # May — Gulmohar
-    ('#a89018', '#c8b030'),  # Jun — Copper Pod
+    ('#887413', '#c8b030'),  # Jun — Copper Pod
     ('#c84568', '#e87898'),  # Jul — Oleander
     ('#c82852', '#f0456a'),  # Aug — Bougainvillea
     ('#8040a8', '#a868c8'),  # Sep — Purple Bauhinia
-    ('#c85080', '#e880a8'),  # Oct — Tabebuia Rosea
-    ('#b87878', '#d0a0a0'),  # Nov — Rain Tree
+    ('#c5477a', '#e880a8'),  # Oct — Tabebuia Rosea
+    ('#ab5f5f', '#d0a0a0'),  # Nov — Rain Tree
     ('#c02838', '#e85060'),  # Dec — Poinsettia
 ]
 SEASON_COLORS = [light for light, _ in SEASONS]

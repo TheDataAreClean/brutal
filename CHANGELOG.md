@@ -29,6 +29,7 @@ Reverse-chronological. Versioning: **major** = redesign · **minor** = new featu
 - Clock keeps one interval at most and doesn't tick in a hidden tab; the `—` pair separator and `°C` unit come from `labels.md`
 - Link URLs with a scheme other than http/https/mailto (e.g. `javascript:`) render as `#`; every meta URL/attribute is escaped
 - Projects without an `org` are skipped with a warning (they'd have a page but no card); `lastBuildDate` never falls back to year 1
+- WCAG AA everywhere: the light accents for Mar, Apr, Jun, Oct and Nov were darkened to ≥4.5:1 against white (`#9870b0`→`#8f64a9`, `#b89010`→`#90700c`, `#a89018`→`#887413`, `#c85080`→`#c5477a`, `#b87878`→`#ab5f5f`); all dark-mode accents already passed. The season picker footnote opacity went 0.5 → 0.65. Monthly OG images regenerated
 - OG heading supports `<br>` line breaks; work page heading split over two lines
 
 ---
