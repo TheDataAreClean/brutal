@@ -1,12 +1,12 @@
 # **lately**, i have been
 
-- read: [The Blue Book: An Anti-Caste Graphic Novel by Siddhesh Gautam](https://www.goodreads.com/book/show/255086143-the-blue-book)
+- read: [The Once and Future Riot by Joe Sacco](https://www.goodreads.com/book/show/222376500-the-once-and-future-riot)
 - listened: 
-- watched: [Lanterns](https://en.wikipedia.org/wiki/Lanterns_(TV_series))
+- watched: 
 - learned: 
 - explored: 
 - wrote: 
-- brewed: [Excelsa by Mooleh Manay Estate, Blue Tokai Coffee](https://bluetokaicoffee.com/collections/roasted-and-ground-coffee-beans/products/excelsa-by-mooleh-manay-estate)
+- brewed: [Yeast Natural Pink Bourbon by Zarza Coffee, Moonwake Coffee Roasters](https://www.thewaytocoffee.com/beans/zarza-coffee-jhonatan-gasca-yeast-natural-pink-bourbon/)
 - photographed: 
 - cycled: 
 - visited: 

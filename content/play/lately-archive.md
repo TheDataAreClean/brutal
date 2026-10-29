@@ -1,3 +1,7 @@
+## 2026-10-29
+- read: [The Once and Future Riot by Joe Sacco](https://www.goodreads.com/book/show/222376500-the-once-and-future-riot)
+- brewed: [Yeast Natural Pink Bourbon by Zarza Coffee, Moonwake Coffee Roasters](https://www.thewaytocoffee.com/beans/zarza-coffee-jhonatan-gasca-yeast-natural-pink-bourbon/)
+
 ## 2026-09-28
 - read: [The Blue Book: An Anti-Caste Graphic Novel by Siddhesh Gautam](https://www.goodreads.com/book/show/255086143-the-blue-book)
 - watched: [Lanterns](https://en.wikipedia.org/wiki/Lanterns_(TV_series))
