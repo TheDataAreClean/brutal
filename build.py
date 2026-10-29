@@ -12,6 +12,7 @@ Usage:
                                        and delete the originals (requires: pip install Pillow)
 """
 
+import functools
 import hashlib
 import inspect
 import json
@@ -1491,6 +1492,7 @@ def smoke_check(pages, project_fields):
     print(f'Smoke check passed — {len(expected)} expected files present.')
 
 
+@functools.lru_cache(maxsize=None)
 def _og_signature():
     """Fingerprint of everything besides the page text that shapes an OG image: the font file
     and the drawing code. Changing either invalidates every cached image."""
