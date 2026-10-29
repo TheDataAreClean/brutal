@@ -1,7 +1,7 @@
 # **lately**, i have been
 
 - read: [The Once and Future Riot by Joe Sacco](https://www.goodreads.com/book/show/222376500-the-once-and-future-riot)
-- listened: 
+- listened: [Inside the race to build the machine god by Decoder, The Verge](https://youtu.be/FU2wls6TOyw)
 - watched: 
 - learned: 
 - explored: 
