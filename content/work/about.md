@@ -1,5 +1,5 @@
 # what is a **data communicator** ?
 
-i help people understand their data — through products, research and stories.
+i help people understand their data, through products, research and stories.
 
-i've spent a decade working with data across sectors. the biggest challenge was never analysis. it's **making data useful to the people who need it most.**
+after a decade of working with data across sectors, i have learned that the biggest challenge is communicating data to the people who need it the most.
