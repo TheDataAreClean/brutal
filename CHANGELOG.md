@@ -6,6 +6,12 @@ Reverse-chronological. Versioning: **major** = redesign · **minor** = new featu
 
 ## UNRELEASED
 
+---
+
+## v4.3.0 — 2026-10-29
+
+- Content: new work-page about copy and toolkit; VizChitra project dates (editorial 2024–2026, Bengaluru 2025–2026); play "lately" filled (archived in `lately-archive.md`); new meta titles/descriptions and OG images, work heading on two lines
+
 - Projects with no slug/org or a duplicate slug are skipped with a warning instead of overwriting another page (including `work/index.html`)
 - Lately values keep text around a link; RSS lately guids include the date and text, so repeated or unlinked entries no longer collapse into one
 - `script.js` survives blocked `sessionStorage`/`localStorage`; season buttons have `type="button"`
