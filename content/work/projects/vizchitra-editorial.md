@@ -1,7 +1,7 @@
 <!-- CARD -->
 - problem: How do you curate the lineup for India's premier data visualization conference and community?
 - org: VizChitra
-- year: 2025–ongoing
+- year: 2024–2026
 - tags: data viz, community, editorial
 
 <!-- IDENTITY -->

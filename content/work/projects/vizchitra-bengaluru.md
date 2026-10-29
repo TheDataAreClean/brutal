@@ -1,7 +1,7 @@
 <!-- CARD -->
 - problem: How do you build a local data viz community to foster creation and connection?
 - org: VizChitra
-- year: 2025–ongoing
+- year: 2025–2026
 - tags: community, events
 
 <!-- IDENTITY -->
