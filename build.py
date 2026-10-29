@@ -1431,6 +1431,9 @@ def _valid_projects(project_mds):
         slug = fields['slug']
         if not slug:
             print(f'Warning: skipping project with no slug or org: {fields["problem"] or "(untitled)"}')
+        elif not re.fullmatch(r'[\w-]+', slug):
+            # One URL segment only: a '/' or '..' would write outside work/<slug>/ and confuse stale-page cleanup
+            print(f'Warning: skipping project with invalid slug "{slug}"')
         elif slug in seen:
             print(f'Warning: skipping project with duplicate slug "{slug}"')
         else:
@@ -1762,10 +1765,9 @@ def optimize_images():
         img = ImageOps.exif_transpose(Image.open(src))
         # Flatten alpha to white
         if img.mode in ('RGBA', 'LA', 'P'):
-            if img.mode == 'P':
-                img = img.convert('RGBA')
+            img = img.convert('RGBA')  # P and LA carry their transparency into the alpha channel
             bg = Image.new('RGB', img.size, (255, 255, 255))
-            bg.paste(img, mask=img.split()[-1] if img.mode == 'RGBA' else None)
+            bg.paste(img, mask=img.split()[-1])
             img = bg
         elif img.mode != 'RGB':
             img = img.convert('RGB')
