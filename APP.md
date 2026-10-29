@@ -61,12 +61,12 @@ dist/            ← generated output, git-tracked, committed with source
 | `render_toolkit(md)` | toolkit.md | tag cloud |
 | `render_projects(heading_md, mds, labels)` | projects.md + projects/*.md | 3-col grid of cards |
 | `render_articles(md, labels)` | articles.md | 3-col grid + show-more |
-| `render_lately(md)` | lately.md | activity list |
+| `render_lately(md, labels)` | lately.md | activity list |
 | `render_playground(md)` | playground.md | 2-col linked image card grid |
 | `render_rolodex(md)` | ideas.md | randomised link list |
 | `render_interests(md)` | interests.md | tag cloud |
 | `render_project_page(md, labels)` | projects/*.md | case study page |
-| `render_feed(articles_md, project_mds, lately_archive_md, playground_md, site_url, site_title, site_desc)` | articles + projects + lately-archive + playground | RSS 2.0 XML |
+| `render_feed(articles_md, project_mds, lately_archive_md, playground_md, site_url, site_title, site_desc, labels)` | articles + projects + lately-archive + playground | RSS 2.0 XML |
 | `render_meta(title, description, url, image_url, favicon)` | per-page values resolved in `build()` | `<title>` + OG/Twitter `<meta>` tags |
 | `render_page(template, css, js, meta_html, ...)` | all above | complete HTML file |
 | `generate_og_image(accent_hex, heading_raw, tagline_raw, domain_text, site_name, output_path)` | per-page heading/tagline | 2400x1260 OG PNG — see OG images |
@@ -75,7 +75,7 @@ dist/            ← generated output, git-tracked, committed with source
 
 ### Key helpers
 
-`parse_kv_list`, `parse_meta(md)` (splits meta.md into site-wide dict + per-page dict), `parse_heading_tagline(md)` (hero.md's `# heading` + tagline format), `parse_labels`, `slugify`, `_BOLD_RE`, `_apply_span()`, `apply_highlight`, `apply_name`, `parse_inline`, `escape`, `render_inline` (bold + italic + links → HTML), `_domain_text(url)` (strips the protocol for the OG image domain label), `_abs_url(src, site_url)`, `_project_fields(md)` (slug/org/problem/year — replaces the old `_project_slug`), `_project_order`.
+`parse_kv_list`, `parse_meta(md)` (splits meta.md into site-wide dict + per-page dict), `parse_heading_tagline(md)` (hero.md's `# heading` + tagline format), `parse_labels`, `slugify`, `_BOLD_RE`, `_apply_span()`, `apply_highlight`, `apply_name`, `escape`, `render_inline` (bold + italic + links → HTML, escaped), `_link_parts(raw)` (lately/feed value → display text + first URL), `_valid_projects(mds)` (drops projects with no, invalid or duplicate slug), `parse_articles(md)` / `parse_playground(md)` (the one parser each for page, feed and asset check), `_og_image(cache, …)` (cached OG generation), `_domain_text(url)` (strips the protocol for the OG image domain label), `_abs_url(src, site_url)`, `_project_fields(md)` (slug/org/problem/year — replaces the old `_project_slug`), `_project_order`.
 
 ### Template placeholders
 
@@ -88,6 +88,9 @@ dist/            ← generated output, git-tracked, committed with source
 | `{{nav_work_active}}` / `{{nav_play_active}}` | active page |
 | `{{toast_email_copied}}` | labels.md `email-copied` |
 | `{{season_info}}` | labels.md `season-info` |
+| `{{label_skip}}`, `{{label_home}}`, `{{label_accent}}`, `{{label_email}}`, `{{label_dark}}`, `{{label_work}}`, `{{label_play}}`, `{{label_instagram}}`, `{{label_linkedin}}` | labels.md nav/aria keys |
+| `{{site_email}}`, `{{site_instagram}}`, `{{site_linkedin}}` | top-level keys in meta.md |
+| `{{site_data_json}}` | `_site_data_json()` — labels `script.js` needs plus the `SEASONS` colour table, in a `<script type="application/json" id="site-data">` block |
 
 ## Pages
 
@@ -161,6 +164,8 @@ In `content/play/lately.md`. Use `[title](url)` for a linked entry or leave blan
 - watched:
 ```
 
+A value can also have text around its link (`[Dune](url) by Frank Herbert`): the link is reduced to its text and the whole item links to the first URL. Plain text renders unlinked.
+
 Available keys: `read`, `listened`, `watched`, `cooked`, `explored`, `played`, `built`, `learned`, `ran`, `cycled`, `photographed`, `brewed`, `visited`, `wrote`.
 
 **Archive:** Past months go in `content/play/lately-archive.md` using `## YYYY-MM-DD` section headers. The pre-commit hook (`scripts/archive_lately.py`) logs changed items automatically on every commit.
@@ -183,9 +188,23 @@ All UI copy lives in `content/labels.md`. Keys are fixed; edit values only.
 | `visit-site` | aria-label on case study visit button |
 | `back-to-work` | Case study back link |
 | `show-more` | Articles expand button |
-| `email-copied` | Clipboard toast |
+| `email-copied`, `email-copy-failed` | Clipboard toast (success / failure) |
 | `season-info` | Season picker footnote |
 | `feed-title` | RSS feed title |
+| `skip-to-content`, `nav-home`, `change-accent`, `copy-email`, `toggle-dark` | Skip link text and aria-labels in `template.html` |
+| `nav-work`, `nav-play` | Nav link text |
+| `nav-instagram`, `nav-linkedin` | aria-labels on the social links (URLs and email are in `meta.md`) |
+| `separator` | Joins org · year and publisher · tags (project pages, OG tagline, feed) |
+| `feed-case-study`, `feed-lately`, `feed-playground` | RSS item title prefixes |
+| `shuffle` | aria-label on the rolodex shuffle button |
+| `aqi` | AQI label in the footer |
+| `time-suffix` | Suffix after the footer clock (e.g. `IST`) |
+| `pair-separator`, `temp-unit` | Dash in `Jan — Flame of Forest` / `42 — Good`, and the temperature unit (`script.js`) |
+| `aqi-good`, `aqi-moderate`, `aqi-sensitive`, `aqi-unhealthy`, `aqi-poor` | AQI bands shown by `script.js` |
+| `month-names`, `season-names` | Comma-separated lists (12 each) for the season picker |
+| `lately-<key>` | Verb beside each lately item (`lately-read: reading`, …) |
+
+`script.js` reads the keys in `JS_LABEL_KEYS` (and the season colours, defined once in `SEASONS` in `build.py`) from the `site-data` block that `render_page()` fills in, so it has no copy or colour table of its own. `build()` warns about any key in `REQUIRED_LABEL_KEYS` that's missing or empty.
 
 ## OG images
 
@@ -197,6 +216,9 @@ Every page gets its own Open Graph image and its own `<title>`/description — n
 - url: https://thedataareclean.com
 - site-name: thedataareclean
 - favicon: assets/favicon.png
+- email: hello@thedataareclean.com
+- instagram: https://www.instagram.com/thedataareclean/
+- linkedin: https://www.linkedin.com/in/thedataareclean/
 
 ## home
 - title: arpit | curious about everything | thedataareclean
@@ -218,7 +240,7 @@ Every page gets its own Open Graph image and its own `<title>`/description — n
 Top-level keys (before the first `## page` header) are site-wide. Each `## pagename` section holds per-page `title`/`description` (→ `<title>`, `og:description`, `twitter:description`) and, for work/play, `heading`/`tagline` (→ the text actually drawn on the image). `parse_meta()` splits the file into `(site, pages)`.
 
 - **home** — image heading/tagline come from `hero.md` instead, not duplicated in `meta.md`, so the hero copy has one source of truth.
-- **work / play** — `heading`/`tagline` live in `meta.md` directly.
+- **work / play** — `heading`/`tagline` live in `meta.md` directly. `<br>` in a `heading` forces a line break in the image.
 - **project pages** — no entry in `meta.md` at all. Image heading = the project's `problem` field (the question), tagline = `org · year`; `title`/`description` meta tags use `org`/`problem`. All already in `content/work/projects/<slug>.md` — nothing extra to maintain.
 
 ### Editing the image text
@@ -273,6 +295,7 @@ Non-obvious implementation details, each fixing a real visual bug hit along the 
 | `--space-xl` | clamp(64px, 10vh, 120px) | page intro top, hero bottom |
 | `--space-lg` | clamp(48px, 7vh, 80px) | between sections, footer |
 | `--space-md` | clamp(24px, 3vw, 40px) | title-to-content, inner gaps |
+| `--space-xs` | 4px | tight gaps (detail list rows), thin scrollbar |
 | `--space-sm` | 12px | box gap (alias `--box-gap`) |
 | `--box-pad` | `12px 16px` | inner padding for bordered boxes |
 | `--tag-pad` | `2px 8px` | pill tag padding |
@@ -289,6 +312,7 @@ Non-obvious implementation details, each fixing a real visual bug hit along the 
 |---|---|---|
 | `--icon-sz` | 16px | inline/small icons |
 | `--icon-sz-lg` | 18px | bar-box and primary icons |
+| `--icon-sz-xl` | 24px | default size for any other icon |
 | `--nav-logo-sz` | 14px | season picker dot |
 
 Material Symbols `opsz` in `font-variation-settings` must match the rendered `font-size` numerically. New icons must be added to `ICON_NAMES` in `build.py` — the font is subsetted at build time.
@@ -309,17 +333,19 @@ All bordered interactive elements (`.bar-box`, `.project`, `.article`, `.lately-
 
 Each `python3 build.py` run:
 
-1. Downloads a subsetted `MaterialSymbolsSharp.woff2` (~25KB) from Google Fonts
+1. Downloads a subsetted `MaterialSymbolsSharp.woff2` (~25KB) from Google Fonts — only when the file is missing or `ICON_NAMES` changed (tracked in `.build-cache.json`)
 2. Copies the current month's home OG image from `assets/monthly/`
-3. Generates `favicon.png` (requires Pillow)
-4. Generates work/play/each-project's OG image fresh into `assets/og/` (requires Pillow) — see [OG images](#og-images)
+3. Generates `favicon.png` (requires Pillow) — only when it's missing or the drawing code changed
+4. Generates work/play/each-project's OG image into `assets/og/` (requires Pillow), skipping any whose inputs (text, accent, font, drawing code) match `.build-cache.json` — see [OG images](#og-images)
 5. Renders all pages from markdown content, each with its own `<title>`/meta tags
 6. Inlines minified CSS + JS into each HTML file
 7. Writes output to `dist/`, copies assets
 8. Generates `dist/feed.xml`
-9. `smoke_check()` — verifies every expected `dist/` file (each page, `feed.xml`, favicon, every OG image) exists and is non-empty; exits 1 if anything's missing. Doesn't check output is *correct*, just that nothing was silently skipped or swallowed by an exception — see `check_content()` for content-level validation (missing images, duplicate slugs) instead.
+9. `smoke_check()` — verifies every expected `dist/` file (each page, `feed.xml`, favicon, every OG image) exists and is non-empty; exits 1 if anything's missing. Doesn't check output is *correct*, just that nothing was silently skipped or swallowed by an exception — see `check_content()` (missing images) and `_valid_projects()` (empty or duplicate slugs are skipped with a warning) for content-level validation instead.
 
-Flags: `--gen-monthly` regenerates all 12 seasonal home OG images (into `assets/monthly/`); `--optimize-images` converts PNG/JPG in `assets/` to WebP in-place (skips `assets/og/`, `assets/monthly/`, fonts).
+`.build-cache.json` is committed so CI and local builds agree on what's up to date. A rebuild with unchanged content rewrites nothing, including `feed.xml` (its `lastBuildDate` is the newest entry's date, not the wall clock).
+
+Flags: `--gen-monthly` regenerates all 12 seasonal home OG images (into `assets/monthly/`); `--optimize-images` converts PNG/JPG/GIF in `assets/` to WebP in-place (an animated GIF is converted only if the animated WebP is smaller — the project GIFs aren't, so they stay GIFs), applying EXIF rotation, leaving any file whose `.webp` name is already taken, and repointing references in `content/**/*.md` (skips `assets/og/`, `assets/monthly/`, fonts).
 
 ## Live data
 

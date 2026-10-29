@@ -1,6 +1,9 @@
 - url: https://thedataareclean.com
 - site-name: thedataareclean
 - favicon: assets/favicon.png
+- email: hello@thedataareclean.com
+- instagram: https://www.instagram.com/thedataareclean/
+- linkedin: https://www.linkedin.com/in/thedataareclean/
 
 ## home
 - title: arpit | thedataareclean
@@ -8,9 +11,9 @@
 
 ## work
 - title: data communicator | thedataareclean
-- description: i help people understand their data — through products, research and stories.
-- heading: multi-disciplinary **data communicator**
-- tagline: i help people understand their data — through products, research and stories.
+- description: i help people understand their data, through products, research and stories.
+- heading: multi-disciplinary<br>**data communicator**
+- tagline: i help people understand their data, through products, research and stories.
 
 ## play
 - title: my playground | thedataareclean

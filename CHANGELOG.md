@@ -8,6 +8,38 @@ Reverse-chronological. Versioning: **major** = redesign · **minor** = new featu
 
 ---
 
+## v4.3.0 — 2026-10-29
+
+- Content: new work-page about copy and toolkit; VizChitra project dates (editorial 2024–2026, Bengaluru 2025–2026); play "lately" filled (archived in `lately-archive.md`); new meta titles/descriptions and OG images, work heading on two lines
+
+- Projects with no slug/org or a duplicate slug are skipped with a warning instead of overwriting another page (including `work/index.html`)
+- Lately values keep text around a link; RSS lately guids include the date and text, so repeated or unlinked entries no longer collapse into one
+- `script.js` survives blocked `sessionStorage`/`localStorage`; season buttons have `type="button"`
+- Remaining hardcoded copy (nav, aria-labels, AQI bands, season/month names, lately verbs, `IST`, `AQI`, `Shuffle`) moved to `labels.md`, passed to `script.js` as JSON
+- List items, article fields, URLs and label attributes are HTML-escaped; rolodex JSON can't close its `<script>`
+- Build no longer redownloads the icon font or regenerates unchanged OG images (`.build-cache.json`); `feed.xml` is reproducible across rebuilds; `build()` no longer crashes on an incomplete `meta.md`
+- `--optimize-images` applies EXIF rotation, won't overwrite an existing `.webp`, checks skip folders relative to `assets/`, and updates content references
+- Dark mode: theme is set from a tiny `<head>` script (no light flash) with a `prefers-color-scheme` CSS fallback for no-JS; season swatches follow the theme
+- Stale `dist/work/<slug>/` pages, OG images and cache entries are removed when a project is renamed or deleted (the old `dist/work/vizchitra/` page is gone)
+- Headings and `**bold**` spans are escaped (a literal `<br>` is still allowed); `*` inside link URLs and spaced asterisks (`5 * 3 * 2`) no longer produce `<em>`
+- Season colour table lives only in `build.py` (`SEASONS`) and reaches `script.js` as JSON; email and social URLs moved to `meta.md`, their labels, the `·` separator and RSS title prefixes to `labels.md`
+- Articles "show more" handler moved from an inline Python string into `script.js`
+- New tokens `--space-xs` (4px) and `--icon-sz-xl` (24px) replace raw pixel values
+- Email-copy button works without the Clipboard API (legacy fallback), reports failure, announces via a live-region toast and no longer stacks timers
+- Weather: a null temperature or AQI shows `--` instead of being cached as `0°C` / `null — Good`
+- Season picker: `aria-expanded`, Escape to close, footnote clicks don't close it, 24px tap target
+- Project markdown: multi-line `<!-- -->` comments are skipped; slugs must be a single path segment
+- `--optimize-images` can convert animated GIFs, but keeps a GIF when the animated WebP would be larger (the three project GIFs: ~2x bigger as WebP, so they stay); transparency in LA/P images is flattened onto white like RGBA instead of going black
+- One `parse_articles()` / `parse_playground()` shared by the page, feed and asset check; unused favicon accent parameter removed and favicon generation cached
+- Decorative icon glyphs are `aria-hidden`; the active nav link has `aria-current="page"`
+- Clock keeps one interval at most and doesn't tick in a hidden tab; the `—` pair separator and `°C` unit come from `labels.md`
+- Link URLs with a scheme other than http/https/mailto (e.g. `javascript:`) render as `#`; every meta URL/attribute is escaped
+- Projects without an `org` are skipped with a warning (they'd have a page but no card); `lastBuildDate` never falls back to year 1
+- WCAG AA everywhere: the light accents for Mar, Apr, Jun, Oct and Nov were darkened to ≥4.5:1 against white (`#9870b0`→`#8f64a9`, `#b89010`→`#90700c`, `#a89018`→`#887413`, `#c85080`→`#c5477a`, `#b87878`→`#ab5f5f`); all dark-mode accents already passed. The season picker footnote opacity went 0.5 → 0.65. Monthly OG images regenerated
+- OG heading supports `<br>` line breaks; work page heading split over two lines
+
+---
+
 ## v4.2.2 — 2026-09-28
 
 - Markdown links whose URL contains balanced parentheses (e.g. Wikipedia's `Foo_(bar)`) no longer get truncated at the first `)` — all link parsing now shares one `_LINK_RE` pattern

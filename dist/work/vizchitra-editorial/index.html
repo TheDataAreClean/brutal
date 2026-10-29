@@ -15,11 +15,12 @@
   <meta name="twitter:title" content="VizChitra | thedataareclean">
   <meta name="twitter:description" content="How do you curate the lineup for India&#x27;s premier data visualization conference and community?">
   <meta name="twitter:image" content="https://thedataareclean.com/assets/og/work/vizchitra-editorial.png">
+  <script>try{var t=sessionStorage.getItem('theme');if(!t&&matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700&display=swap" as="style">
   <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="alternate" type="application/rss+xml" title="arpit's universe" href="../../feed.xml">
+  <link rel="alternate" type="application/rss+xml" title="arpit&#x27;s universe" href="../../feed.xml">
   <style>
     @font-face {
       font-family: 'Material Symbols Sharp';
@@ -32,7 +33,7 @@
       font-family: 'Material Symbols Sharp';
       font-weight: normal;
       font-style: normal;
-      font-size: 24px;
+      font-size: var(--icon-sz-xl);
       line-height: 1;
       letter-spacing: normal;
       text-transform: none;
@@ -51,6 +52,8 @@
       --inner-gap: 8px;
       --icon-sz: 16px;
       --icon-sz-lg: 18px;
+      --icon-sz-xl: 24px;
+      --space-xs: 4px;
       --nav-logo-sz: 14px;
       --ls-ui: 1px;
       --ls-label: 0.5px;
@@ -100,6 +103,16 @@
       --white: #000000;
       --accent: var(--accent-dark);
       --on-accent: #000000;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme]) {
+        --black: #ffffff;
+        --white: #000000;
+        --accent: var(--accent-dark);
+        --on-accent: #000000;
+      }
+      :root:not([data-theme]) .icon-sun { display: inline; }
+      :root:not([data-theme]) .icon-moon { display: none; }
     }
     .skip-to-content {
       position: absolute;
@@ -159,6 +172,11 @@
       border: none;
       cursor: pointer;
       padding: 0;
+    }
+    .nav-logo-season::after {
+      content: '';
+      position: absolute;
+      inset: calc((var(--nav-logo-sz) - var(--icon-sz-xl)) / 2);
     }
     @media (hover: hover) {
       .nav-logo-season:hover {
@@ -242,10 +260,14 @@
       width: var(--nav-logo-sz);
       height: var(--nav-logo-sz);
       flex-shrink: 0;
+      background: var(--swatch-light);
+    }
+    [data-theme="dark"] .season-swatch {
+      background: var(--swatch-dark);
     }
     .season-info {
       padding: var(--inner-gap);
-      opacity: 0.5;
+      opacity: 0.65;
       border-top: 1px solid currentColor;
       white-space: normal;
     }
@@ -300,7 +322,7 @@
       padding: var(--box-gap) 0;
     }
     .content-box::-webkit-scrollbar {
-      width: 4px;
+      width: var(--space-xs);
       background: transparent;
     }
     .content-box::-webkit-scrollbar-thumb {
@@ -611,7 +633,7 @@
       list-style: none;
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: var(--space-xs);
       margin-bottom: var(--space-sm);
     }
     .project-detail-list li {
@@ -1005,12 +1027,12 @@
   <div class="top-bar">
     <div class="nav-logo-wrap">
       <a class="nav-logo-home" href="../../" aria-label="Home"></a>
-      <button type="button" class="nav-logo-season" onclick="toggleSeasons(event)" aria-label="Change accent color"></button>
-      <div class="season-dropdown" id="season-dropdown" data-info="colours from bengaluru's seasonal blooms"></div>
+      <button type="button" class="nav-logo-season" onclick="toggleSeasons(event)" aria-label="Change accent color" aria-haspopup="true" aria-expanded="false" aria-controls="season-dropdown"></button>
+      <div class="season-dropdown" id="season-dropdown" data-info="colours from bengaluru&#x27;s seasonal blooms"></div>
     </div>
     <div class="top-bar-center">
       <button type="button" class="bar-box" onclick="copyEmail(this)" data-email="hello@thedataareclean.com" aria-label="Copy email address">
-        <span class="material-symbols-sharp">mail</span>
+        <span class="material-symbols-sharp" aria-hidden="true">mail</span>
       </button>
       <a class="bar-box" href="https://www.instagram.com/thedataareclean/" target="_blank" rel="noopener" aria-label="Instagram">
         <svg viewBox="0 0 24 24"><path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2m-.2 2A3.6 3.6 0 0 0 4 7.6v8.8C4 18.39 5.61 20 7.6 20h8.8a3.6 3.6 0 0 0 3.6-3.6V7.6C20 5.61 18.39 4 16.4 4H7.6m9.65 1.5a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5M12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10m0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/></svg>
@@ -1020,23 +1042,23 @@
       </a>
     </div>
     <button type="button" class="bar-box" onclick="toggleTheme()" aria-label="Toggle dark mode">
-      <span class="material-symbols-sharp icon-moon">dark_mode</span>
-      <span class="material-symbols-sharp icon-sun">light_mode</span>
+      <span class="material-symbols-sharp icon-moon" aria-hidden="true">dark_mode</span>
+      <span class="material-symbols-sharp icon-sun" aria-hidden="true">light_mode</span>
     </button>
   </div>
 
   <nav>
-    <a class="nav-link-box active" href="../../work/">work</a>
-    <div class="toast" id="toast">email copied</div>
-    <a class="nav-link-box " href="../../play/">play</a>
+    <a class="nav-link-box active" aria-current="page" href="../../work/">work</a>
+    <div class="toast" id="toast" role="status" aria-live="polite" data-copied="email copied" data-failed="couldn&#x27;t copy email"></div>
+    <a class="nav-link-box "  href="../../play/">play</a>
   </nav>
 
   <div class="content-box" id="main-content">
   <!-- PROJECT DETAIL -->
   <section class="project-header">
     <h1 class="project-problem-heading">How do you curate the lineup for India&#x27;s premier data visualization conference and community?</h1>
-    <p class="project-detail-meta">VizChitra · 2025–ongoing</p>
-    <div class="project-header-tags"><span class="project-tags"><span class="project-tag">data viz</span><span class="project-tag">community</span><span class="project-tag">editorial</span></span><a class="bar-box project-visit-btn" href="https://vizchitra.com/" target="_blank" rel="noopener" aria-label="visit site"><span class="material-symbols-sharp">arrow_outward</span></a></div>
+    <p class="project-detail-meta">VizChitra · 2024–2026</p>
+    <div class="project-header-tags"><span class="project-tags"><span class="project-tag">data viz</span><span class="project-tag">community</span><span class="project-tag">editorial</span></span><a class="bar-box project-visit-btn" href="https://vizchitra.com/" target="_blank" rel="noopener" aria-label="visit site"><span class="material-symbols-sharp" aria-hidden="true">arrow_outward</span></a></div>
   </section>
 
   <section class="project-section">
@@ -1111,48 +1133,68 @@
     </footer>
   </div>
 
+  <script type="application/json" id="site-data">{"seasons": [["#c84520", "#e87040"], ["#7d4abf", "#a878d8"], ["#8f64a9", "#b898d0"], ["#90700c", "#d8b030"], ["#c83020", "#e86040"], ["#887413", "#c8b030"], ["#c84568", "#e87898"], ["#c82852", "#f0456a"], ["#8040a8", "#a868c8"], ["#c5477a", "#e880a8"], ["#ab5f5f", "#d0a0a0"], ["#c02838", "#e85060"]], "season-names": ["Flame of Forest", "Jacaranda", "Pongamia", "Golden Shower", "Gulmohar", "Copper Pod", "Oleander", "Bougainvillea", "Purple Bauhinia", "Tabebuia Rosea", "Rain Tree", "Poinsettia"], "month-names": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], "time-suffix": "IST", "pair-separator": "—", "temp-unit": "°C", "aqi-good": "Good", "aqi-moderate": "Moderate", "aqi-sensitive": "Unhealthy for some", "aqi-unhealthy": "Unhealthy", "aqi-poor": "Poor"}</script>
   <script>
+    // Storage can throw (blocked cookies, sandboxed frames, some private modes) — never let it stop the script
+    function storageGet(kind, key) {
+      try { return window[kind].getItem(key); } catch (e) { return null; }
+    }
+    function storageSet(kind, key, value) {
+      try { window[kind].setItem(key, value); } catch (e) {}
+    }
+    // Copy (content/labels.md) and the season colour table (build.py) arrive via the site-data JSON block
+    var siteData = (function() {
+      try { return JSON.parse(document.getElementById('site-data').textContent); } catch (e) { return {}; }
+    })();
     function toggleTheme() {
       var html = document.documentElement;
       var current = html.getAttribute('data-theme');
       var next = current === 'dark' ? 'light' : 'dark';
       html.setAttribute('data-theme', next);
-      sessionStorage.setItem('theme', next);
+      storageSet('sessionStorage', 'theme', next);
     }
+    var toastTimer;
+    function showToast(message) {
+      var toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('visible');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(function() {
+        toast.classList.remove('visible');
+        toast.textContent = '';
+      }, 2000);
+    }
+    // Clipboard API where available (secure contexts), else the legacy copy command; always say how it went
     function copyEmail(btn) {
-      navigator.clipboard.writeText(btn.dataset.email).then(function() {
-        var toast = document.getElementById('toast');
-        toast.classList.add('visible');
-        setTimeout(function() { toast.classList.remove('visible'); }, 2000);
-      }).catch(function() {});
-    }
-    // Restore theme from session, else match OS
-    (function() {
-      var saved = sessionStorage.getItem('theme');
-      if (saved) {
-        document.documentElement.setAttribute('data-theme', saved);
-      } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        document.documentElement.setAttribute('data-theme', 'dark');
+      var toast = document.getElementById('toast');
+      var ok = function() { showToast(toast.dataset.copied); };
+      var fail = function() { showToast(toast.dataset.failed); };
+      function legacyCopy() {
+        var field = document.createElement('textarea');
+        field.value = btn.dataset.email;
+        field.setAttribute('readonly', '');
+        field.style.position = 'fixed';
+        field.style.opacity = '0';
+        document.body.appendChild(field);
+        field.select();
+        var copied = false;
+        try { copied = document.execCommand('copy'); } catch (e) {}
+        document.body.removeChild(field);
+        (copied ? ok : fail)();
       }
-    })();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(btn.dataset.email).then(ok, legacyCopy);
+      } else {
+        legacyCopy();
+      }
+    }
     // Seasonal accent — Bengaluru blooms
-    var seasons = [
-      { name: 'Flame of Forest', light: '#c84520', dark: '#e87040' },
-      { name: 'Jacaranda',       light: '#7d4abf', dark: '#a878d8' },
-      { name: 'Pongamia',        light: '#9870b0', dark: '#b898d0' },
-      { name: 'Golden Shower',   light: '#b89010', dark: '#d8b030' },
-      { name: 'Gulmohar',        light: '#c83020', dark: '#e86040' },
-      { name: 'Copper Pod',      light: '#a89018', dark: '#c8b030' },
-      { name: 'Oleander',        light: '#c84568', dark: '#e87898' },
-      { name: 'Bougainvillea',   light: '#c82852', dark: '#f0456a' },
-      { name: 'Purple Bauhinia', light: '#8040a8', dark: '#a868c8' },
-      { name: 'Tabebuia Rosea',  light: '#c85080', dark: '#e880a8' },
-      { name: 'Rain Tree',       light: '#b87878', dark: '#d0a0a0' },
-      { name: 'Poinsettia',      light: '#c02838', dark: '#e85060' }
-    ];
-    var monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var seasons = (siteData.seasons || []).map(function(pair) { return { light: pair[0], dark: pair[1] }; });
+    var seasonNames = siteData['season-names'] || [];
+    var monthNames = siteData['month-names'] || [];
     var activeSeason = new Date().getMonth();
     function applySeason(index, save) {
+      if (!seasons[index]) return;
       activeSeason = index;
       document.documentElement.style.setProperty('--accent-light', seasons[index].light);
       document.documentElement.style.setProperty('--accent-dark', seasons[index].dark);
@@ -1160,59 +1202,72 @@
       btns.forEach(function(btn, i) {
         btn.classList.toggle('active', i === index);
       });
-      if (save) sessionStorage.setItem('season', index);
+      if (save) storageSet('sessionStorage', 'season', index);
     }
     // Restore season from session, else default to current month
-    var savedSeason = parseInt(sessionStorage.getItem('season'), 10);
-    applySeason(!isNaN(savedSeason) ? savedSeason : new Date().getMonth());
+    var savedSeason = parseInt(storageGet('sessionStorage', 'season'), 10);
+    applySeason(savedSeason >= 0 && savedSeason < seasons.length ? savedSeason : new Date().getMonth());
     // Build dropdown (safe DOM — no innerHTML)
     (function() {
       var dropdown = document.getElementById('season-dropdown');
       seasons.forEach(function(s, i) {
         var btn = document.createElement('button');
+        btn.type = 'button';
         btn.className = 'season-option' + (i === activeSeason ? ' active' : '');
         var swatch = document.createElement('span');
         swatch.className = 'season-swatch';
-        swatch.style.background = s.light;
+        swatch.style.setProperty('--swatch-light', s.light);
+        swatch.style.setProperty('--swatch-dark', s.dark);
         btn.appendChild(swatch);
-        btn.appendChild(document.createTextNode(monthNames[i] + ' — ' + s.name));
+        btn.appendChild(document.createTextNode((monthNames[i] || '') + ' ' + siteData['pair-separator'] + ' ' + (seasonNames[i] || '')));
         btn.onclick = function(e) {
           e.stopPropagation();
           applySeason(i, true);
-          dropdown.classList.remove('open');
+          setSeasonsOpen(false);
         };
         dropdown.appendChild(btn);
       });
       var info = document.createElement('div');
       info.className = 'season-info';
       info.textContent = dropdown.dataset.info || '';
+      info.addEventListener('click', function(e) { e.stopPropagation(); });
       dropdown.appendChild(info);
     })();
+    function setSeasonsOpen(open) {
+      document.getElementById('season-dropdown').classList.toggle('open', open);
+      var toggle = document.querySelector('.nav-logo-season');
+      if (toggle) toggle.setAttribute('aria-expanded', String(open));
+    }
     function toggleSeasons(e) {
       e.stopPropagation();
-      document.getElementById('season-dropdown').classList.toggle('open');
+      setSeasonsOpen(!document.getElementById('season-dropdown').classList.contains('open'));
     }
-    document.addEventListener('click', function() {
-      document.getElementById('season-dropdown').classList.remove('open');
+    document.addEventListener('click', function() { setSeasonsOpen(false); });
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') setSeasonsOpen(false);
     });
     // Local time (pauses when tab is hidden)
     (function() {
       var timer;
       function updateTime() {
         var now = new Date().toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: true });
-        document.getElementById('local-time').textContent = now + ' IST';
+        document.getElementById('local-time').textContent = now + ' ' + (siteData['time-suffix'] || '');
       }
-      function start() { updateTime(); timer = setInterval(updateTime, 60000); }
-      function stop() { clearInterval(timer); }
+      // One interval at most, and none while the tab is hidden
+      function stop() { clearInterval(timer); timer = null; }
+      function start() {
+        stop();
+        if (document.hidden) return;
+        updateTime();
+        timer = setInterval(updateTime, 60000);
+      }
       start();
-      document.addEventListener('visibilitychange', function() {
-        if (document.hidden) { stop(); } else { start(); }
-      });
+      document.addEventListener('visibilitychange', start);
     })();
     // Cached fetch helper (localStorage, 1h TTL)
     function cachedFetch(key, url, parse, onSuccess, onError) {
-      var cached = localStorage.getItem(key);
-      var ts = localStorage.getItem(key + '_ts');
+      var cached = storageGet('localStorage', key);
+      var ts = storageGet('localStorage', key + '_ts');
       if (cached && ts && Date.now() - Number(ts) < 3600000) {
         onSuccess(cached);
         return;
@@ -1220,8 +1275,8 @@
       fetch(url)
         .then(parse)
         .then(function(value) {
-          localStorage.setItem(key, value);
-          localStorage.setItem(key + '_ts', String(Date.now()));
+          storageSet('localStorage', key, value);
+          storageSet('localStorage', key + '_ts', String(Date.now()));
           onSuccess(value);
         })
         .catch(function() { onError(); });
@@ -1230,7 +1285,13 @@
     cachedFetch(
       'weather_temp',
       'https://api.open-meteo.com/v1/forecast?latitude=12.97&longitude=77.59&current=temperature_2m',
-      function(r) { return r.json().then(function(d) { return Math.round(d.current.temperature_2m) + '°C'; }); },
+      function(r) {
+        return r.json().then(function(d) {
+          var temp = d.current.temperature_2m;
+          if (typeof temp !== 'number') throw new Error('no temperature');
+          return Math.round(temp) + siteData['temp-unit'];
+        });
+      },
       function(v) { document.getElementById('temperature').textContent = v; },
       function() { document.getElementById('temperature').textContent = '--'; }
     );
@@ -1241,13 +1302,26 @@
       function(r) {
         return r.json().then(function(d) {
           var aqi = d.current.us_aqi;
-          var label = aqi <= 50 ? 'Good' : aqi <= 100 ? 'Moderate' : aqi <= 150 ? 'Unhealthy for some' : aqi <= 200 ? 'Unhealthy' : 'Poor';
-          return aqi + ' — ' + label;
+          if (typeof aqi !== 'number') throw new Error('no AQI');
+          var label = aqi <= 50 ? siteData['aqi-good'] : aqi <= 100 ? siteData['aqi-moderate'] : aqi <= 150 ? siteData['aqi-sensitive'] : aqi <= 200 ? siteData['aqi-unhealthy'] : siteData['aqi-poor'];
+          return aqi + ' ' + siteData['pair-separator'] + ' ' + label;
         });
       },
       function(v) { document.getElementById('aqi').textContent = v; },
       function() { document.getElementById('aqi').textContent = '--'; }
     );
+    // Articles "show more": reveal the next batch, drop the button when none are left
+    (function() {
+      var btn = document.getElementById('articles-show-more');
+      if (!btn) return;
+      var batch = parseInt(btn.dataset.batch, 10) || 6;
+      btn.addEventListener('click', function() {
+        Array.from(document.querySelectorAll('.article-hidden')).slice(0, batch).forEach(function(el) {
+          el.classList.remove('article-hidden');
+        });
+        if (!document.querySelector('.article-hidden')) btn.remove();
+      });
+    })();
   </script>
 </body>
 </html>

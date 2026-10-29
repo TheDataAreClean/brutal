@@ -1,7 +1,7 @@
 <!-- CARD -->
 - problem: How do you build a digital platform that advances understanding of India through data?
 - org: Data For India
-- year: 2024-ongoing
+- year: 2024–ongoing
 - tags: product, design, ux
 
 <!-- IDENTITY -->

@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 {{meta}}
+  <script>try{var t=sessionStorage.getItem('theme');if(!t&&matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700&display=swap" as="style">
@@ -13,35 +14,35 @@
 </head>
 <body>
 
-  <a class="skip-to-content" href="#main-content">Skip to content</a>
+  <a class="skip-to-content" href="#main-content">{{label_skip}}</a>
 
   <div class="top-bar">
     <div class="nav-logo-wrap">
-      <a class="nav-logo-home" href="{{nav_root}}" aria-label="Home"></a>
-      <button type="button" class="nav-logo-season" onclick="toggleSeasons(event)" aria-label="Change accent color"></button>
+      <a class="nav-logo-home" href="{{nav_root}}" aria-label="{{label_home}}"></a>
+      <button type="button" class="nav-logo-season" onclick="toggleSeasons(event)" aria-label="{{label_accent}}" aria-haspopup="true" aria-expanded="false" aria-controls="season-dropdown"></button>
       <div class="season-dropdown" id="season-dropdown" data-info="{{season_info}}"></div>
     </div>
     <div class="top-bar-center">
-      <button type="button" class="bar-box" onclick="copyEmail(this)" data-email="hello@thedataareclean.com" aria-label="Copy email address">
+      <button type="button" class="bar-box" onclick="copyEmail(this)" data-email="{{site_email}}" aria-label="{{label_email}}">
         <span class="material-symbols-sharp">mail</span>
       </button>
-      <a class="bar-box" href="https://www.instagram.com/thedataareclean/" target="_blank" rel="noopener" aria-label="Instagram">
+      <a class="bar-box" href="{{site_instagram}}" target="_blank" rel="noopener" aria-label="{{label_instagram}}">
         <svg viewBox="0 0 24 24"><path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2m-.2 2A3.6 3.6 0 0 0 4 7.6v8.8C4 18.39 5.61 20 7.6 20h8.8a3.6 3.6 0 0 0 3.6-3.6V7.6C20 5.61 18.39 4 16.4 4H7.6m9.65 1.5a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5M12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10m0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/></svg>
       </a>
-      <a class="bar-box" href="https://www.linkedin.com/in/thedataareclean/" target="_blank" rel="noopener" aria-label="LinkedIn">
+      <a class="bar-box" href="{{site_linkedin}}" target="_blank" rel="noopener" aria-label="{{label_linkedin}}">
         <svg viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
       </a>
     </div>
-    <button type="button" class="bar-box" onclick="toggleTheme()" aria-label="Toggle dark mode">
+    <button type="button" class="bar-box" onclick="toggleTheme()" aria-label="{{label_dark}}">
       <span class="material-symbols-sharp icon-moon">dark_mode</span>
       <span class="material-symbols-sharp icon-sun">light_mode</span>
     </button>
   </div>
 
   <nav>
-    <a class="nav-link-box {{nav_work_active}}" href="{{nav_root}}work/">work</a>
-    <div class="toast" id="toast">{{toast_email_copied}}</div>
-    <a class="nav-link-box {{nav_play_active}}" href="{{nav_root}}play/">play</a>
+    <a class="nav-link-box {{nav_work_active}}" {{nav_work_current}} href="{{nav_root}}work/">{{label_work}}</a>
+    <div class="toast" id="toast" role="status" aria-live="polite" data-copied="{{toast_email_copied}}" data-failed="{{toast_email_failed}}"></div>
+    <a class="nav-link-box {{nav_play_active}}" {{nav_play_current}} href="{{nav_root}}play/">{{label_play}}</a>
   </nav>
 
   <div class="content-box" id="main-content">
@@ -53,6 +54,7 @@
     </footer>
   </div>
 
+  <script type="application/json" id="site-data">{{site_data_json}}</script>
   <script src="script.js"></script>
 </body>
 </html>

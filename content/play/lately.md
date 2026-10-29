@@ -1,15 +1,15 @@
 # **lately**, i have been
 
-- read: [The Blue Book: An Anti-Caste Graphic Novel by Siddhesh Gautam](https://www.goodreads.com/book/show/255086143-the-blue-book)
-- listened: 
-- watched: [Lanterns](https://en.wikipedia.org/wiki/Lanterns_(TV_series))
+- read: [The Once and Future Riot by Joe Sacco](https://www.goodreads.com/book/show/222376500-the-once-and-future-riot)
+- listened: [Inside the race to build the machine god by Decoder, The Verge](https://youtu.be/FU2wls6TOyw)
+- watched: 
 - learned: 
 - explored: 
-- wrote: 
-- brewed: [Excelsa by Mooleh Manay Estate, Blue Tokai Coffee](https://bluetokaicoffee.com/collections/roasted-and-ground-coffee-beans/products/excelsa-by-mooleh-manay-estate)
-- photographed: 
+- wrote: [musings](https://musings.thedataareclean.com)
+- brewed: [Yeast Natural Pink Bourbon by Zarza Coffee, Moonwake Coffee Roasters](https://moonwakecoffeeroasters.com/products/zarza-coffee-jhonatan-gasca-yeast-natural-pink-bourbon-colombia)
+- photographed: [Sashitihlu Beach, Mangalore](https://maps.google.com?ftid=0x3ba34d59115c3d49:0x2535f64c3a5a28d8&entry=gps&shh=CAE&lucs=,94297699,94231188,94280568,100821559,47071704,94218641,94282134,100835694,94286869,100820247,100822504,100838877,121816461&g_st=ic)
 - cycled: 
-- visited: 
+- visited: [Mangalore](https://en.wikipedia.org/wiki/Mangalore)
 - played: 
 - cooked: 
 - built: 

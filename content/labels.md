@@ -3,5 +3,45 @@
 - back-to-work: ← back to work
 - show-more: show more
 - email-copied: email copied
+- email-copy-failed: couldn't copy email
 - season-info: colours from bengaluru's seasonal blooms
 - feed-title: arpit's universe
+- skip-to-content: Skip to content
+- nav-home: Home
+- change-accent: Change accent color
+- copy-email: Copy email address
+- toggle-dark: Toggle dark mode
+- nav-work: work
+- nav-play: play
+- shuffle: Shuffle
+- aqi: AQI
+- time-suffix: IST
+- pair-separator: —
+- temp-unit: °C
+- aqi-good: Good
+- aqi-moderate: Moderate
+- aqi-sensitive: Unhealthy for some
+- aqi-unhealthy: Unhealthy
+- aqi-poor: Poor
+- month-names: Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec
+- season-names: Flame of Forest, Jacaranda, Pongamia, Golden Shower, Gulmohar, Copper Pod, Oleander, Bougainvillea, Purple Bauhinia, Tabebuia Rosea, Rain Tree, Poinsettia
+- lately-read: reading
+- lately-listened: listening to
+- lately-watched: watching
+- lately-cooked: cooking
+- lately-explored: exploring
+- lately-played: playing
+- lately-built: building
+- lately-learned: learning
+- lately-ran: running
+- lately-cycled: cycling
+- lately-photographed: photographing
+- lately-brewed: brewing
+- lately-visited: visiting
+- lately-wrote: writing
+- nav-instagram: Instagram
+- nav-linkedin: LinkedIn
+- separator: ·
+- feed-case-study: new case study
+- feed-lately: lately
+- feed-playground: playground
