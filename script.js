@@ -93,7 +93,7 @@
         swatch.style.setProperty('--swatch-light', s.light);
         swatch.style.setProperty('--swatch-dark', s.dark);
         btn.appendChild(swatch);
-        btn.appendChild(document.createTextNode((monthNames[i] || '') + ' — ' + (seasonNames[i] || '')));
+        btn.appendChild(document.createTextNode((monthNames[i] || '') + ' ' + siteData['pair-separator'] + ' ' + (seasonNames[i] || '')));
         btn.onclick = function(e) {
           e.stopPropagation();
           applySeason(i, true);
@@ -131,12 +131,16 @@
         var now = new Date().toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: true });
         document.getElementById('local-time').textContent = now + ' ' + (siteData['time-suffix'] || '');
       }
-      function start() { updateTime(); timer = setInterval(updateTime, 60000); }
-      function stop() { clearInterval(timer); }
+      // One interval at most, and none while the tab is hidden
+      function stop() { clearInterval(timer); timer = null; }
+      function start() {
+        stop();
+        if (document.hidden) return;
+        updateTime();
+        timer = setInterval(updateTime, 60000);
+      }
       start();
-      document.addEventListener('visibilitychange', function() {
-        if (document.hidden) { stop(); } else { start(); }
-      });
+      document.addEventListener('visibilitychange', start);
     })();
 
     // Cached fetch helper (localStorage, 1h TTL)
@@ -165,7 +169,7 @@
         return r.json().then(function(d) {
           var temp = d.current.temperature_2m;
           if (typeof temp !== 'number') throw new Error('no temperature');
-          return Math.round(temp) + '°C';
+          return Math.round(temp) + siteData['temp-unit'];
         });
       },
       function(v) { document.getElementById('temperature').textContent = v; },
@@ -181,7 +185,7 @@
           var aqi = d.current.us_aqi;
           if (typeof aqi !== 'number') throw new Error('no AQI');
           var label = aqi <= 50 ? siteData['aqi-good'] : aqi <= 100 ? siteData['aqi-moderate'] : aqi <= 150 ? siteData['aqi-sensitive'] : aqi <= 200 ? siteData['aqi-unhealthy'] : siteData['aqi-poor'];
-          return aqi + ' — ' + label;
+          return aqi + ' ' + siteData['pair-separator'] + ' ' + label;
         });
       },
       function(v) { document.getElementById('aqi').textContent = v; },

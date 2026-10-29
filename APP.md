@@ -199,6 +199,7 @@ All UI copy lives in `content/labels.md`. Keys are fixed; edit values only.
 | `shuffle` | aria-label on the rolodex shuffle button |
 | `aqi` | AQI label in the footer |
 | `time-suffix` | Suffix after the footer clock (e.g. `IST`) |
+| `pair-separator`, `temp-unit` | Dash in `Jan — Flame of Forest` / `42 — Good`, and the temperature unit (`script.js`) |
 | `aqi-good`, `aqi-moderate`, `aqi-sensitive`, `aqi-unhealthy`, `aqi-poor` | AQI bands shown by `script.js` |
 | `month-names`, `season-names` | Comma-separated lists (12 each) for the season picker |
 | `lately-<key>` | Verb beside each lately item (`lately-read: reading`, …) |

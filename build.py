@@ -63,7 +63,7 @@ LATELY_ICONS = {
 # labels.md keys that script.js reads (via the site-labels JSON block). Comma-separated values
 # are split into lists.
 JS_LABEL_KEYS = (
-    'season-names', 'month-names', 'time-suffix',
+    'season-names', 'month-names', 'time-suffix', 'pair-separator', 'temp-unit',
     'aqi-good', 'aqi-moderate', 'aqi-sensitive', 'aqi-unhealthy', 'aqi-poor',
 )
 JS_LABEL_LISTS = ('season-names', 'month-names')
@@ -97,6 +97,12 @@ _IMG_RE = re.compile(r'^!\[([^\]]*)\]\(([^)]+)\)$')
 _LINK_RE = re.compile(r'\[(.+?)\]\(((?:[^()\s]|\([^()\s]*\))+)\)')
 
 
+def _safe_href(url):
+    """url unchanged when it's relative or http/https/mailto; '#' for any other scheme (javascript:, data:, …)."""
+    scheme = re.match(r'\s*([a-zA-Z][a-zA-Z0-9+.-]*):', url)
+    return url if not scheme or scheme.group(1).lower() in ('http', 'https', 'mailto') else '#'
+
+
 def _link_parts(raw):
     """Split a lately/feed value into (display text, url).
 
@@ -107,7 +113,7 @@ def _link_parts(raw):
     first = _LINK_RE.search(raw)
     if not first:
         return raw, ''
-    return _LINK_RE.sub(r'\1', raw), first.group(2)
+    return _LINK_RE.sub(r'\1', raw), _safe_href(first.group(2))
 
 
 def parse_bold_segments(text):
@@ -430,7 +436,7 @@ def render_inline(text):
     text = fmt(_LINK_RE.sub(stash, escape(text)))
     return re.sub(
         r'\x00(\d+)\x00',
-        lambda m: f'<a href="{links[int(m.group(1))].group(2)}" target="_blank" rel="noopener">{fmt(links[int(m.group(1))].group(1))}</a>',
+        lambda m: f'<a href="{_safe_href(links[int(m.group(1))].group(2))}" target="_blank" rel="noopener">{fmt(links[int(m.group(1))].group(1))}</a>',
         text,
     )
 
@@ -466,6 +472,7 @@ def parse_meta(md):
 def render_meta(title, description, url, image_url, favicon=''):
     title = escape(title)
     description = escape(description)
+    url, image_url, favicon = escape(url), escape(image_url), escape(favicon)
     return (
         f'  <title>{title}</title>\n'
         + (f'  <link rel="icon" type="image/png" href="{favicon}">\n' if favicon else '')
@@ -617,6 +624,8 @@ def parse_articles(md):
                 current[key] = value.strip()
     if current:
         articles.append(current)
+    for a in articles:
+        a['url'] = _safe_href(a['url'])
     return title, articles
 
 
@@ -637,7 +646,7 @@ def parse_playground(md):
             m = _LINK_RE.match(parts[0]) if len(parts) >= 3 else None
             if m:
                 cards.append({
-                    'name': m.group(1), 'url': m.group(2),
+                    'name': m.group(1), 'url': _safe_href(m.group(2)),
                     'img': parts[1], 'desc': parts[2],
                     'year': parts[3] if len(parts) == 4 else '',
                 })
@@ -947,7 +956,7 @@ def render_rolodex(md, labels):
         elif stripped.startswith('- '):
             m = _LINK_RE.match(stripped[2:].strip())
             if m:
-                items.append({'name': m.group(1), 'url': m.group(2)})
+                items.append({'name': m.group(1), 'url': _safe_href(m.group(2))})
 
     title = apply_highlight(title)
     # '<' escaped so a name containing '</script>' can't close the inline script block
@@ -1112,7 +1121,7 @@ def render_project_page(md, labels):
     meta_html = f' {escape(_label(labels, "separator"))} '.join(meta_parts)
 
     visit_btn = (
-        f'<a class="bar-box project-visit-btn" href="{escape(url)}" target="_blank" rel="noopener" aria-label="{visit_label}">'
+        f'<a class="bar-box project-visit-btn" href="{escape(_safe_href(url))}" target="_blank" rel="noopener" aria-label="{visit_label}">'
         f'<span class="material-symbols-sharp">arrow_outward</span></a>'
     ) if url else ''
 
@@ -1284,7 +1293,7 @@ def render_feed(articles_md, project_mds, lately_archive_md, playground_md, site
     entries.sort(key=lambda e: e[0], reverse=True)
 
     # Newest entry's date, not the wall clock, so a rebuild with unchanged content writes an identical feed.
-    newest = entries[0][0] if entries else datetime.min
+    newest = entries[0][0] if entries and entries[0][0] > datetime.min else datetime(1970, 1, 1)
     last_build_rfc822 = newest.strftime('%a, %d %b %Y 00:00:00 +0000')
     feed_url = f'{site_url}/feed.xml'
     items_xml = '\n'.join(xml for _, xml in entries)
@@ -1355,6 +1364,10 @@ def render_page(template, css, js, meta_html, footer_html, body_html, active_nav
     html = html.replace('{{nav_root}}', prefix)
     html = html.replace('{{nav_work_active}}', 'active' if active_nav == 'work' else '')
     html = html.replace('{{nav_play_active}}', 'active' if active_nav == 'play' else '')
+    html = html.replace('{{nav_work_current}}', 'aria-current="page"' if active_nav == 'work' else '')
+    html = html.replace('{{nav_play_current}}', 'aria-current="page"' if active_nav == 'play' else '')
+    # Icon glyphs are ligature names ("arrow_outward"); hide them from screen readers
+    html = re.sub(r'<span class="(material-symbols-sharp[^"]*)"(?![^>]*aria-hidden)>', r'<span class="\1" aria-hidden="true">', html)
 
     # Fix asset paths for subpages
     if prefix:
@@ -1405,8 +1418,8 @@ def minify_js(js):
 def _valid_projects(project_mds):
     """Pair each project markdown with its parsed fields, dropping ones that can't be built.
 
-    A project needs a slug (explicit, or derived from org) that no earlier project already
-    uses. Otherwise its page path would be 'work//index.html' (overwriting the work landing
+    A project needs an org and a slug (explicit, or derived from org) that no earlier project
+    already uses. Otherwise its page path would be 'work//index.html' (overwriting the work landing
     page) or collide with another project's page. Skipped projects are reported, not fatal.
     """
     seen = set()
@@ -1414,8 +1427,9 @@ def _valid_projects(project_mds):
     for md in project_mds:
         fields = _project_fields(md)
         slug = fields['slug']
-        if not slug:
-            print(f'Warning: skipping project with no slug or org: {fields["problem"] or "(untitled)"}')
+        if not slug or not fields['org']:
+            # No org means no grid card, so a page would exist that nothing links to
+            print(f'Warning: skipping project with no org or slug: {fields["problem"] or "(untitled)"}')
         elif not re.fullmatch(r'[\w-]+', slug):
             # One URL segment only: a '/' or '..' would write outside work/<slug>/ and confuse stale-page cleanup
             print(f'Warning: skipping project with invalid slug "{slug}"')

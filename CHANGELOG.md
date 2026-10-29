@@ -23,8 +23,12 @@ Reverse-chronological. Versioning: **major** = redesign · **minor** = new featu
 - Weather: a null temperature or AQI shows `--` instead of being cached as `0°C` / `null — Good`
 - Season picker: `aria-expanded`, Escape to close, footnote clicks don't close it, 24px tap target
 - Project markdown: multi-line `<!-- -->` comments are skipped; slugs must be a single path segment
-- `--optimize-images` can convert animated GIFs, but keeps a GIF when the animated WebP would be larger (the three project GIFs: ~2x bigger as WebP, so they stay); transparency is kept for LA/P images
+- `--optimize-images` can convert animated GIFs, but keeps a GIF when the animated WebP would be larger (the three project GIFs: ~2x bigger as WebP, so they stay); transparency in LA/P images is flattened onto white like RGBA instead of going black
 - One `parse_articles()` / `parse_playground()` shared by the page, feed and asset check; unused favicon accent parameter removed and favicon generation cached
+- Decorative icon glyphs are `aria-hidden`; the active nav link has `aria-current="page"`
+- Clock keeps one interval at most and doesn't tick in a hidden tab; the `—` pair separator and `°C` unit come from `labels.md`
+- Link URLs with a scheme other than http/https/mailto (e.g. `javascript:`) render as `#`; every meta URL/attribute is escaped
+- Projects without an `org` are skipped with a warning (they'd have a page but no card); `lastBuildDate` never falls back to year 1
 - OG heading supports `<br>` line breaks; work page heading split over two lines
 
 ---

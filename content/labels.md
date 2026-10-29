@@ -16,6 +16,8 @@
 - shuffle: Shuffle
 - aqi: AQI
 - time-suffix: IST
+- pair-separator: —
+- temp-unit: °C
 - aqi-good: Good
 - aqi-moderate: Moderate
 - aqi-sensitive: Unhealthy for some
