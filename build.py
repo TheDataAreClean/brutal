@@ -148,6 +148,14 @@ def _wrap_segments(draw, raw_text, font, max_width):
     return lines or [[('', False)]]
 
 
+def _wrap_lines(draw, raw_text, font, max_width):
+    """_wrap_segments for each '<br>'-separated part of raw_text, so copy can force a line break."""
+    lines = []
+    for part in raw_text.split('<br>'):
+        lines.extend(_wrap_segments(draw, part, font, max_width))
+    return lines
+
+
 def generate_og_image(accent_hex, heading_raw, tagline_raw, domain_text, site_name, output_path):
     """Generate OG image matching the site's viewport-box layout.
 
@@ -225,7 +233,7 @@ def generate_og_image(accent_hex, heading_raw, tagline_raw, domain_text, site_na
     font_sm = ImageFont.truetype(str(FONT_PATH), 24 * OUT * SS)
     max_text_width = (width - 2 * margin - 2 * box_pad) * SS
 
-    heading_lines = _wrap_segments(tdraw, heading_raw, font_lg, max_text_width)
+    heading_lines = _wrap_lines(tdraw, heading_raw, font_lg, max_text_width)
     tagline_lines = _wrap_segments(tdraw, tagline_raw, font_sm, max_text_width)
 
     # Use fixed font metrics (ascent + descent), not each string's tight glyph bbox — bbox
@@ -252,7 +260,7 @@ def generate_og_image(accent_hex, heading_raw, tagline_raw, domain_text, site_na
             break
         font_lg = ImageFont.truetype(str(FONT_PATH), max(min_heading_size, round(font_lg.size * 0.85)))
         font_lg.set_variation_by_name('Bold')
-        heading_lines = _wrap_segments(tdraw, heading_raw, font_lg, max_text_width)
+        heading_lines = _wrap_lines(tdraw, heading_raw, font_lg, max_text_width)
 
     y = box_bottom_ss - box_pad_ss - total_h
 

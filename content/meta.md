@@ -9,7 +9,7 @@
 ## work
 - title: data communicator | thedataareclean
 - description: i help people understand their data, through products, research and stories.
-- heading: multi-disciplinary **data communicator**
+- heading: multi-disciplinary<br>**data communicator**
 - tagline: i help people understand their data, through products, research and stories.
 
 ## play
