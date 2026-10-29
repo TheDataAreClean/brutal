@@ -36,3 +36,9 @@
 - lately-brewed: brewing
 - lately-visited: visiting
 - lately-wrote: writing
+- nav-instagram: Instagram
+- nav-linkedin: LinkedIn
+- separator: ·
+- feed-case-study: new case study
+- feed-lately: lately
+- feed-playground: playground

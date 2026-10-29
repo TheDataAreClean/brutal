@@ -28,20 +28,22 @@ BASE = Path(__file__).parent
 CONTENT = BASE / 'content'
 DIST = BASE / 'dist'
 
-SEASON_COLORS = [
-    '#c84520',  # Jan — Flame of Forest
-    '#7d4abf',  # Feb — Jacaranda
-    '#9870b0',  # Mar — Pongamia
-    '#b89010',  # Apr — Golden Shower
-    '#c83020',  # May — Gulmohar
-    '#a89018',  # Jun — Copper Pod
-    '#c84568',  # Jul — Oleander
-    '#c82852',  # Aug — Bougainvillea
-    '#8040a8',  # Sep — Purple Bauhinia
-    '#c85080',  # Oct — Tabebuia Rosea
-    '#b87878',  # Nov — Rain Tree
-    '#c02838',  # Dec — Poinsettia
+# (light, dark) accent per month, Jan-Dec. script.js gets the same table via the site-data JSON block.
+SEASONS = [
+    ('#c84520', '#e87040'),  # Jan — Flame of Forest
+    ('#7d4abf', '#a878d8'),  # Feb — Jacaranda
+    ('#9870b0', '#b898d0'),  # Mar — Pongamia
+    ('#b89010', '#d8b030'),  # Apr — Golden Shower
+    ('#c83020', '#e86040'),  # May — Gulmohar
+    ('#a89018', '#c8b030'),  # Jun — Copper Pod
+    ('#c84568', '#e87898'),  # Jul — Oleander
+    ('#c82852', '#f0456a'),  # Aug — Bougainvillea
+    ('#8040a8', '#a868c8'),  # Sep — Purple Bauhinia
+    ('#c85080', '#e880a8'),  # Oct — Tabebuia Rosea
+    ('#b87878', '#d0a0a0'),  # Nov — Rain Tree
+    ('#c02838', '#e85060'),  # Dec — Poinsettia
 ]
+SEASON_COLORS = [light for light, _ in SEASONS]
 
 
 FONT_PATH = BASE / 'assets' / 'fonts' / 'SchibstedGrotesk.ttf'
@@ -70,7 +72,8 @@ JS_LABEL_LISTS = ('season-names', 'month-names')
 REQUIRED_LABEL_KEYS = (
     'case-study', 'visit-site', 'back-to-work', 'show-more', 'email-copied', 'season-info',
     'feed-title', 'skip-to-content', 'nav-home', 'change-accent', 'copy-email', 'toggle-dark',
-    'nav-work', 'nav-play', 'shuffle', 'aqi',
+    'nav-work', 'nav-play', 'nav-instagram', 'nav-linkedin', 'shuffle', 'aqi', 'separator',
+    'feed-case-study', 'feed-lately', 'feed-playground',
     *JS_LABEL_KEYS,
     *(f'lately-{k}' for k in LATELY_ICONS),
 )
@@ -86,7 +89,7 @@ ICON_NAMES = [
 
 
 _BOLD_RE = re.compile(r'\*\*(.+?)\*\*')
-_ITALIC_RE = re.compile(r'(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)')
+_ITALIC_RE = re.compile(r'(?<!\*)\*(?![\s*])(.+?)(?<![\s*])\*(?!\*)')
 _NUM_LIST_RE = re.compile(r'^\d+\.\s+')
 _SECTION_HDG_RE = re.compile(r'^(#{2,4})(\s|$)')
 _IMG_RE = re.compile(r'^!\[([^\]]*)\]\(([^)]+)\)$')
@@ -399,6 +402,8 @@ def _project_fields(md):
 
 def _apply_span(text, cls):
     """Convert **bold** to <span class="{cls}">bold</span>."""
+    # Escaped first; a literal <br> is the one tag copy may use (forced line break in a heading)
+    text = re.sub(r'&lt;br\s*/?&gt;', '<br>', escape(text, quote=False))
     return _BOLD_RE.sub(rf'<span class="{cls}">\1</span>', text)
 
 
@@ -412,11 +417,22 @@ def apply_name(text):
 
 def render_inline(text):
     """HTML-escape then convert **bold**, *italic*, [link](url) to inline HTML."""
-    text = escape(text)
-    text = _BOLD_RE.sub(r'<strong>\1</strong>', text)
-    text = _ITALIC_RE.sub(r'<em>\1</em>', text)
-    text = _LINK_RE.sub(r'<a href="\2" target="_blank" rel="noopener">\1</a>', text)
-    return text
+    def fmt(t):
+        return _ITALIC_RE.sub(r'<em>\1</em>', _BOLD_RE.sub(r'<strong>\1</strong>', t))
+
+    # Links are lifted out before bold/italic run so a '*' inside a URL isn't read as emphasis
+    links = []
+
+    def stash(m):
+        links.append(m)
+        return f'\x00{len(links) - 1}\x00'
+
+    text = fmt(_LINK_RE.sub(stash, escape(text)))
+    return re.sub(
+        r'\x00(\d+)\x00',
+        lambda m: f'<a href="{links[int(m.group(1))].group(2)}" target="_blank" rel="noopener">{fmt(links[int(m.group(1))].group(1))}</a>',
+        text,
+    )
 
 
 def parse_kv_list(text):
@@ -510,12 +526,12 @@ def render_about(md):
         after = m.group(3)
         h2 = (
             '      <h2>\n'
-            f'        <span class="thin">{before}</span>\n'
-            f'        <span class="highlight">{highlight}</span>{after}\n'
+            f'        <span class="thin">{escape(before, quote=False)}</span>\n'
+            f'        <span class="highlight">{escape(highlight, quote=False)}</span>{escape(after, quote=False)}\n'
             '      </h2>'
         )
     else:
-        h2 = f'      <h2>{heading}</h2>'
+        h2 = f'      <h2>{escape(heading, quote=False)}</h2>'
 
     highlighted = [apply_highlight(p) for p in paragraphs]
     paras = '\n'.join(
@@ -635,14 +651,8 @@ def render_articles(md, labels):
     show_more_label = escape(_label(labels, 'show-more'))
     has_more = len(articles) > initial
     show_more = (
-        f'    <button type="button" class="bar-box articles-show-more" id="articles-show-more" aria-label="{show_more_label}">'
+        f'    <button type="button" class="bar-box articles-show-more" id="articles-show-more" data-batch="{initial}" aria-label="{show_more_label}">'
         f'{show_more_label} <span class="material-symbols-sharp">keyboard_arrow_down</span></button>\n'
-        f'    <script>!function(){{var batch={initial};'
-        'document.getElementById("articles-show-more").addEventListener("click",function(){'
-        'var hidden=Array.from(document.querySelectorAll(".article-hidden"));'
-        'hidden.slice(0,batch).forEach(function(el){{el.classList.remove("article-hidden");}});'
-        'if(!document.querySelector(".article-hidden"))this.remove();'
-        '});}();</script>\n'
     ) if has_more else ''
 
     return (
@@ -1082,7 +1092,7 @@ def render_project_page(md, labels):
     back_label = escape(_label(labels, 'back-to-work'))
 
     meta_parts = [escape(p) for p in [org, year] if p]
-    meta_html = ' · '.join(meta_parts)
+    meta_html = f' {escape(_label(labels, "separator"))} '.join(meta_parts)
 
     visit_btn = (
         f'<a class="bar-box project-visit-btn" href="{escape(url)}" target="_blank" rel="noopener" aria-label="{visit_label}">'
@@ -1189,6 +1199,7 @@ def render_feed(articles_md, project_mds, lately_archive_md, playground_md, site
     site_url = site_url.rstrip('/')
 
     entries = []  # list of (datetime, xml_str)
+    sep = f' {_label(labels, "separator")} '
 
     # --- Articles ---
     lines = articles_md.strip().split('\n')
@@ -1200,7 +1211,7 @@ def render_feed(articles_md, project_mds, lately_archive_md, playground_md, site
                 entries.append(_feed_item(
                     title=current['name'],
                     link=current['url'],
-                    desc=' · '.join(filter(None, [current['publisher'], current['tags']])),
+                    desc=sep.join(filter(None, [current['publisher'], current['tags']])),
                     date_str=current['date'],
                     guid=current['url'],
                 ))
@@ -1214,7 +1225,7 @@ def render_feed(articles_md, project_mds, lately_archive_md, playground_md, site
         entries.append(_feed_item(
             title=current['name'],
             link=current['url'],
-            desc=' · '.join(filter(None, [current['publisher'], current['tags']])),
+            desc=sep.join(filter(None, [current['publisher'], current['tags']])),
             date_str=current['date'],
             guid=current['url'],
         ))
@@ -1227,7 +1238,7 @@ def render_feed(articles_md, project_mds, lately_archive_md, playground_md, site
         link = f'{site_url}/work/{p["slug"]}/'
         img_src = _first_project_image(md)
         entries.append(_feed_item(
-            title=f'new case study: {p["org"]}',
+            title=f'{_label(labels, "feed-case-study")}: {p["org"]}',
             link=link,
             desc=p['problem'],
             date_str=p['added'],
@@ -1253,7 +1264,7 @@ def render_feed(articles_md, project_mds, lately_archive_md, playground_md, site
         url = url or site_url
         label = lately_labels[key]
         entries.append(_feed_item(
-            title=f'lately {label}: {display}',
+            title=f'{_label(labels, "feed-lately")} {label}: {display}',
             link=url,
             desc='',
             date_str=current_date,
@@ -1276,7 +1287,7 @@ def render_feed(articles_md, project_mds, lately_archive_md, playground_md, site
         desc = parts[2]
         year = parts[3] if len(parts) == 4 else ''
         entries.append(_feed_item(
-            title=f'playground: {name}',
+            title=f'{_label(labels, "feed-playground")}: {name}',
             link=url,
             desc=desc,
             date_str=year,
@@ -1324,16 +1335,16 @@ def render_play_body(intro_md, lately_md, playground_md, interests_md, rolodex_m
     return '\n\n'.join(parts)
 
 
-def _js_labels_json(labels):
-    """labels.md values script.js needs, as JSON safe to inline in a <script> block."""
-    out = {}
+def _site_data_json(labels):
+    """labels.md values and the season colour table script.js needs, as JSON safe to inline in a <script> block."""
+    out = {'seasons': SEASONS}
     for key in JS_LABEL_KEYS:
         value = _label(labels, key)
         out[key] = [v.strip() for v in value.split(',')] if key in JS_LABEL_LISTS else value
     return json.dumps(out, ensure_ascii=False).replace('<', '\\u003c')
 
 
-def render_page(template, css, js, meta_html, footer_html, body_html, active_nav, depth=0, labels=None):
+def render_page(template, css, js, meta_html, footer_html, body_html, active_nav, depth=0, labels=None, site=None):
     """Assemble a full HTML page with shared nav/footer, inlined CSS/JS."""
     prefix = '../' * depth if depth > 0 else ''
 
@@ -1348,9 +1359,12 @@ def render_page(template, css, js, meta_html, footer_html, body_html, active_nav
         ('label_home', 'nav-home'), ('label_accent', 'change-accent'),
         ('label_email', 'copy-email'), ('label_dark', 'toggle-dark'),
         ('label_work', 'nav-work'), ('label_play', 'nav-play'),
+        ('label_instagram', 'nav-instagram'), ('label_linkedin', 'nav-linkedin'),
     ):
         html = html.replace('{{' + placeholder + '}}', escape(_label(labels, key)))
-    html = html.replace('{{labels_json}}', _js_labels_json(labels))
+    for placeholder, key in (('site_email', 'email'), ('site_instagram', 'instagram'), ('site_linkedin', 'linkedin')):
+        html = html.replace('{{' + placeholder + '}}', escape((site or {}).get(key, '')))
+    html = html.replace('{{site_data_json}}', _site_data_json(labels))
 
     # Nav active states
     html = html.replace('{{nav_root}}', prefix)
@@ -1606,7 +1620,7 @@ def build():
     for f in project_fields:
         year_display = re.sub(r'\s*[-–—]\s*', ' - ', f['year']) if f['year'] else ''
         org_display = f'**{f["org"]}**' if f['org'] else ''
-        project_tagline = ' · '.join(p for p in [org_display, year_display] if p)
+        project_tagline = f' {_label(labels, "separator")} '.join(p for p in [org_display, year_display] if p)
         _og_image(cache, accent, f['problem'], project_tagline, domain_text, site_name, og_dir / 'work' / f'{f["slug"]}.png')
 
     # Per-page meta tags — title/description/image differ per page instead of being shared site-wide
@@ -1645,11 +1659,24 @@ def build():
     DIST.mkdir(exist_ok=True)
 
     for path, page_meta_html, body, active, depth in pages:
-        html = render_page(template, css, js, page_meta_html, footer_html, body, active, depth, labels=labels)
+        html = render_page(template, css, js, page_meta_html, footer_html, body, active, depth, labels=labels, site=site)
         out = DIST / path
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(html)
         print(f'Built dist/{path} ({len(html)} bytes)')
+
+    # Drop output for projects that no longer exist (renamed slug, deleted file), plus their OG
+    # images and cache entries, so old URLs don't stay live
+    live_slugs = {f['slug'] for f in project_fields}
+    for stale_dir in sorted((DIST / 'work').iterdir()):
+        if stale_dir.is_dir() and stale_dir.name not in live_slugs:
+            shutil.rmtree(stale_dir)
+            print(f'Removed stale dist/work/{stale_dir.name}/')
+    for stale_og in sorted((og_dir / 'work').glob('*.png')):
+        if stale_og.stem not in live_slugs:
+            stale_og.unlink()
+            print(f'Removed stale {stale_og.relative_to(BASE)}')
+    cache['og'] = {k: v for k, v in cache.get('og', {}).items() if (BASE / k).exists()}
 
     # Copy assets
     assets_src = BASE / 'assets'

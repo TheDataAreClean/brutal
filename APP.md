@@ -88,6 +88,9 @@ dist/            ← generated output, git-tracked, committed with source
 | `{{nav_work_active}}` / `{{nav_play_active}}` | active page |
 | `{{toast_email_copied}}` | labels.md `email-copied` |
 | `{{season_info}}` | labels.md `season-info` |
+| `{{label_skip}}`, `{{label_home}}`, `{{label_accent}}`, `{{label_email}}`, `{{label_dark}}`, `{{label_work}}`, `{{label_play}}`, `{{label_instagram}}`, `{{label_linkedin}}` | labels.md nav/aria keys |
+| `{{site_email}}`, `{{site_instagram}}`, `{{site_linkedin}}` | top-level keys in meta.md |
+| `{{site_data_json}}` | `_site_data_json()` — labels `script.js` needs plus the `SEASONS` colour table, in a `<script type="application/json" id="site-data">` block |
 
 ## Pages
 
@@ -190,6 +193,9 @@ All UI copy lives in `content/labels.md`. Keys are fixed; edit values only.
 | `feed-title` | RSS feed title |
 | `skip-to-content`, `nav-home`, `change-accent`, `copy-email`, `toggle-dark` | Skip link text and aria-labels in `template.html` |
 | `nav-work`, `nav-play` | Nav link text |
+| `nav-instagram`, `nav-linkedin` | aria-labels on the social links (URLs and email are in `meta.md`) |
+| `separator` | Joins org · year and publisher · tags (project pages, OG tagline, feed) |
+| `feed-case-study`, `feed-lately`, `feed-playground` | RSS item title prefixes |
 | `shuffle` | aria-label on the rolodex shuffle button |
 | `aqi` | AQI label in the footer |
 | `time-suffix` | Suffix after the footer clock (e.g. `IST`) |
@@ -197,7 +203,7 @@ All UI copy lives in `content/labels.md`. Keys are fixed; edit values only.
 | `month-names`, `season-names` | Comma-separated lists (12 each) for the season picker |
 | `lately-<key>` | Verb beside each lately item (`lately-read: reading`, …) |
 
-`script.js` reads the keys in `JS_LABEL_KEYS` from a `<script type="application/json" id="site-labels">` block that `render_page()` fills in, so it has no copy of its own. `build()` warns about any key in `REQUIRED_LABEL_KEYS` that's missing or empty.
+`script.js` reads the keys in `JS_LABEL_KEYS` (and the season colours, defined once in `SEASONS` in `build.py`) from the `site-data` block that `render_page()` fills in, so it has no copy or colour table of its own. `build()` warns about any key in `REQUIRED_LABEL_KEYS` that's missing or empty.
 
 ## OG images
 
@@ -209,6 +215,9 @@ Every page gets its own Open Graph image and its own `<title>`/description — n
 - url: https://thedataareclean.com
 - site-name: thedataareclean
 - favicon: assets/favicon.png
+- email: hello@thedataareclean.com
+- instagram: https://www.instagram.com/thedataareclean/
+- linkedin: https://www.linkedin.com/in/thedataareclean/
 
 ## home
 - title: arpit | curious about everything | thedataareclean
@@ -285,6 +294,7 @@ Non-obvious implementation details, each fixing a real visual bug hit along the 
 | `--space-xl` | clamp(64px, 10vh, 120px) | page intro top, hero bottom |
 | `--space-lg` | clamp(48px, 7vh, 80px) | between sections, footer |
 | `--space-md` | clamp(24px, 3vw, 40px) | title-to-content, inner gaps |
+| `--space-xs` | 4px | tight gaps (detail list rows), thin scrollbar |
 | `--space-sm` | 12px | box gap (alias `--box-gap`) |
 | `--box-pad` | `12px 16px` | inner padding for bordered boxes |
 | `--tag-pad` | `2px 8px` | pill tag padding |
@@ -301,6 +311,7 @@ Non-obvious implementation details, each fixing a real visual bug hit along the 
 |---|---|---|
 | `--icon-sz` | 16px | inline/small icons |
 | `--icon-sz-lg` | 18px | bar-box and primary icons |
+| `--icon-sz-xl` | 24px | default size for any other icon |
 | `--nav-logo-sz` | 14px | season picker dot |
 
 Material Symbols `opsz` in `font-variation-settings` must match the rendered `font-size` numerically. New icons must be added to `ICON_NAMES` in `build.py` — the font is subsetted at build time.

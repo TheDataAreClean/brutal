@@ -10,7 +10,7 @@
       font-family: 'Material Symbols Sharp';
       font-weight: normal;
       font-style: normal;
-      font-size: 24px;
+      font-size: var(--icon-sz-xl);
       line-height: 1;
       letter-spacing: normal;
       text-transform: none;
@@ -50,6 +50,7 @@
      *   --space-lg : clamp(48px, 7vh, 80px)   — between sections, footer
      *   --space-md : clamp(24px, 3vw, 40px)   — title→content, inner gaps
      *   --space-sm : 12px                     — box gap (alias --box-gap)
+     *   --space-xs : 4px                      — tight gaps (detail list rows), thin scrollbar
      *
      *   Mobile:  12 → 24 → 48 → 64
      *   Desktop: 12 → 40 → 80 → 120
@@ -67,6 +68,7 @@
      *
      *   --icon-sz         : 16px — inline/small icon
      *   --icon-sz-lg      : 18px — bar-box icon, article arrow
+     *   --icon-sz-xl      : 24px — default size for any other icon
      *   --nav-logo-sz     : 14px — season picker dot
      *
      * COLOUR
@@ -87,6 +89,8 @@
       --inner-gap: 8px;
       --icon-sz: 16px;
       --icon-sz-lg: 18px;
+      --icon-sz-xl: 24px;
+      --space-xs: 4px;
       --nav-logo-sz: 14px;
 
       --ls-ui: 1px;
@@ -146,6 +150,20 @@
 
       --accent: var(--accent-dark);
       --on-accent: #000000;
+    }
+
+    /* No-JS fallback: head script in template.html normally sets data-theme before first paint */
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme]) {
+        --black: #ffffff;
+        --white: #000000;
+
+        --accent: var(--accent-dark);
+        --on-accent: #000000;
+      }
+
+      :root:not([data-theme]) .icon-sun { display: inline; }
+      :root:not([data-theme]) .icon-moon { display: none; }
     }
 
     /* ---- SKIP TO CONTENT ---- */
@@ -312,6 +330,11 @@
       width: var(--nav-logo-sz);
       height: var(--nav-logo-sz);
       flex-shrink: 0;
+      background: var(--swatch-light);
+    }
+
+    [data-theme="dark"] .season-swatch {
+      background: var(--swatch-dark);
     }
 
     .season-info {
@@ -379,7 +402,7 @@
     }
 
     .content-box::-webkit-scrollbar {
-      width: 4px;
+      width: var(--space-xs);
       background: transparent;
     }
 
@@ -758,7 +781,7 @@
       list-style: none;
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: var(--space-xs);
       margin-bottom: var(--space-sm);
     }
 

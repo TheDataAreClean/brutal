@@ -7,9 +7,9 @@
       try { window[kind].setItem(key, value); } catch (e) {}
     }
 
-    // Copy comes from content/labels.md via the site-labels JSON block
-    var labels = (function() {
-      try { return JSON.parse(document.getElementById('site-labels').textContent); } catch (e) { return {}; }
+    // Copy (content/labels.md) and the season colour table (build.py) arrive via the site-data JSON block
+    var siteData = (function() {
+      try { return JSON.parse(document.getElementById('site-data').textContent); } catch (e) { return {}; }
     })();
 
     function toggleTheme() {
@@ -28,37 +28,15 @@
       }).catch(function() {});
     }
 
-    // Restore theme from session, else match OS
-    (function() {
-      var saved = storageGet('sessionStorage', 'theme');
-      if (saved) {
-        document.documentElement.setAttribute('data-theme', saved);
-      } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        document.documentElement.setAttribute('data-theme', 'dark');
-      }
-    })();
-
     // Seasonal accent — Bengaluru blooms
-    var seasons = [
-      { light: '#c84520', dark: '#e87040' },
-      { light: '#7d4abf', dark: '#a878d8' },
-      { light: '#9870b0', dark: '#b898d0' },
-      { light: '#b89010', dark: '#d8b030' },
-      { light: '#c83020', dark: '#e86040' },
-      { light: '#a89018', dark: '#c8b030' },
-      { light: '#c84568', dark: '#e87898' },
-      { light: '#c82852', dark: '#f0456a' },
-      { light: '#8040a8', dark: '#a868c8' },
-      { light: '#c85080', dark: '#e880a8' },
-      { light: '#b87878', dark: '#d0a0a0' },
-      { light: '#c02838', dark: '#e85060' }
-    ];
+    var seasons = (siteData.seasons || []).map(function(pair) { return { light: pair[0], dark: pair[1] }; });
 
-    var seasonNames = labels['season-names'] || [];
-    var monthNames = labels['month-names'] || [];
+    var seasonNames = siteData['season-names'] || [];
+    var monthNames = siteData['month-names'] || [];
     var activeSeason = new Date().getMonth();
 
     function applySeason(index, save) {
+      if (!seasons[index]) return;
       activeSeason = index;
       document.documentElement.style.setProperty('--accent-light', seasons[index].light);
       document.documentElement.style.setProperty('--accent-dark', seasons[index].dark);
@@ -82,7 +60,8 @@
         btn.className = 'season-option' + (i === activeSeason ? ' active' : '');
         var swatch = document.createElement('span');
         swatch.className = 'season-swatch';
-        swatch.style.background = s.light;
+        swatch.style.setProperty('--swatch-light', s.light);
+        swatch.style.setProperty('--swatch-dark', s.dark);
         btn.appendChild(swatch);
         btn.appendChild(document.createTextNode((monthNames[i] || '') + ' — ' + (seasonNames[i] || '')));
         btn.onclick = function(e) {
@@ -112,7 +91,7 @@
       var timer;
       function updateTime() {
         var now = new Date().toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: true });
-        document.getElementById('local-time').textContent = now + ' ' + (labels['time-suffix'] || '');
+        document.getElementById('local-time').textContent = now + ' ' + (siteData['time-suffix'] || '');
       }
       function start() { updateTime(); timer = setInterval(updateTime, 60000); }
       function stop() { clearInterval(timer); }
@@ -156,10 +135,23 @@
       function(r) {
         return r.json().then(function(d) {
           var aqi = d.current.us_aqi;
-          var label = aqi <= 50 ? labels['aqi-good'] : aqi <= 100 ? labels['aqi-moderate'] : aqi <= 150 ? labels['aqi-sensitive'] : aqi <= 200 ? labels['aqi-unhealthy'] : labels['aqi-poor'];
+          var label = aqi <= 50 ? siteData['aqi-good'] : aqi <= 100 ? siteData['aqi-moderate'] : aqi <= 150 ? siteData['aqi-sensitive'] : aqi <= 200 ? siteData['aqi-unhealthy'] : siteData['aqi-poor'];
           return aqi + ' — ' + label;
         });
       },
       function(v) { document.getElementById('aqi').textContent = v; },
       function() { document.getElementById('aqi').textContent = '--'; }
     );
+
+    // Articles "show more": reveal the next batch, drop the button when none are left
+    (function() {
+      var btn = document.getElementById('articles-show-more');
+      if (!btn) return;
+      var batch = parseInt(btn.dataset.batch, 10) || 6;
+      btn.addEventListener('click', function() {
+        Array.from(document.querySelectorAll('.article-hidden')).slice(0, batch).forEach(function(el) {
+          el.classList.remove('article-hidden');
+        });
+        if (!document.querySelector('.article-hidden')) btn.remove();
+      });
+    })();

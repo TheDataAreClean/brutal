@@ -15,6 +15,7 @@
   <meta name="twitter:title" content="data communicator | thedataareclean">
   <meta name="twitter:description" content="i help people understand their data, through products, research and stories.">
   <meta name="twitter:image" content="https://thedataareclean.com/assets/og/work.png">
+  <script>try{var t=sessionStorage.getItem('theme');if(!t&&matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700&display=swap" as="style">
@@ -32,7 +33,7 @@
       font-family: 'Material Symbols Sharp';
       font-weight: normal;
       font-style: normal;
-      font-size: 24px;
+      font-size: var(--icon-sz-xl);
       line-height: 1;
       letter-spacing: normal;
       text-transform: none;
@@ -51,6 +52,8 @@
       --inner-gap: 8px;
       --icon-sz: 16px;
       --icon-sz-lg: 18px;
+      --icon-sz-xl: 24px;
+      --space-xs: 4px;
       --nav-logo-sz: 14px;
       --ls-ui: 1px;
       --ls-label: 0.5px;
@@ -100,6 +103,16 @@
       --white: #000000;
       --accent: var(--accent-dark);
       --on-accent: #000000;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme]) {
+        --black: #ffffff;
+        --white: #000000;
+        --accent: var(--accent-dark);
+        --on-accent: #000000;
+      }
+      :root:not([data-theme]) .icon-sun { display: inline; }
+      :root:not([data-theme]) .icon-moon { display: none; }
     }
     .skip-to-content {
       position: absolute;
@@ -242,6 +255,10 @@
       width: var(--nav-logo-sz);
       height: var(--nav-logo-sz);
       flex-shrink: 0;
+      background: var(--swatch-light);
+    }
+    [data-theme="dark"] .season-swatch {
+      background: var(--swatch-dark);
     }
     .season-info {
       padding: var(--inner-gap);
@@ -300,7 +317,7 @@
       padding: var(--box-gap) 0;
     }
     .content-box::-webkit-scrollbar {
-      width: 4px;
+      width: var(--space-xs);
       background: transparent;
     }
     .content-box::-webkit-scrollbar-thumb {
@@ -611,7 +628,7 @@
       list-style: none;
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: var(--space-xs);
       margin-bottom: var(--space-sm);
     }
     .project-detail-list li {
@@ -1180,8 +1197,7 @@
         <span class="article-arrow"><span class="material-symbols-sharp">arrow_outward</span></span>
       </a>
     </div>
-    <button type="button" class="bar-box articles-show-more" id="articles-show-more" aria-label="show more">show more <span class="material-symbols-sharp">keyboard_arrow_down</span></button>
-    <script>!function(){var batch=6;document.getElementById("articles-show-more").addEventListener("click",function(){var hidden=Array.from(document.querySelectorAll(".article-hidden"));hidden.slice(0,batch).forEach(function(el){{el.classList.remove("article-hidden");}});if(!document.querySelector(".article-hidden"))this.remove();});}();</script>
+    <button type="button" class="bar-box articles-show-more" id="articles-show-more" data-batch="6" aria-label="show more">show more <span class="material-symbols-sharp">keyboard_arrow_down</span></button>
   </section>
 
     <!-- FOOTER -->
@@ -1201,7 +1217,7 @@
     </footer>
   </div>
 
-  <script type="application/json" id="site-labels">{"season-names": ["Flame of Forest", "Jacaranda", "Pongamia", "Golden Shower", "Gulmohar", "Copper Pod", "Oleander", "Bougainvillea", "Purple Bauhinia", "Tabebuia Rosea", "Rain Tree", "Poinsettia"], "month-names": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], "time-suffix": "IST", "aqi-good": "Good", "aqi-moderate": "Moderate", "aqi-sensitive": "Unhealthy for some", "aqi-unhealthy": "Unhealthy", "aqi-poor": "Poor"}</script>
+  <script type="application/json" id="site-data">{"seasons": [["#c84520", "#e87040"], ["#7d4abf", "#a878d8"], ["#9870b0", "#b898d0"], ["#b89010", "#d8b030"], ["#c83020", "#e86040"], ["#a89018", "#c8b030"], ["#c84568", "#e87898"], ["#c82852", "#f0456a"], ["#8040a8", "#a868c8"], ["#c85080", "#e880a8"], ["#b87878", "#d0a0a0"], ["#c02838", "#e85060"]], "season-names": ["Flame of Forest", "Jacaranda", "Pongamia", "Golden Shower", "Gulmohar", "Copper Pod", "Oleander", "Bougainvillea", "Purple Bauhinia", "Tabebuia Rosea", "Rain Tree", "Poinsettia"], "month-names": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], "time-suffix": "IST", "aqi-good": "Good", "aqi-moderate": "Moderate", "aqi-sensitive": "Unhealthy for some", "aqi-unhealthy": "Unhealthy", "aqi-poor": "Poor"}</script>
   <script>
     // Storage can throw (blocked cookies, sandboxed frames, some private modes) — never let it stop the script
     function storageGet(kind, key) {
@@ -1210,9 +1226,9 @@
     function storageSet(kind, key, value) {
       try { window[kind].setItem(key, value); } catch (e) {}
     }
-    // Copy comes from content/labels.md via the site-labels JSON block
-    var labels = (function() {
-      try { return JSON.parse(document.getElementById('site-labels').textContent); } catch (e) { return {}; }
+    // Copy (content/labels.md) and the season colour table (build.py) arrive via the site-data JSON block
+    var siteData = (function() {
+      try { return JSON.parse(document.getElementById('site-data').textContent); } catch (e) { return {}; }
     })();
     function toggleTheme() {
       var html = document.documentElement;
@@ -1228,34 +1244,13 @@
         setTimeout(function() { toast.classList.remove('visible'); }, 2000);
       }).catch(function() {});
     }
-    // Restore theme from session, else match OS
-    (function() {
-      var saved = storageGet('sessionStorage', 'theme');
-      if (saved) {
-        document.documentElement.setAttribute('data-theme', saved);
-      } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        document.documentElement.setAttribute('data-theme', 'dark');
-      }
-    })();
     // Seasonal accent — Bengaluru blooms
-    var seasons = [
-      { light: '#c84520', dark: '#e87040' },
-      { light: '#7d4abf', dark: '#a878d8' },
-      { light: '#9870b0', dark: '#b898d0' },
-      { light: '#b89010', dark: '#d8b030' },
-      { light: '#c83020', dark: '#e86040' },
-      { light: '#a89018', dark: '#c8b030' },
-      { light: '#c84568', dark: '#e87898' },
-      { light: '#c82852', dark: '#f0456a' },
-      { light: '#8040a8', dark: '#a868c8' },
-      { light: '#c85080', dark: '#e880a8' },
-      { light: '#b87878', dark: '#d0a0a0' },
-      { light: '#c02838', dark: '#e85060' }
-    ];
-    var seasonNames = labels['season-names'] || [];
-    var monthNames = labels['month-names'] || [];
+    var seasons = (siteData.seasons || []).map(function(pair) { return { light: pair[0], dark: pair[1] }; });
+    var seasonNames = siteData['season-names'] || [];
+    var monthNames = siteData['month-names'] || [];
     var activeSeason = new Date().getMonth();
     function applySeason(index, save) {
+      if (!seasons[index]) return;
       activeSeason = index;
       document.documentElement.style.setProperty('--accent-light', seasons[index].light);
       document.documentElement.style.setProperty('--accent-dark', seasons[index].dark);
@@ -1277,7 +1272,8 @@
         btn.className = 'season-option' + (i === activeSeason ? ' active' : '');
         var swatch = document.createElement('span');
         swatch.className = 'season-swatch';
-        swatch.style.background = s.light;
+        swatch.style.setProperty('--swatch-light', s.light);
+        swatch.style.setProperty('--swatch-dark', s.dark);
         btn.appendChild(swatch);
         btn.appendChild(document.createTextNode((monthNames[i] || '') + ' — ' + (seasonNames[i] || '')));
         btn.onclick = function(e) {
@@ -1304,7 +1300,7 @@
       var timer;
       function updateTime() {
         var now = new Date().toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: true });
-        document.getElementById('local-time').textContent = now + ' ' + (labels['time-suffix'] || '');
+        document.getElementById('local-time').textContent = now + ' ' + (siteData['time-suffix'] || '');
       }
       function start() { updateTime(); timer = setInterval(updateTime, 60000); }
       function stop() { clearInterval(timer); }
@@ -1345,13 +1341,25 @@
       function(r) {
         return r.json().then(function(d) {
           var aqi = d.current.us_aqi;
-          var label = aqi <= 50 ? labels['aqi-good'] : aqi <= 100 ? labels['aqi-moderate'] : aqi <= 150 ? labels['aqi-sensitive'] : aqi <= 200 ? labels['aqi-unhealthy'] : labels['aqi-poor'];
+          var label = aqi <= 50 ? siteData['aqi-good'] : aqi <= 100 ? siteData['aqi-moderate'] : aqi <= 150 ? siteData['aqi-sensitive'] : aqi <= 200 ? siteData['aqi-unhealthy'] : siteData['aqi-poor'];
           return aqi + ' — ' + label;
         });
       },
       function(v) { document.getElementById('aqi').textContent = v; },
       function() { document.getElementById('aqi').textContent = '--'; }
     );
+    // Articles "show more": reveal the next batch, drop the button when none are left
+    (function() {
+      var btn = document.getElementById('articles-show-more');
+      if (!btn) return;
+      var batch = parseInt(btn.dataset.batch, 10) || 6;
+      btn.addEventListener('click', function() {
+        Array.from(document.querySelectorAll('.article-hidden')).slice(0, batch).forEach(function(el) {
+          el.classList.remove('article-hidden');
+        });
+        if (!document.querySelector('.article-hidden')) btn.remove();
+      });
+    })();
   </script>
 </body>
 </html>

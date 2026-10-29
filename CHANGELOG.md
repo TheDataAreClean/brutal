@@ -13,6 +13,12 @@ Reverse-chronological. Versioning: **major** = redesign · **minor** = new featu
 - List items, article fields, URLs and label attributes are HTML-escaped; rolodex JSON can't close its `<script>`
 - Build no longer redownloads the icon font or regenerates unchanged OG images (`.build-cache.json`); `feed.xml` is reproducible across rebuilds; `build()` no longer crashes on an incomplete `meta.md`
 - `--optimize-images` applies EXIF rotation, won't overwrite an existing `.webp`, checks skip folders relative to `assets/`, and updates content references
+- Dark mode: theme is set from a tiny `<head>` script (no light flash) with a `prefers-color-scheme` CSS fallback for no-JS; season swatches follow the theme
+- Stale `dist/work/<slug>/` pages, OG images and cache entries are removed when a project is renamed or deleted (the old `dist/work/vizchitra/` page is gone)
+- Headings and `**bold**` spans are escaped (a literal `<br>` is still allowed); `*` inside link URLs and spaced asterisks (`5 * 3 * 2`) no longer produce `<em>`
+- Season colour table lives only in `build.py` (`SEASONS`) and reaches `script.js` as JSON; email and social URLs moved to `meta.md`, their labels, the `·` separator and RSS title prefixes to `labels.md`
+- Articles "show more" handler moved from an inline Python string into `script.js`
+- New tokens `--space-xs` (4px) and `--icon-sz-xl` (24px) replace raw pixel values
 - OG heading supports `<br>` line breaks; work page heading split over two lines
 
 ---

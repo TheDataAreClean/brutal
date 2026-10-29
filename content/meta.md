@@ -1,6 +1,9 @@
 - url: https://thedataareclean.com
 - site-name: thedataareclean
 - favicon: assets/favicon.png
+- email: hello@thedataareclean.com
+- instagram: https://www.instagram.com/thedataareclean/
+- linkedin: https://www.linkedin.com/in/thedataareclean/
 
 ## home
 - title: arpit | thedataareclean
