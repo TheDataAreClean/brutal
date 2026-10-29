@@ -20,12 +20,42 @@
       storageSet('sessionStorage', 'theme', next);
     }
 
+    var toastTimer;
+
+    function showToast(message) {
+      var toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('visible');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(function() {
+        toast.classList.remove('visible');
+        toast.textContent = '';
+      }, 2000);
+    }
+
+    // Clipboard API where available (secure contexts), else the legacy copy command; always say how it went
     function copyEmail(btn) {
-      navigator.clipboard.writeText(btn.dataset.email).then(function() {
-        var toast = document.getElementById('toast');
-        toast.classList.add('visible');
-        setTimeout(function() { toast.classList.remove('visible'); }, 2000);
-      }).catch(function() {});
+      var toast = document.getElementById('toast');
+      var ok = function() { showToast(toast.dataset.copied); };
+      var fail = function() { showToast(toast.dataset.failed); };
+      function legacyCopy() {
+        var field = document.createElement('textarea');
+        field.value = btn.dataset.email;
+        field.setAttribute('readonly', '');
+        field.style.position = 'fixed';
+        field.style.opacity = '0';
+        document.body.appendChild(field);
+        field.select();
+        var copied = false;
+        try { copied = document.execCommand('copy'); } catch (e) {}
+        document.body.removeChild(field);
+        (copied ? ok : fail)();
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(btn.dataset.email).then(ok, legacyCopy);
+      } else {
+        legacyCopy();
+      }
     }
 
     // Seasonal accent — Bengaluru blooms
@@ -67,23 +97,31 @@
         btn.onclick = function(e) {
           e.stopPropagation();
           applySeason(i, true);
-          dropdown.classList.remove('open');
+          setSeasonsOpen(false);
         };
         dropdown.appendChild(btn);
       });
       var info = document.createElement('div');
       info.className = 'season-info';
       info.textContent = dropdown.dataset.info || '';
+      info.addEventListener('click', function(e) { e.stopPropagation(); });
       dropdown.appendChild(info);
     })();
 
-    function toggleSeasons(e) {
-      e.stopPropagation();
-      document.getElementById('season-dropdown').classList.toggle('open');
+    function setSeasonsOpen(open) {
+      document.getElementById('season-dropdown').classList.toggle('open', open);
+      var toggle = document.querySelector('.nav-logo-season');
+      if (toggle) toggle.setAttribute('aria-expanded', String(open));
     }
 
-    document.addEventListener('click', function() {
-      document.getElementById('season-dropdown').classList.remove('open');
+    function toggleSeasons(e) {
+      e.stopPropagation();
+      setSeasonsOpen(!document.getElementById('season-dropdown').classList.contains('open'));
+    }
+
+    document.addEventListener('click', function() { setSeasonsOpen(false); });
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') setSeasonsOpen(false);
     });
 
     // Local time (pauses when tab is hidden)
@@ -123,7 +161,13 @@
     cachedFetch(
       'weather_temp',
       'https://api.open-meteo.com/v1/forecast?latitude=12.97&longitude=77.59&current=temperature_2m',
-      function(r) { return r.json().then(function(d) { return Math.round(d.current.temperature_2m) + '°C'; }); },
+      function(r) {
+        return r.json().then(function(d) {
+          var temp = d.current.temperature_2m;
+          if (typeof temp !== 'number') throw new Error('no temperature');
+          return Math.round(temp) + '°C';
+        });
+      },
       function(v) { document.getElementById('temperature').textContent = v; },
       function() { document.getElementById('temperature').textContent = '--'; }
     );
@@ -135,6 +179,7 @@
       function(r) {
         return r.json().then(function(d) {
           var aqi = d.current.us_aqi;
+          if (typeof aqi !== 'number') throw new Error('no AQI');
           var label = aqi <= 50 ? siteData['aqi-good'] : aqi <= 100 ? siteData['aqi-moderate'] : aqi <= 150 ? siteData['aqi-sensitive'] : aqi <= 200 ? siteData['aqi-unhealthy'] : siteData['aqi-poor'];
           return aqi + ' — ' + label;
         });

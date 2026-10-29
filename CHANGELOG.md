@@ -19,6 +19,12 @@ Reverse-chronological. Versioning: **major** = redesign · **minor** = new featu
 - Season colour table lives only in `build.py` (`SEASONS`) and reaches `script.js` as JSON; email and social URLs moved to `meta.md`, their labels, the `·` separator and RSS title prefixes to `labels.md`
 - Articles "show more" handler moved from an inline Python string into `script.js`
 - New tokens `--space-xs` (4px) and `--icon-sz-xl` (24px) replace raw pixel values
+- Email-copy button works without the Clipboard API (legacy fallback), reports failure, announces via a live-region toast and no longer stacks timers
+- Weather: a null temperature or AQI shows `--` instead of being cached as `0°C` / `null — Good`
+- Season picker: `aria-expanded`, Escape to close, footnote clicks don't close it, 24px tap target
+- Project markdown: multi-line `<!-- -->` comments are skipped; slugs must be a single path segment
+- `--optimize-images` can convert animated GIFs, but keeps a GIF when the animated WebP would be larger (the three project GIFs: ~2x bigger as WebP, so they stay); transparency is kept for LA/P images
+- One `parse_articles()` / `parse_playground()` shared by the page, feed and asset check; unused favicon accent parameter removed and favicon generation cached
 - OG heading supports `<br>` line breaks; work page heading split over two lines
 
 ---

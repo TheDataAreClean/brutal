@@ -3,6 +3,7 @@
 - back-to-work: ← back to work
 - show-more: show more
 - email-copied: email copied
+- email-copy-failed: couldn't copy email
 - season-info: colours from bengaluru's seasonal blooms
 - feed-title: arpit's universe
 - skip-to-content: Skip to content

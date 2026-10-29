@@ -70,7 +70,7 @@ JS_LABEL_LISTS = ('season-names', 'month-names')
 
 # Every labels.md key build.py or template.html reads. Missing ones are reported at build time.
 REQUIRED_LABEL_KEYS = (
-    'case-study', 'visit-site', 'back-to-work', 'show-more', 'email-copied', 'season-info',
+    'case-study', 'visit-site', 'back-to-work', 'show-more', 'email-copied', 'email-copy-failed', 'season-info',
     'feed-title', 'skip-to-content', 'nav-home', 'change-accent', 'copy-email', 'toggle-dark',
     'nav-work', 'nav-play', 'nav-instagram', 'nav-linkedin', 'shuffle', 'aqi', 'separator',
     'feed-case-study', 'feed-lately', 'feed-playground',
@@ -327,7 +327,7 @@ def generate_og_image(accent_hex, heading_raw, tagline_raw, domain_text, site_na
     img.save(output_path)
 
 
-def generate_favicon(accent_hex, output_path):
+def generate_favicon(output_path):
     """Generate favicon: white background, black border box, black square bottom-left."""
     from PIL import Image, ImageDraw
     size = 64
@@ -597,14 +597,12 @@ def render_projects(heading_md, project_mds, labels):
     )
 
 
-def render_articles(md, labels):
-    """Parse articles.md into a list of article cards."""
-    lines = md.strip().split('\n')
+def parse_articles(md):
+    """Parse articles.md into (title, [article dicts with name/publisher/date/tags/url])."""
     title = ''
     articles = []
     current = None
-
-    for line in lines:
+    for line in md.strip().split('\n'):
         stripped = line.strip()
         if stripped.startswith('# '):
             title = stripped[2:]
@@ -615,12 +613,40 @@ def render_articles(md, labels):
         elif stripped.startswith('- ') and current:
             key, _, value = stripped[2:].partition(':')
             key = key.strip()
-            value = value.strip()
             if key in ('publisher', 'date', 'tags', 'url'):
-                current[key] = value
-
+                current[key] = value.strip()
     if current:
         articles.append(current)
+    return title, articles
+
+
+def parse_playground(md):
+    """Parse playground.md into (title, [card dicts with name/url/img/desc/year]).
+
+    Line format: [Name](url) | image-filename | description | year (optional). Lines are split
+    on the first three '|', so a description can't itself contain one.
+    """
+    title = ''
+    cards = []
+    for line in md.strip().split('\n'):
+        line = line.strip()
+        if line.startswith('# '):
+            title = line[2:]
+        elif '|' in line and not line.startswith('#'):
+            parts = [p.strip() for p in line.split('|', 3)]
+            m = _LINK_RE.match(parts[0]) if len(parts) >= 3 else None
+            if m:
+                cards.append({
+                    'name': m.group(1), 'url': m.group(2),
+                    'img': parts[1], 'desc': parts[2],
+                    'year': parts[3] if len(parts) == 4 else '',
+                })
+    return title, cards
+
+
+def render_articles(md, labels):
+    """Parse articles.md into a list of article cards."""
+    title, articles = parse_articles(md)
 
     title = apply_highlight(title)
 
@@ -815,22 +841,8 @@ def render_playground(md):
     Format per line: [Name](url) | image-filename.png | one-line description | year (optional)
     Images are served from assets/playground/.
     """
-    lines = [l.strip() for l in md.strip().split('\n') if l.strip()]
-    title = ''
-    cards = []
-    for line in lines:
-        if line.startswith('# '):
-            title = apply_highlight(line[2:])
-        elif '|' in line:
-            parts = [p.strip() for p in line.split('|', 3)]
-            if len(parts) >= 3:
-                m = _LINK_RE.match(parts[0])
-                if m:
-                    cards.append({
-                        'name': m.group(1), 'url': m.group(2),
-                        'img': parts[1], 'desc': parts[2],
-                        'year': parts[3] if len(parts) == 4 else '',
-                    })
+    title, cards = parse_playground(md)
+    title = apply_highlight(title)
 
     if not cards:
         return ''
@@ -988,9 +1000,14 @@ def render_project_page(md, labels):
 
     sections = []
     current = None
+    in_comment = False
     for line in lines:
         stripped = line.strip()
+        if in_comment:
+            in_comment = '-->' not in stripped
+            continue
         if stripped.startswith('<!--'):
+            in_comment = '-->' not in stripped
             continue
         m = _SECTION_HDG_RE.match(stripped)
         if m:
@@ -1202,32 +1219,13 @@ def render_feed(articles_md, project_mds, lately_archive_md, playground_md, site
     sep = f' {_label(labels, "separator")} '
 
     # --- Articles ---
-    lines = articles_md.strip().split('\n')
-    current = None
-    for line in lines:
-        stripped = line.strip()
-        if stripped.startswith('## '):
-            if current:
-                entries.append(_feed_item(
-                    title=current['name'],
-                    link=current['url'],
-                    desc=sep.join(filter(None, [current['publisher'], current['tags']])),
-                    date_str=current['date'],
-                    guid=current['url'],
-                ))
-            current = {'name': stripped[3:], 'publisher': '', 'date': '', 'tags': '', 'url': ''}
-        elif stripped.startswith('- ') and current:
-            key, _, value = stripped[2:].partition(':')
-            key, value = key.strip(), value.strip()
-            if key in ('publisher', 'date', 'tags', 'url'):
-                current[key] = value
-    if current:
+    for a in parse_articles(articles_md)[1]:
         entries.append(_feed_item(
-            title=current['name'],
-            link=current['url'],
-            desc=sep.join(filter(None, [current['publisher'], current['tags']])),
-            date_str=current['date'],
-            guid=current['url'],
+            title=a['name'],
+            link=a['url'],
+            desc=sep.join(filter(None, [a['publisher'], a['tags']])),
+            date_str=a['date'],
+            guid=a['url'],
         ))
 
     # --- Projects ---
@@ -1272,27 +1270,14 @@ def render_feed(articles_md, project_mds, lately_archive_md, playground_md, site
         ))
 
     # --- Playground ---
-    for line in playground_md.strip().split('\n'):
-        s = line.strip()
-        if '|' not in s or s.startswith('#'):
-            continue
-        parts = [p.strip() for p in s.split('|', 3)]
-        if len(parts) < 3:
-            continue
-        m = _LINK_RE.match(parts[0])
-        if not m:
-            continue
-        name, url = m.group(1), m.group(2)
-        img_file = parts[1]
-        desc = parts[2]
-        year = parts[3] if len(parts) == 4 else ''
+    for c in parse_playground(playground_md)[1]:
         entries.append(_feed_item(
-            title=f'{_label(labels, "feed-playground")}: {name}',
-            link=url,
-            desc=desc,
-            date_str=year,
-            guid=url,
-            image_url=_abs_url(f'/assets/playground/{img_file}', site_url),
+            title=f'{_label(labels, "feed-playground")}: {c["name"]}',
+            link=c['url'],
+            desc=c['desc'],
+            date_str=c['year'],
+            guid=c['url'],
+            image_url=_abs_url(f'/assets/playground/{c["img"]}', site_url),
         ))
 
     # Sort newest first
@@ -1354,7 +1339,7 @@ def render_page(template, css, js, meta_html, footer_html, body_html, active_nav
     html = html.replace('{{footer}}', footer_html)
     # Label placeholders land in text and attribute values, so they're escaped.
     for placeholder, key in (
-        ('toast_email_copied', 'email-copied'), ('season_info', 'season-info'),
+        ('toast_email_copied', 'email-copied'), ('toast_email_failed', 'email-copy-failed'), ('season_info', 'season-info'),
         ('feed_title', 'feed-title'), ('label_skip', 'skip-to-content'),
         ('label_home', 'nav-home'), ('label_accent', 'change-accent'),
         ('label_email', 'copy-email'), ('label_dark', 'toggle-dark'),
@@ -1466,17 +1451,9 @@ def check_content(project_mds, playground_md):
                 label = f'[{slug}]' if slug else '[project]'
                 warnings.append(f'Warning: missing asset {label}: {src}')
 
-    for line in playground_md.strip().split('\n'):
-        s = line.strip()
-        if '|' not in s or s.startswith('#'):
-            continue
-        parts = [p.strip() for p in s.split('|', 3)]
-        if len(parts) < 2:
-            continue
-        img_file = parts[1]
-        path = BASE / 'assets' / 'playground' / img_file
-        if not path.exists():
-            warnings.append(f'Warning: missing playground asset: assets/playground/{img_file}')
+    for c in parse_playground(playground_md)[1]:
+        if not (BASE / 'assets' / 'playground' / c['img']).exists():
+            warnings.append(f'Warning: missing playground asset: assets/playground/{c["img"]}')
 
     for w in warnings:
         print(w)
@@ -1613,7 +1590,11 @@ def build():
 
     # Generate static favicon
     accent = SEASON_COLORS[month - 1]
-    generate_favicon(accent, BASE / 'assets' / 'favicon.png')
+    favicon_path = BASE / 'assets' / 'favicon.png'
+    favicon_key = hashlib.sha256(inspect.getsource(generate_favicon).encode()).hexdigest()
+    if not favicon_path.exists() or cache.get('favicon') != favicon_key:
+        generate_favicon(favicon_path)
+        cache['favicon'] = favicon_key
 
     # Generate per-page OG images (work, play, each project) — built fresh every run
     # so they always match current content, unlike home's precomputed monthly set.
@@ -1727,7 +1708,7 @@ def generate_monthly_assets():
 
 
 def optimize_images():
-    """Convert all PNG/JPG/JPEG in assets/ to WebP, delete the originals, and repoint content.
+    """Convert all PNG/JPG/JPEG/GIF in assets/ to WebP (animated GIFs stay animated, and stay GIFs when WebP would be larger), delete the originals, and repoint content.
 
     Skips: assets/monthly/ (source OG images), assets/fonts/, assets/og/, favicon.png.
     Already-WebP files are ignored, and an image whose .webp name is already taken is left
@@ -1739,7 +1720,7 @@ def optimize_images():
 
     SKIP_FILES = {'favicon.png', 'og-image.png'}
     SKIP_DIRS = {'monthly', 'fonts', 'og'}
-    EXTENSIONS = {'.png', '.jpg', '.jpeg'}
+    EXTENSIONS = {'.png', '.jpg', '.jpeg', '.gif'}
     TARGET_W = 1200
     QUALITY = 82
 
@@ -1762,22 +1743,18 @@ def optimize_images():
         if out.exists():
             print(f'Skipping {src.relative_to(BASE)}: {out.name} already exists')
             continue
-        img = ImageOps.exif_transpose(Image.open(src))
-        # Flatten alpha to white
-        if img.mode in ('RGBA', 'LA', 'P'):
-            img = img.convert('RGBA')  # P and LA carry their transparency into the alpha channel
-            bg = Image.new('RGB', img.size, (255, 255, 255))
-            bg.paste(img, mask=img.split()[-1])
-            img = bg
-        elif img.mode != 'RGB':
-            img = img.convert('RGB')
-
-        # Downscale if wider than target
-        w, h = img.size
-        if w > TARGET_W:
-            img = img.resize((TARGET_W, round(h * TARGET_W / w)), Image.LANCZOS)
-
-        img.save(out, 'WEBP', quality=QUALITY, method=6)
+        source = Image.open(src)
+        if getattr(source, 'is_animated', False):
+            _save_animated_webp(source, out, TARGET_W, QUALITY)
+            if out.stat().st_size >= src.stat().st_size:
+                # Flat-colour GIF animations often compress better as GIF than as lossy WebP
+                source.close()
+                out.unlink()
+                print(f'Skipping {src.relative_to(BASE)}: animated WebP would be larger ({src.stat().st_size / 1024:.0f}KB GIF kept)')
+                continue
+        else:
+            _save_still_webp(ImageOps.exif_transpose(source), out, TARGET_W, QUALITY)
+        source.close()
         orig_kb = src.stat().st_size / 1024
         new_kb = out.stat().st_size / 1024
         src.unlink()
@@ -1787,6 +1764,40 @@ def optimize_images():
 
     _repoint_images(converted)
     print('Done — all images optimised.')
+
+
+def _flatten_to_rgb(img):
+    """RGB copy of img with any transparency flattened onto white."""
+    from PIL import Image
+    if img.mode in ('RGBA', 'LA', 'P'):
+        img = img.convert('RGBA')  # P and LA carry their transparency into the alpha channel
+        bg = Image.new('RGB', img.size, (255, 255, 255))
+        bg.paste(img, mask=img.split()[-1])
+        return bg
+    return img if img.mode == 'RGB' else img.convert('RGB')
+
+
+def _fit_width(img, target_w):
+    from PIL import Image
+    w, h = img.size
+    return img.resize((target_w, round(h * target_w / w)), Image.LANCZOS) if w > target_w else img
+
+
+def _save_still_webp(img, out, target_w, quality):
+    _fit_width(_flatten_to_rgb(img), target_w).save(out, 'WEBP', quality=quality, method=6)
+
+
+def _save_animated_webp(source, out, target_w, quality):
+    """Re-encode every frame of an animated image into one animated WebP, keeping frame timing and looping."""
+    from PIL import ImageSequence
+    frames, durations = [], []
+    for frame in ImageSequence.Iterator(source):
+        durations.append(frame.info.get('duration', 100))
+        frames.append(_fit_width(_flatten_to_rgb(frame.copy()), target_w))
+    frames[0].save(
+        out, 'WEBP', save_all=True, append_images=frames[1:], duration=durations,
+        loop=source.info.get('loop', 0), quality=quality, method=6,
+    )
 
 
 def _repoint_images(converted):

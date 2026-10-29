@@ -75,7 +75,7 @@ dist/            ← generated output, git-tracked, committed with source
 
 ### Key helpers
 
-`parse_kv_list`, `parse_meta(md)` (splits meta.md into site-wide dict + per-page dict), `parse_heading_tagline(md)` (hero.md's `# heading` + tagline format), `parse_labels`, `slugify`, `_BOLD_RE`, `_apply_span()`, `apply_highlight`, `apply_name`, `escape`, `render_inline` (bold + italic + links → HTML, escaped), `_link_parts(raw)` (lately/feed value → display text + first URL), `_valid_projects(mds)` (drops projects with no or duplicate slug), `_og_image(cache, …)` (cached OG generation), `_domain_text(url)` (strips the protocol for the OG image domain label), `_abs_url(src, site_url)`, `_project_fields(md)` (slug/org/problem/year — replaces the old `_project_slug`), `_project_order`.
+`parse_kv_list`, `parse_meta(md)` (splits meta.md into site-wide dict + per-page dict), `parse_heading_tagline(md)` (hero.md's `# heading` + tagline format), `parse_labels`, `slugify`, `_BOLD_RE`, `_apply_span()`, `apply_highlight`, `apply_name`, `escape`, `render_inline` (bold + italic + links → HTML, escaped), `_link_parts(raw)` (lately/feed value → display text + first URL), `_valid_projects(mds)` (drops projects with no, invalid or duplicate slug), `parse_articles(md)` / `parse_playground(md)` (the one parser each for page, feed and asset check), `_og_image(cache, …)` (cached OG generation), `_domain_text(url)` (strips the protocol for the OG image domain label), `_abs_url(src, site_url)`, `_project_fields(md)` (slug/org/problem/year — replaces the old `_project_slug`), `_project_order`.
 
 ### Template placeholders
 
@@ -188,7 +188,7 @@ All UI copy lives in `content/labels.md`. Keys are fixed; edit values only.
 | `visit-site` | aria-label on case study visit button |
 | `back-to-work` | Case study back link |
 | `show-more` | Articles expand button |
-| `email-copied` | Clipboard toast |
+| `email-copied`, `email-copy-failed` | Clipboard toast (success / failure) |
 | `season-info` | Season picker footnote |
 | `feed-title` | RSS feed title |
 | `skip-to-content`, `nav-home`, `change-accent`, `copy-email`, `toggle-dark` | Skip link text and aria-labels in `template.html` |
@@ -334,7 +334,7 @@ Each `python3 build.py` run:
 
 1. Downloads a subsetted `MaterialSymbolsSharp.woff2` (~25KB) from Google Fonts — only when the file is missing or `ICON_NAMES` changed (tracked in `.build-cache.json`)
 2. Copies the current month's home OG image from `assets/monthly/`
-3. Generates `favicon.png` (requires Pillow)
+3. Generates `favicon.png` (requires Pillow) — only when it's missing or the drawing code changed
 4. Generates work/play/each-project's OG image into `assets/og/` (requires Pillow), skipping any whose inputs (text, accent, font, drawing code) match `.build-cache.json` — see [OG images](#og-images)
 5. Renders all pages from markdown content, each with its own `<title>`/meta tags
 6. Inlines minified CSS + JS into each HTML file
@@ -344,7 +344,7 @@ Each `python3 build.py` run:
 
 `.build-cache.json` is committed so CI and local builds agree on what's up to date. A rebuild with unchanged content rewrites nothing, including `feed.xml` (its `lastBuildDate` is the newest entry's date, not the wall clock).
 
-Flags: `--gen-monthly` regenerates all 12 seasonal home OG images (into `assets/monthly/`); `--optimize-images` converts PNG/JPG in `assets/` to WebP in-place, applying EXIF rotation, leaving any file whose `.webp` name is already taken, and repointing references in `content/**/*.md` (skips `assets/og/`, `assets/monthly/`, fonts).
+Flags: `--gen-monthly` regenerates all 12 seasonal home OG images (into `assets/monthly/`); `--optimize-images` converts PNG/JPG/GIF in `assets/` to WebP in-place (an animated GIF is converted only if the animated WebP is smaller — the project GIFs aren't, so they stay GIFs), applying EXIF rotation, leaving any file whose `.webp` name is already taken, and repointing references in `content/**/*.md` (skips `assets/og/`, `assets/monthly/`, fonts).
 
 ## Live data
 
