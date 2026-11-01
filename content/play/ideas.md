@@ -29,3 +29,4 @@
 - [Anurag Minus Verma](https://www.anuragminusverma.com)
 - [Quanta Magazine](https://www.quantamagazine.org)
 - [David Squires](https://www.dsquires.net)
+- [Joanna Stern](https://thenewthings.com)
