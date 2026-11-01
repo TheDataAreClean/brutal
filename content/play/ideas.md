@@ -22,3 +22,7 @@
 - [Platformer](https://www.platformer.news)
 - [The Verge](https://www.theverge.com)
 - [3Blue1Brown](https://www.3blue1brown.com)
+- [Saturday Morning Breakfast Cereal](https://www.smbc-comics.com)
+- [xkcd](https://xkcd.com)
+- [PhD Comics](https://phdcomics.com)
+- [Design Thinking Comic](https://designthinkingcomic.substack.com)
