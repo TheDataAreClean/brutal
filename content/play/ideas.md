@@ -17,3 +17,8 @@
 - [Thoraya](https://www.youtube.com/@Thorayaa)
 - [Meghnad S](https://www.youtube.com/@meghnerd)
 - [Laura Kampf](https://www.youtube.com/@laurakampf)
+- [Stratechery](https://stratechery.com)
+- [Daring Fireball](https://daringfireball.net)
+- [Platformer](https://www.platformer.news)
+- [The Verge](https://www.theverge.com)
+- [3Blue1Brown](https://www.3blue1brown.com)
