@@ -26,3 +26,6 @@
 - [xkcd](https://xkcd.com)
 - [PhD Comics](https://phdcomics.com)
 - [Design Thinking Comic](https://designthinkingcomic.substack.com)
+- [Anurag Minus Verma](https://www.anuragminusverma.com)
+- [Quanta Magazine](https://www.quantamagazine.org)
+- [David Squires](https://www.dsquires.net)
