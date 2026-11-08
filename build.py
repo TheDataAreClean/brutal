@@ -950,7 +950,7 @@ def render_interests(md):
 
 
 def render_rolodex(md, labels):
-    """Parse ideas.md into a hidden list, JS picks 5 random on each load.
+    """Parse ideas.md into a hidden list, JS picks one random link per category on each load.
 
     A `<!-- category name | icon_name -->` comment starts a category: the links below it carry
     that icon (and the category name as its tooltip). Links above the first one have no icon.
@@ -987,8 +987,9 @@ def render_rolodex(md, labels):
         '    <div class="rolodex" id="rolodex"></div>\n'
         f'    <script>!function(){{var items={items_json};'
         'function shuffle(){var el=document.getElementById("rolodex");el.textContent="";'
-        'var a=items.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}'
-        'a.slice(0,5).forEach(function(item){'
+        'var g={},a=[];items.forEach(function(it){var k=it.category;(g[k]=g[k]||(a.push(k),[])).push(it);});'
+        'a=a.map(function(k){return g[k][Math.floor(Math.random()*g[k].length)];});'
+        'a.forEach(function(item){'
         'var link=document.createElement("a");link.className="rolodex-item";'
         'link.href=item.url;link.target="_blank";link.rel="noopener";'
         'if(item.icon){var ic=document.createElement("span");ic.className="rolodex-icon material-symbols-sharp";'
