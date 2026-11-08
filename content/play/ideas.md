@@ -41,3 +41,8 @@
 - [Laura Kampf](https://www.youtube.com/@laurakampf)
 - [Thoraya](https://www.youtube.com/@Thorayaa)
 - [Meghnad S](https://www.youtube.com/@meghnerd)
+
+<!-- friends -->
+- [Ankur Sethi](https://ankursethi.com/)
+- [Tanvi Bhakta](https://tanvibhakta.in/)
+- [Jatan Mehta](https://jatan.space/)
