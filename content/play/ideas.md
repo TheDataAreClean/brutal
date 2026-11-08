@@ -47,3 +47,5 @@
 - [Tanvi Bhakta](https://tanvibhakta.in/)
 - [Jatan Mehta](https://jatan.space/)
 - [Kashvi Bansal](https://kashvibansal.blog/)
+- [Gurman Bhatia](https://gurmanbhatia.com/)
+- [Amit Kapoor](https://amitkaps.com/)
