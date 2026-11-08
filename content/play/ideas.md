@@ -46,3 +46,4 @@
 - [Ankur Sethi](https://ankursethi.com/)
 - [Tanvi Bhakta](https://tanvibhakta.in/)
 - [Jatan Mehta](https://jatan.space/)
+- [Kashvi Bansal](https://kashvibansal.blog/)
