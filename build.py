@@ -87,6 +87,7 @@ ICON_NAMES = [
     'keyboard_arrow_down', 'light_mode', 'mail', 'menu_book', 'movie',
     'pedal_bike', 'photo_camera', 'place', 'refresh', 'school',
     'skillet', 'sports_esports',
+    'bar_chart', 'devices', 'group', 'handyman', 'lightbulb', 'mood', 'science',
 ]
 
 
@@ -96,6 +97,7 @@ _NUM_LIST_RE = re.compile(r'^\d+\.\s+')
 _SECTION_HDG_RE = re.compile(r'^(#{2,4})(\s|$)')
 _IMG_RE = re.compile(r'^!\[([^\]]*)\]\(([^)]+)\)$')
 # [text](url) — url may contain one level of balanced parens, e.g. Wikipedia's Foo_(bar)
+_ROLODEX_CATEGORY_RE = re.compile(r'^<!--\s*(.+?)\s*\|\s*([a-z0-9_]+)\s*-->$')
 _LINK_RE = re.compile(r'\[(.+?)\]\(((?:[^()\s]|\([^()\s]*\))+)\)')
 
 
@@ -948,17 +950,27 @@ def render_interests(md):
 
 
 def render_rolodex(md, labels):
-    """Parse ideas.md into a hidden list, JS picks 5 random on each load."""
+    """Parse ideas.md into a hidden list, JS picks 5 random on each load.
+
+    A `<!-- category name | icon_name -->` comment starts a category: the links below it carry
+    that icon (and the category name as its tooltip). Links above the first one have no icon.
+    """
     title = ''
     items = []
+    category = icon = ''
     for line in md.strip().split('\n'):
         stripped = line.strip()
         if stripped.startswith('# '):
             title = stripped[2:]
+        elif stripped.startswith('<!--'):
+            c = _ROLODEX_CATEGORY_RE.match(stripped)
+            if c:
+                category, icon = c.group(1), c.group(2)
         elif stripped.startswith('- '):
             m = _LINK_RE.match(stripped[2:].strip())
             if m:
-                items.append({'name': m.group(1), 'url': _safe_href(m.group(2))})
+                items.append({'name': m.group(1), 'url': _safe_href(m.group(2)),
+                              'category': category, 'icon': icon})
 
     title = apply_highlight(title)
     # '<' escaped so a name containing '</script>' can't close the inline script block
@@ -979,6 +991,8 @@ def render_rolodex(md, labels):
         'a.slice(0,5).forEach(function(item){'
         'var link=document.createElement("a");link.className="rolodex-item";'
         'link.href=item.url;link.target="_blank";link.rel="noopener";'
+        'if(item.icon){var ic=document.createElement("span");ic.className="rolodex-icon material-symbols-sharp";'
+        'ic.textContent=item.icon;ic.title=item.category;ic.setAttribute("aria-hidden","true");link.appendChild(ic);}'
         'var name=document.createElement("span");name.className="rolodex-name";name.textContent=item.name;'
         'var arrow=document.createElement("span");arrow.className="rolodex-arrow";'
         'arrow.innerHTML=\'<span class="material-symbols-sharp">arrow_outward</span>\';'

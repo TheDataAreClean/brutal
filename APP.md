@@ -174,6 +174,8 @@ Available keys: `read`, `listened`, `watched`, `cooked`, `explored`, `played`, `
 
 In `content/play/ideas.md`, add `[name](url)` bullet entries. 5 random items are shown per visit with a shuffle button.
 
+Group entries under a `<!-- category name | icon_name -->` comment. Every link below it shows that Material Symbols icon on its card, with the category name as a tooltip. `icon_name` must be in `ICON_NAMES` in `build.py`. Links above the first comment have no icon.
+
 ### Interests
 
 In `content/play/interests.md`, add plain-text tags as a flat list. Rendered as a tag cloud.
