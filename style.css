@@ -1061,6 +1061,7 @@
         border-color: var(--accent);
       }
 
+      .rolodex-item:hover .rolodex-icon,
       .rolodex-item:hover .rolodex-arrow {
         color: var(--on-accent);
       }
@@ -1070,6 +1071,12 @@
       font-size: var(--text-small);
       font-weight: 700;
       line-height: 1.4;
+    }
+
+    .rolodex-icon {
+      color: var(--accent);
+      font-size: var(--icon-sz);
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 16;
     }
 
     .rolodex-arrow {
@@ -1255,6 +1262,7 @@
         border-color: var(--accent);
       }
 
+      .rolodex-item:active .rolodex-icon,
       .rolodex-item:active .rolodex-arrow {
         color: var(--on-accent);
       }

@@ -6,6 +6,8 @@ Reverse-chronological. Versioning: **major** = redesign · **minor** = new featu
 
 ## UNRELEASED
 
+- Rolodex: links grouped by theme (`<!-- category | icon -->` comments in `ideas.md`), each card shows its category icon; 20+ new links including a friends section
+
 ---
 
 ## v4.3.0 — 2026-10-29

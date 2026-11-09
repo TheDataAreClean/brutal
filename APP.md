@@ -63,7 +63,7 @@ dist/            ← generated output, git-tracked, committed with source
 | `render_articles(md, labels)` | articles.md | 3-col grid + show-more |
 | `render_lately(md, labels)` | lately.md | activity list |
 | `render_playground(md)` | playground.md | 2-col linked image card grid |
-| `render_rolodex(md)` | ideas.md | randomised link list |
+| `render_rolodex(md)` | ideas.md | one random link per category |
 | `render_interests(md)` | interests.md | tag cloud |
 | `render_project_page(md, labels)` | projects/*.md | case study page |
 | `render_feed(articles_md, project_mds, lately_archive_md, playground_md, site_url, site_title, site_desc, labels)` | articles + projects + lately-archive + playground | RSS 2.0 XML |
@@ -98,7 +98,7 @@ dist/            ← generated output, git-tracked, committed with source
 |---|---|
 | `/` | Full-viewport hero |
 | `/work` | About, toolkit, project cards (3-col), articles (3-col, show-more) |
-| `/play` | Lately, playground (2-col), rolodex (5 random), interests |
+| `/play` | Lately, playground (2-col), rolodex (1 per category), interests |
 | `/work/<slug>/` | Case study: problem as h1, meta, tags, sections, back link |
 | `/feed.xml` | RSS 2.0 — articles, projects, lately archive, playground |
 
@@ -172,7 +172,9 @@ Available keys: `read`, `listened`, `watched`, `cooked`, `explored`, `played`, `
 
 ### Rolodex
 
-In `content/play/ideas.md`, add `[name](url)` bullet entries. 5 random items are shown per visit with a shuffle button.
+In `content/play/ideas.md`, add `[name](url)` bullet entries. One random item per category is shown per visit, with a shuffle button.
+
+Group entries under a `<!-- category name | icon_name -->` comment. Every link below it shows that Material Symbols icon on its card, with the category name as a tooltip. `icon_name` must be in `ICON_NAMES` in `build.py`. Links above the first comment have no icon.
 
 ### Interests
 
