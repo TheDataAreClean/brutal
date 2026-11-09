@@ -6,7 +6,11 @@ Reverse-chronological. Versioning: **major** = redesign · **minor** = new featu
 
 ## UNRELEASED
 
-- Rolodex: links grouped by theme (`<!-- category | icon -->` comments in `ideas.md`), each card shows its category icon; 20+ new links including a friends section
+---
+
+## v4.4.0 — 2026-11-09
+
+- Rolodex: links grouped by theme (`<!-- category | icon -->` comments in `ideas.md`), each card shows its category icon and the rolodex shows one random link per category; section retitled "people i endorse"; 20+ new links including a friends section
 
 ---
 
