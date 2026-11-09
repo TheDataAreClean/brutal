@@ -1,4 +1,4 @@
-# **people** i keep coming back to
+# **people** i endorse
 
 <!-- data & visualisation | bar_chart -->
 - [The Pudding](https://pudding.cool)
