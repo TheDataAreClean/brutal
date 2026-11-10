@@ -46,7 +46,7 @@
 - [Jonathan Wilson](https://www.theguardian.com/profile/jonathanwilson)
 - [David Squires](https://www.theguardian.com/profile/david-squires)
 - [Rory Smith](https://observer.co.uk/contributor/rory-smith)
-- [Tifo](https://youtube.com/@tifo)
+- [Tifo Football](https://youtube.com/@tifo)
 - [Libero](https://www.liberopodcast.com/)
 
 <!-- friends | group -->
