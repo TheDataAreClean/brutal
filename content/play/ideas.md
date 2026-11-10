@@ -45,7 +45,10 @@
 <!-- news & information | newspaper -->
 - [Newslaundry](https://www.newslaundry.com)
 - [Puliyabaazi](https://puliyabaazi.in)
+- [Scroll](https://scroll.in)
+- [The Caravan](https://caravanmagazine.in)
 - [The Daily Brief](https://thedailybrief.zerodha.com)
+- [The Economist](https://www.economist.com)
 - [The Ken](https://the-ken.com)
 - [The News Minute](https://www.thenewsminute.com)
 
