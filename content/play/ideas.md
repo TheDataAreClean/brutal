@@ -12,9 +12,11 @@
 
 <!-- data & visualisation | bar_chart -->
 - [Diagram Chasing](https://diagramchasing.fun/)
+- [Duncan Geere](https://klimat.studio)
 - [Flowing Data](https://flowingdata.com)
+- [Gabrielle Mérite](https://www.instagram.com/gab.md/)
 - [Giorgia Lupi](https://giorgialupi.com)
-- [Nadieh Bremer](https://www.visualcinnamon.com)
+- [Mona Chalabi](https://monachalabi.com)
 - [Our World in Data](https://ourworldindata.org)
 - [Revisual Labs](https://revisual.co/)
 - [The Pudding](https://pudding.cool)
