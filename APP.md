@@ -294,7 +294,6 @@ Non-obvious implementation details, each fixing a real visual bug hit along the 
 
 | Token | Value | Use |
 |---|---|---|
-| `--space-xl` | clamp(64px, 10vh, 120px) | page intro top, hero bottom |
 | `--space-lg` | clamp(48px, 7vh, 80px) | between sections, footer |
 | `--space-md` | clamp(24px, 3vw, 40px) | title-to-content, inner gaps |
 | `--space-xs` | 4px | tight gaps (detail list rows), thin scrollbar |
@@ -306,7 +305,7 @@ Non-obvious implementation details, each fixing a real visual bug hit along the 
 | `--bar-pad` | 20px | top/bottom padding inside top-bar and nav |
 | `--btn-pad-x` | 16px | horizontal padding in text bar-boxes |
 | `--inner-gap` | 8px | tight gap within component items |
-| `--padding` | clamp(24px, 5vw, 64px) | horizontal page margin |
+| `--padding` | clamp(24px, 5vw, 64px) | horizontal page margin, hero/intro bottom |
 
 ### Icons
 

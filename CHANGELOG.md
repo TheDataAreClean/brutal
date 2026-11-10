@@ -6,6 +6,7 @@ Reverse-chronological. Versioning: **major** = redesign · **minor** = new featu
 
 ## UNRELEASED
 
+- Landing text on home, work, play and project pages sits closer to the box bottom: bottom spacing now matches the side spacing (`--padding`); unused `--space-xl` token removed
 ---
 
 ## v4.4.1 — 2026-11-10
