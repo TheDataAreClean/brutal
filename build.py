@@ -1395,6 +1395,10 @@ def render_page(template, css, js, meta_html, footer_html, body_html, active_nav
 
     # Inline minified CSS (rewrite url(assets/...) for subpages)
     minified_css = minify_css(css)
+    # Icon font keeps one filename, so a content hash in the URL stops browsers/CDNs serving a stale subset
+    if ICON_FONT_PATH.exists():
+        font_v = hashlib.sha256(ICON_FONT_PATH.read_bytes()).hexdigest()[:8]
+        minified_css = minified_css.replace('MaterialSymbolsSharp.woff2)', f'MaterialSymbolsSharp.woff2?v={font_v})')
     if prefix:
         minified_css = minified_css.replace('url(assets/', f'url({prefix}assets/')
     html = html.replace(
