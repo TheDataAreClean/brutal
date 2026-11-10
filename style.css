@@ -46,7 +46,6 @@
      *
      * SPACING
      *
-     *   --space-xl : clamp(64px, 10vh, 120px) — page intro top, hero bottom
      *   --space-lg : clamp(48px, 7vh, 80px)   — between sections, footer
      *   --space-md : clamp(24px, 3vw, 40px)   — title→content, inner gaps
      *   --space-sm : 12px                     — box gap (alias --box-gap)
@@ -55,7 +54,7 @@
      *   Mobile:  12 → 24 → 48 → 64
      *   Desktop: 12 → 40 → 80 → 120
      *
-     *   --padding   : clamp(24px, 5vw, 64px) — horizontal page margin
+     *   --padding   : clamp(24px, 5vw, 64px) — horizontal page margin, hero/intro bottom
      *   --box-pad   : 12px 16px              — padding inside boxes
      *   --tag-pad   : 2px 8px                — padding inside pill tags
      *   --tag-gap   : 6px                    — gap between tags in a group
@@ -99,7 +98,6 @@
       --accent: var(--accent-light);
       --accent-light: #7d4abf;
       --accent-dark: #a878d8;
-      --space-xl: clamp(64px, 10vh, 120px);
       --space-lg: clamp(48px, 7vh, 80px);
       --space-md: clamp(24px, 3vw, 40px);
       --space-sm: 12px;
@@ -438,12 +436,12 @@
 
     /* ---- HERO ---- */
     .hero {
-      min-height: calc(100% + 2 * var(--box-gap)); /* fill .content-box incl. its padding; % not vh, since vh can exceed the real viewport in in-app browsers */
+      min-height: calc(100% + var(--box-gap)); /* end flush with the .content-box border (offsets its top padding); % not vh, since vh can exceed the real viewport in in-app browsers */
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
       padding: 0 var(--padding);
-      padding-bottom: var(--space-xl);
+      padding-bottom: var(--padding);
     }
 
     .hero h1 {
@@ -464,12 +462,12 @@
 
     /* ---- PAGE INTRO ---- */
     .page-intro {
-      min-height: calc(100% + 2 * var(--box-gap)); /* fill .content-box incl. its padding; % not vh, since vh can exceed the real viewport in in-app browsers */
+      min-height: calc(100% + var(--box-gap)); /* end flush with the .content-box border (offsets its top padding); % not vh, since vh can exceed the real viewport in in-app browsers */
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
       padding: 0 var(--padding);
-      padding-bottom: var(--space-xl);
+      padding-bottom: var(--padding);
     }
 
     .page-intro .tagline {
@@ -479,12 +477,12 @@
 
     /* ---- PROJECT DETAIL HEADER ---- */
     .project-header {
-      min-height: calc(100% + 2 * var(--box-gap)); /* fill .content-box incl. its padding; % not vh, since vh can exceed the real viewport in in-app browsers */
+      min-height: calc(100% + var(--box-gap)); /* end flush with the .content-box border (offsets its top padding); % not vh, since vh can exceed the real viewport in in-app browsers */
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
       padding: 0 var(--padding);
-      padding-bottom: var(--space-xl);
+      padding-bottom: var(--padding);
       gap: var(--space-sm);
     }
 

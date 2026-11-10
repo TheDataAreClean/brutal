@@ -60,7 +60,6 @@
       --accent: var(--accent-light);
       --accent-light: #7d4abf;
       --accent-dark: #a878d8;
-      --space-xl: clamp(64px, 10vh, 120px);
       --space-lg: clamp(48px, 7vh, 80px);
       --space-md: clamp(24px, 3vw, 40px);
       --space-sm: 12px;
@@ -345,12 +344,12 @@
       opacity: 1;
     }
     .hero {
-      min-height: calc(100% + 2 * var(--box-gap));
+      min-height: calc(100% + var(--box-gap));
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
       padding: 0 var(--padding);
-      padding-bottom: var(--space-xl);
+      padding-bottom: var(--padding);
     }
     .hero h1 {
       font-size: var(--text-display);
@@ -366,24 +365,24 @@
       margin-top: var(--space-md);
     }
     .page-intro {
-      min-height: calc(100% + 2 * var(--box-gap));
+      min-height: calc(100% + var(--box-gap));
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
       padding: 0 var(--padding);
-      padding-bottom: var(--space-xl);
+      padding-bottom: var(--padding);
     }
     .page-intro .tagline {
       font-size: var(--text-heading);
       max-width: none;
     }
     .project-header {
-      min-height: calc(100% + 2 * var(--box-gap));
+      min-height: calc(100% + var(--box-gap));
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
       padding: 0 var(--padding);
-      padding-bottom: var(--space-xl);
+      padding-bottom: var(--padding);
       gap: var(--space-sm);
     }
     .project-problem-heading {
