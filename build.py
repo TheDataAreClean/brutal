@@ -88,6 +88,7 @@ ICON_NAMES = [
     'pedal_bike', 'photo_camera', 'place', 'refresh', 'school',
     'skillet', 'sports_esports',
     'bar_chart', 'devices', 'group', 'handyman', 'lightbulb', 'mood', 'science',
+    'sports',
 ]
 
 

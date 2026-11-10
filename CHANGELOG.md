@@ -6,6 +6,8 @@ Reverse-chronological. Versioning: **major** = redesign · **minor** = new featu
 
 ## UNRELEASED
 
+- Rolodex: sports category (`sports` icon) added to `ideas.md`; hidden until it has links
+
 ---
 
 ## v4.4.2 — 2026-11-10
