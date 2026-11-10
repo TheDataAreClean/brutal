@@ -6,7 +6,12 @@ Reverse-chronological. Versioning: **major** = redesign · **minor** = new featu
 
 ## UNRELEASED
 
-- Rolodex: sports category (`sports_soccer` icon) with 5 links; news & information category (`newspaper` icon, 8 links); more comics and science links; categories and links sorted alphabetically
+---
+
+## v4.5.0 — 2026-11-10
+
+- Rolodex: new sports (`sports_soccer` icon, 5 links) and news & information (`newspaper` icon, 8 links) categories; more comics, science and data & visualisation links; categories and links sorted alphabetically
+- Fix: icon font URL carries a content hash (`?v=`), so browsers and CDNs can't keep serving an older icon subset after icons are added
 
 ---
 
