@@ -6,6 +6,7 @@ Reverse-chronological. Versioning: **major** = redesign · **minor** = new featu
 
 ## UNRELEASED
 
+- Fix: landing text on home, work, play and project pages could sit below the visible box in some iOS in-app browsers (e.g. Lens); hero heights now fill the content box instead of using `100vh`
 - Rolodex: links grouped by theme (`<!-- category | icon -->` comments in `ideas.md`), each card shows its category icon; 20+ new links including a friends section
 
 ---
