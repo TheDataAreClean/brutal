@@ -12,9 +12,9 @@
 
 <!-- data & visualisation | bar_chart -->
 - [Diagram Chasing](https://diagramchasing.fun/)
-- [Duncan Geere](https://klimat.studio)
+- [Duncan Geere](https://www.duncangeere.com/)
 - [Flowing Data](https://flowingdata.com)
-- [Gabrielle Mérite](https://www.instagram.com/gab.md/)
+- [Gabrielle Mérite](https://www.gabriellemerite.com/)
 - [Giorgia Lupi](https://giorgialupi.com)
 - [Mona Chalabi](https://monachalabi.com)
 - [Our World in Data](https://ourworldindata.org)
