@@ -6,6 +6,8 @@ Reverse-chronological. Versioning: **major** = redesign · **minor** = new featu
 
 ## UNRELEASED
 
+- Rolodex: sports category (`sports_soccer` icon) with 5 links; news & information category (`newspaper` icon, 8 links); more comics and science links; categories and links sorted alphabetically
+
 ---
 
 ## v4.4.2 — 2026-11-10
