@@ -6,7 +6,7 @@ Reverse-chronological. Versioning: **major** = redesign · **minor** = new featu
 
 ## UNRELEASED
 
-- Rolodex: sports category (`sports` icon) with 5 links
+- Rolodex: sports category (`sports_soccer` icon) with 5 links; categories and links sorted alphabetically
 
 ---
 
