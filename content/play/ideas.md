@@ -3,7 +3,10 @@
 <!-- comics | mood -->
 - [David Squires](https://www.dsquires.net)
 - [Design Thinking Comic](https://designthinkingcomic.substack.com)
+- [PenPencilDraw](https://www.instagram.com/penpencildraw/)
 - [PhD Comics](https://phdcomics.com)
+- [Sanitary Panels](https://sanitarypanels.com)
+- [Sarah Andersen](https://www.sarahcandersen.com)
 - [Saturday Morning Breakfast Cereal](https://www.smbc-comics.com)
 - [xkcd](https://xkcd.com)
 
@@ -39,9 +42,18 @@
 - [Simone Giertz](https://www.youtube.com/@simonegiertz)
 - [Thoraya](https://www.youtube.com/@Thorayaa)
 
+<!-- news & information | newspaper -->
+- [Newslaundry](https://www.newslaundry.com)
+- [Puliyabaazi](https://puliyabaazi.in)
+- [The Daily Brief](https://thedailybrief.zerodha.com)
+- [The Ken](https://the-ken.com)
+- [The News Minute](https://www.thenewsminute.com)
+
 <!-- science & maths | science -->
 - [3Blue1Brown](https://www.3blue1brown.com)
+- [Numberphile](https://www.youtube.com/@numberphile)
 - [Quanta Magazine](https://www.quantamagazine.org)
+- [Veritasium](https://www.youtube.com/@veritasium)
 
 <!-- sports | sports_soccer -->
 - [David Squires](https://www.theguardian.com/profile/david-squires)
