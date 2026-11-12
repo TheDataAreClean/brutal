@@ -789,7 +789,7 @@ def render_footer(footer_md, labels):
         f'      <span>{location}</span>\n'
         '      <span id="local-time">--:--</span>\n'
         '      <span id="temperature">--</span>\n'
-        f'      <span>{escape(_label(labels, "aqi"))} <span id="aqi">--</span></span>\n'
+        f'      <span class="footer-aqi">{escape(_label(labels, "aqi"))} <span id="aqi">--</span></span>\n'
         '    </div>\n'
         '\n'
         '    <div class="footer-bottom">\n'
@@ -1229,7 +1229,7 @@ def _token_items(items):
     return [(k.strip(), v.strip()) for k, _, v in (i.partition(':') for i in items)]
 
 
-_SAMPLE_RE = re.compile(r'(?m)^<!--\s*(project|article|lately|rolodex|playground|tags|tagline)\s*-->\s*$')
+_SAMPLE_RE = re.compile(r'(?m)^<!--\s*(project|article|lately|rolodex|playground|tags|tagline|footer)\s*-->\s*$')
 
 
 def parse_samples(md):
@@ -1246,6 +1246,7 @@ def parse_samples(md):
         'playground': parse_playground(get('playground'))[1],
         'toolkit': [l.strip()[2:].strip() for l in get('tags').splitlines() if l.strip().startswith('- ')],
         'intro': get('tagline').strip(),
+        'footer': get('footer'),
     }
 
 
@@ -1376,6 +1377,10 @@ def style_blocks(css, template, labels, demo):
         playground = demo['playground'][0] if demo['playground'] else None
         project_tags = ''.join(f'<span class="tag">{escape(t.strip())}</span>'
                                for t in (project['tags'] if project else '').split(',') if t.strip())
+        # The footer's live ids and values are filled by script.js on the real footer; the demo shows fixed ones
+        footer_specimen = render_footer(demo['footer'], labels) if demo['footer'].strip() else ''
+        for fid, sample in (('local-time', '12:00 pm IST'), ('temperature', '24°C'), ('aqi', '42')):
+            footer_specimen = re.sub(rf'<span id="{fid}">[^<]*</span>', f'<span>{sample}</span>', footer_specimen)
         specimens = {
             'bar-box': (
                 f'<button type="button" class="bar-box" aria-label="{lb("copy-email")}"><span class="material-symbols-sharp">mail</span></button>'
@@ -1387,6 +1392,7 @@ def style_blocks(css, template, labels, demo):
             'toast': f'<div class="toast visible">{lb("email-copied")}</div>',
             'tag': f'<span class="tags">{project_tags}</span>',
             'tag-lg': ''.join(f'<span class="tag-lg">{escape(t)}</span>' for t in demo['toolkit']),
+            'footer': footer_specimen,
             'name': f'<p class="tagline">{apply_name(demo["intro"])}</p>',
             'project': f'<div class="projects">\n{_project_card(project, project["url"] or "#")}\n</div>' if project else '',
             'article': f'<div class="articles">\n{_article_card(article)}\n</div>' if article else '',

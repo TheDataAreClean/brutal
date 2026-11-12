@@ -102,3 +102,4 @@ Everything you can click is a bordered box. On hover it fills with the accent, i
 - lately-item: one thing from the lately list
 - rolodex-item: one random link from a category
 - playground-card: an outside project, with a preview
+- footer: the first row is live info, values in accent and not clickable; the second row is buttons, the whole box is the link

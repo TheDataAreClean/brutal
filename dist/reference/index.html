@@ -890,6 +890,11 @@
     .style-specimen-demo > .rolodex {
       margin-top: 0;
     }
+    .style-specimen-demo > .footer-meta,
+    .style-specimen-demo > .footer-bottom {
+      margin-top: 0;
+      flex: 1 1 100%;
+    }
     .style-specimen-demo > .tagline {
       font-size: var(--text-heading);
     }
@@ -1096,15 +1101,41 @@
       line-height: 1.4;
       letter-spacing: var(--ls-label);
     }
-    .footer-meta a,
+    .footer-meta > span,
+    .footer-meta .footer-aqi > span {
+      color: var(--accent);
+    }
+    .footer-meta > .footer-aqi {
+      color: var(--black);
+    }
+    .footer-bottom > span {
+      position: relative;
+    }
     .footer-bottom a {
       color: var(--accent);
       text-decoration: none;
     }
+    .footer-bottom a::after {
+      content: '';
+      position: absolute;
+      inset: -1px;
+    }
+    .footer-meta a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .footer-bottom > span:has(a:focus-visible) {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
     @media (hover: hover) {
-      .footer-meta a:hover,
-      .footer-bottom a:hover {
-        text-decoration: underline;
+      .footer-bottom > span:has(a):hover {
+        background: var(--accent);
+        color: var(--on-accent);
+        border-color: var(--accent);
+      }
+      .footer-bottom > span:has(a):hover a {
+        color: var(--on-accent);
       }
     }
     .footer-bottom {
@@ -1227,6 +1258,14 @@
       }
       .rolodex-item:active .rolodex-icon,
       .rolodex-item:active .rolodex-arrow {
+        color: var(--on-accent);
+      }
+      .footer-bottom > span:has(a):active {
+        background: var(--accent);
+        color: var(--on-accent);
+        border-color: var(--accent);
+      }
+      .footer-bottom > span:has(a):active a {
         color: var(--on-accent);
       }
       .style-season:active {
@@ -1486,7 +1525,7 @@ an optional subtitle line.
       <span>Bengaluru, India</span>
       <span id="local-time">--:--</span>
       <span id="temperature">--</span>
-      <span>AQI <span id="aqi">--</span></span>
+      <span class="footer-aqi">AQI <span id="aqi">--</span></span>
     </div>
 
     <div class="footer-bottom">

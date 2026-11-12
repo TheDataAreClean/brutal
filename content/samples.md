@@ -32,3 +32,9 @@ Generic sample content for the component demos on the style page. Each part is w
 
 <!-- tagline -->
 a sample tagline with an **accent** word.
+
+<!-- footer -->
+- location: Sample City
+- designed: designed by [a sample designer](https://example.com/)
+- developed: developed using [a sample tool](https://example.com/)
+- license: [CC BY](https://creativecommons.org/licenses/by/4.0/) · 2025

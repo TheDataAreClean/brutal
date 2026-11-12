@@ -361,9 +361,11 @@ Material Symbols `opsz` in `font-variation-settings` must match the rendered `fo
 
 ### Hover pattern
 
-All bordered interactive elements (`.bar-box`, `.project`, `.article`, `.lately-item`, `.rolodex-item`, `.playground-card`, `.nav-link-box`, `.season-option`, `.style-season`) use: `background: var(--accent)`, `color: var(--on-accent)`, `border-color: var(--accent)`. Always inside `@media (hover: hover)`. On touch screens the same fill shows on `:active`.
+All bordered interactive elements (`.bar-box`, `.project`, `.article`, `.lately-item`, `.rolodex-item`, `.playground-card`, `.nav-link-box`, `.season-option`, `.style-season`, footer buttons) use: `background: var(--accent)`, `color: var(--on-accent)`, `border-color: var(--accent)`. Always inside `@media (hover: hover)`. On touch screens the same fill shows on `:active`.
 
-Intentional exceptions: the season picker square (`.nav-logo-season`) swaps to `--white` on hover, since it sits on an accent fill; `.season-option` shows its fill for the active season as well as on hover; footer links are not boxes, so they underline on hover instead.
+Intentional exceptions: the season picker square (`.nav-logo-season`) swaps to `--white` on hover, since it sits on an accent fill; `.season-option` shows its fill for the active season as well as on hover; the footer's first row is static info (live values in accent, no hover).
+
+Footer buttons (second row): each box is one link stretched over the whole box (`a::after`), and follows the standard hover and `:active` fill.
 
 ## Build pipeline
 

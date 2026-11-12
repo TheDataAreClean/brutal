@@ -11,6 +11,7 @@ Reverse-chronological. Versioning: **major** = redesign · **minor** = new featu
 - Tags consolidated into two styles: `.tag` (inside cards) and `.tag-lg` (standalone, now also used for case study header tags); replaces `project-tag`, `article-tag`, `offering-tag`, `interest-tag`
 - Case study sections now support ``` code blocks and `inline code`
 - New tokens: `--opacity-muted`, `--measure-prose`, `--measure-tagline`, `--font-sans`, `--font-mono`
+- Footer: live values (location, time, temperature, AQI) in accent; credit and licence boxes are whole-box buttons with the standard hover fill
 - Docs: tag sizes and line heights corrected; intentional hover exceptions written down
 
 ---
