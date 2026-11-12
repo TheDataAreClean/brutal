@@ -600,8 +600,8 @@ def render_projects(heading_md, project_mds, labels):
     )
 
 
-def _project_card(p):
-    """One project grid card, from _project_fields() output."""
+def _project_card(p, href=None):
+    """One project grid card, from _project_fields() output. `href` overrides the case study link."""
     problem = escape(p['problem'])
     year_html = (
         f' <span class="project-year">{escape(p["year"])}</span>'
@@ -616,7 +616,7 @@ def _project_card(p):
         if tag_spans:
             tags_html = f'\n        <span class="project-tags">{tag_spans}</span>'
     return (
-        f'      <a class="project" href="{{{{nav_root}}}}work/{p["slug"]}/">\n'
+        f'      <a class="project" href="{escape(href) if href else f"{{{{nav_root}}}}work/{p['slug']}/"}">\n'
         f'        <p class="project-problem">{problem}</p>\n'
         f'        <span class="project-meta"><span class="project-org">{escape(p["org"])}</span>{year_html}</span>{tags_html}\n'
         f'      </a>'
@@ -869,13 +869,13 @@ def fetch_icon_font(cache):
         print(f'Warning: icon font download failed ({e}), keeping existing file.')
 
 
-def _playground_card(c):
-    """One playground card, from parse_playground() output. Images come from assets/playground/."""
+def _playground_card(c, img_dir='assets/playground/'):
+    """One playground card, from parse_playground() output. Images come from `img_dir`."""
     year_html = f'          <span class="playground-card-year">{escape(c["year"])}</span>\n' if c['year'] else ''
     return (
         f'      <a class="playground-card" href="{escape(c["url"])}" target="_blank" rel="noopener" aria-label="{escape(c["name"])}">\n'
         f'        <div class="playground-card-img">\n'
-        f'          <img src="{{{{nav_root}}}}assets/playground/{escape(c["img"])}" alt="{escape(c["name"])}" loading="lazy">\n'
+        f'          <img src="{{{{nav_root}}}}{img_dir}{escape(c["img"])}" alt="{escape(c["name"])}" loading="lazy">\n'
         f'        </div>\n'
         f'        <div class="playground-card-body">\n'
         f'          <div class="playground-card-header">\n'
@@ -1229,13 +1229,33 @@ def _token_items(items):
     return [(k.strip(), v.strip()) for k, _, v in (i.partition(':') for i in items)]
 
 
+_SAMPLE_RE = re.compile(r'(?m)^<!--\s*(project|article|lately|rolodex|playground|tags|tagline)\s*-->\s*$')
+
+
+def parse_samples(md):
+    """Split content/samples.md on its `<!-- name -->` markers and parse each part with the parser
+    its real file uses, so the style page's specimens show generic content in the real formats."""
+    parts = _SAMPLE_RE.split(md)
+    chunks = {parts[i]: parts[i + 1] for i in range(1, len(parts) - 1, 2)}
+    get = lambda k: chunks.get(k, '')
+    return {
+        'projects': [_project_fields(get('project'))] if get('project').strip() else [],
+        'articles': parse_articles(get('article'))[1],
+        'lately': parse_lately(get('lately'))[1],
+        'rolodex': parse_rolodex(get('rolodex'))[1],
+        'playground': parse_playground(get('playground'))[1],
+        'toolkit': [l.strip()[2:].strip() for l in get('tags').splitlines() if l.strip().startswith('- ')],
+        'intro': get('tagline').strip(),
+    }
+
+
 def style_blocks(css, template, labels, demo):
     """Generated blocks for the style page (content/style.md), keyed by directive name.
 
     Every value comes from style.css (:root and the dark-mode rule), template.html (font weights)
     or build.py (SEASONS, ICON_NAMES), so the page can't drift from the real thing. Copy (notes,
-    sample text, headings) stays in style.md and labels.md. `demo` holds the real content the
-    component specimens are drawn from.
+    sample text, headings) stays in style.md and labels.md. `demo` holds the sample content
+    (parse_samples) the component specimens are drawn from.
     """
     light = parse_css_tokens(css, ':root')
     dark = parse_css_tokens(css, '[data-theme="dark"]')
@@ -1367,13 +1387,13 @@ def style_blocks(css, template, labels, demo):
             'toast': f'<div class="toast visible">{lb("email-copied")}</div>',
             'project-tag': (
                 f'<span class="project-tags">{project_tags}</span>'
-                + ''.join(f'<span class="offering-tag">{escape(t)}</span>' for t in demo['toolkit'][:2])),
+                + ''.join(f'<span class="offering-tag">{escape(t)}</span>' for t in demo['toolkit'])),
             'name': f'<p class="tagline">{apply_name(demo["intro"])}</p>',
-            'project': f'<div class="projects">\n{_project_card(project)}\n</div>' if project else '',
+            'project': f'<div class="projects">\n{_project_card(project, project["url"] or "#")}\n</div>' if project else '',
             'article': f'<div class="articles">\n{_article_card(article)}\n</div>' if article else '',
             'lately-item': f'<div class="lately-list">\n{lately}\n</div>' if lately else '',
             'rolodex-item': f'<div class="rolodex">\n{_rolodex_item(rolodex)}\n</div>' if rolodex else '',
-            'playground-card': f'<div class="playground-grid">\n{_playground_card(playground)}\n</div>' if playground else '',
+            'playground-card': f'<div class="playground-grid">\n{_playground_card(playground, "assets/samples/")}\n</div>' if playground else '',
         }
         parts = []
         for key, note in _token_items(items):
@@ -1889,15 +1909,9 @@ def build():
 
     work_body = render_work_body(work_intro_md, about_md, toolkit_md, projects_heading_md, project_mds, articles_md, labels)
 
-    # Reference and style pages: the style page's specimens are drawn from real content
+    # Reference and style pages: the style page's specimens are drawn from content/samples.md
     reference_body = render_doc_page(reference_md)
-    demo = {
-        'projects': project_fields, 'articles': parse_articles(articles_md)[1],
-        'lately': parse_lately(lately_md)[1], 'rolodex': parse_rolodex(ideas_md)[1],
-        'playground': parse_playground(playground_md)[1],
-        'toolkit': [l.strip()[2:].strip() for l in toolkit_md.splitlines() if l.strip().startswith('- ')],
-        'intro': work_intro_md.strip(),
-    }
+    demo = parse_samples(read(CONTENT / 'samples.md'))
     style_body = render_doc_page(style_md, style_blocks(css, template, labels, demo))
 
     project_pages = [

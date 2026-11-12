@@ -1300,9 +1300,9 @@
   <section class="project-section">
     <h2 class="section-title">inline text</h2>
     <div class="project-detail-text doc-text">
-    <p>Text can be <strong>bold</strong> or <em>italic</em>. Links look like <a href="https://thedataareclean.com" target="_blank" rel="noopener">this</a> and open in a new tab, while links to a page on this site, like the <a href="/style/">style</a> page, open in the same one. File names and keys are written as <code>inline code</code>.</p>
+    <p>Text can be <strong>bold</strong> or <em>italic</em>. Links look like <a href="https://example.com/" target="_blank" rel="noopener">this</a> and open in a new tab, while links to a page on this site, like the <a href="/style/">style</a> page, open in the same one. File names and keys are written as <code>inline code</code>.</p>
     <pre class="code-block"><code>Text can be **bold** or *italic*.
-Links look like [this](https://thedataareclean.com).
+Links look like [this](https://example.com/).
 Links to a page on this site, like the [style](/style/) page, open in the same tab.
 File names and keys are written as `inline code`.</code></pre>
     <p>Bold, italic and links work in case study paragraphs and lists, team lists and the footer. Everywhere else, text is shown as written.</p>
@@ -1313,9 +1313,9 @@ File names and keys are written as `inline code`.</code></pre>
     <h2 class="section-title">accent words</h2>
     <div class="project-detail-text doc-text">
     <p>In headings and taglines, <code>**bold**</code> turns a word the accent colour instead of making it bold, like the heading at the top of this page. A <code>&lt;br&gt;</code> forces a line break.</p>
-    <pre class="code-block"><code># hello, i am **arpit** !
-during **play**,&lt;br&gt;i do **whatever i want**.
-# **toolkit** at work</code></pre>
+    <pre class="code-block"><code># hello, i am **sam** !
+a first line,&lt;br&gt;then a second with an **accent** word.
+# **section** title</code></pre>
     <p>This works in the hero, the page intros, every section title and the <code>heading</code> lines in <code>meta.md</code>, which are also drawn on the share images.</p>
     </div>
   </section>
@@ -1326,9 +1326,9 @@ during **play**,&lt;br&gt;i do **whatever i want**.
     <p>Each <code>##</code> heading starts a section, shown as a small accent label like the ones on this page. A <code>###</code> heading is a sub-heading inside it.</p>
     <h3 class="project-subheading">this is a sub-heading</h3>
     <p>The smallest heading level in a file becomes the section level, and one level deeper becomes a sub-heading. A section with nothing in it is skipped.</p>
-    <pre class="code-block"><code>## what i did
+    <pre class="code-block"><code>## approach
 
-### research</code></pre>
+### first step</code></pre>
     </div>
   </section>
 
@@ -1361,10 +1361,10 @@ Blank lines between them are optional and ignored.</code></pre>
     <div class="project-detail-text doc-text">
     <p>An image sits on its own line. The text in the brackets is its caption and alt text; leave it empty for no caption.</p>
     <figure class="project-figure">
-      <img src="/assets/projects/dfi-folders.webp" alt="Data For India&#x27;s folders, a caption sits under the image." loading="lazy">
-      <figcaption class="project-figcaption">Data For India&#x27;s folders, a caption sits under the image.</figcaption>
+      <img src="/assets/samples/placeholder.svg" alt="A caption sits under the image." loading="lazy">
+      <figcaption class="project-figcaption">A caption sits under the image.</figcaption>
     </figure>
-    <pre class="code-block"><code>![A caption sits under the image.](/assets/projects/dfi-folders.webp)</code></pre>
+    <pre class="code-block"><code>![A caption sits under the image.](/assets/projects/sample.webp)</code></pre>
     <p>Two images in a row stack flush, with no gap between them. Images live in <code>assets/</code> and must be WebP: run <code>python3 build.py --optimize-images</code> after adding a PNG or JPG. The build warns about any case study image it can&#x27;t find.</p>
     </div>
   </section>
@@ -1392,22 +1392,23 @@ python3 build.py --gen-monthly</code></pre>
     <div class="project-detail-text doc-text">
     <p>Each project is one file in <code>content/work/projects/</code>. The lines before the first <code>##</code> heading fill the project card and the top of its page; everything after is the case study, written with the elements above.</p>
     <pre class="code-block"><code>&lt;!-- CARD --&gt;
-- problem: How do you measure which interventions work?
-- org: Udhyam Vyapaar
-- year: 2022–2024
-- tags: monitoring &amp; evaluation, product, impact
+- problem: How might a small library understand what its readers need?
+- org: Sample Studio
+- year: 2024–2025
+- tags: research, design, data
 
 &lt;!-- IDENTITY --&gt;
-- url: https://www.udhyam.org/vyapaar
-- slug: vyapaar-mne
-- added: Apr 2026
+- url: https://example.com/
+- slug: sample-studio
+- added: Jan 2025
 
 &lt;!-- CASE STUDY --&gt;
 ## overview
-Udhyam Vyapaar works with nano-entrepreneurs across India.
+Sample Studio helps small libraries plan their collections.
 
 ## team
-- Arpit Arora, Senior Manager, Monitoring and Evaluation</code></pre>
+- [Sam Example](https://example.com/), Lead Researcher
+- Alex Sample, Designer</code></pre>
     <ul class="project-detail-list">
       <li><strong>problem</strong> is the heading on the card, the page and the share image.</li>
       <li><strong>org</strong> and <strong>year</strong> sit under it. A project with no org is skipped.</li>
@@ -1422,11 +1423,11 @@ Udhyam Vyapaar works with nano-entrepreneurs across India.
     <h2 class="section-title">articles</h2>
     <div class="project-detail-text doc-text">
     <p>Published writing lives in <code>content/work/articles.md</code>, newest first. The first six show, and a button reveals the rest.</p>
-    <pre class="code-block"><code>## Visualising data for social development
-- publisher: infogr8
-- date: Apr 2024
-- tags: data viz, social impact, interview
-- url: https://infogr8.com/arpit-arora-on-visualising-data-for-social-development/</code></pre>
+    <pre class="code-block"><code>## A field guide to reading charts
+- publisher: The Sample Review
+- date: Jan 2025
+- tags: data viz, essay
+- url: https://example.com/</code></pre>
     </div>
   </section>
 
@@ -1434,7 +1435,7 @@ Udhyam Vyapaar works with nano-entrepreneurs across India.
     <h2 class="section-title">playground</h2>
     <div class="project-detail-text doc-text">
     <p>Each playground card is one line in <code>content/play/playground.md</code>: a link, an image from <code>assets/playground/</code>, a one-line description, and an optional year, split by <code>|</code>.</p>
-    <pre class="code-block"><code>[musings](https://musings.thedataareclean.com) | musings.webp | a place for my thoughts and ideas. | 2026</code></pre>
+    <pre class="code-block"><code>[sample project](https://example.com/) | sample.webp | a one-line description of the project. | 2025</code></pre>
     </div>
   </section>
 
@@ -1442,8 +1443,8 @@ Udhyam Vyapaar works with nano-entrepreneurs across India.
     <h2 class="section-title">lately</h2>
     <div class="project-detail-text doc-text">
     <p><code>content/play/lately.md</code> holds one line per activity. A link makes the row clickable, plain text shows it unlinked, and an empty value hides the row.</p>
-    <pre class="code-block"><code>- read: [The Once and Future Riot](https://www.goodreads.com/book/show/222376500)
-- listened: Decoder, The Verge
+    <pre class="code-block"><code>- read: [A Book About Maps](https://example.com/)
+- listened: A Sample Podcast
 - watched:</code></pre>
     <p>The keys are read, listened, watched, cooked, explored, played, built, learned, ran, cycled, photographed, brewed, visited and wrote. Each one&#x27;s icon is fixed, and the verb shown beside it is set in <code>labels.md</code>. Changed rows are logged to <code>lately-archive.md</code> on every commit, which feeds the RSS feed.</p>
     </div>
@@ -1454,8 +1455,8 @@ Udhyam Vyapaar works with nano-entrepreneurs across India.
     <div class="project-detail-text doc-text">
     <p><code>content/play/ideas.md</code> groups links into categories. A comment names each category and its icon, and one random link per category shows on each visit.</p>
     <pre class="code-block"><code>&lt;!-- data &amp; visualisation | bar_chart --&gt;
-- [Flowing Data](https://flowingdata.com)
-- [Our World in Data](https://ourworldindata.org)</code></pre>
+- [A Sample Blog](https://example.com/)
+- [Another Sample Site](https://example.org/)</code></pre>
     <p>The icon must be one of the icons on the <a href="/style/">style</a> page. A new one has to be added to <code>ICON_NAMES</code> in <code>build.py</code> first.</p>
     </div>
   </section>
@@ -1464,11 +1465,11 @@ Udhyam Vyapaar works with nano-entrepreneurs across India.
     <h2 class="section-title">tags</h2>
     <div class="project-detail-text doc-text">
     <p>The toolkit (<code>content/work/toolkit.md</code>) and interests (<code>content/play/interests.md</code>) are plain lists, one tag per line. In interests, a line between the heading and the list becomes a subtitle.</p>
-    <pre class="code-block"><code># **other** things
-i am curious about, in no particular order.
+    <pre class="code-block"><code># **section** title
+an optional subtitle line.
 
-- walking
-- squirrels</code></pre>
+- first tag
+- second tag</code></pre>
     </div>
   </section>
 
@@ -1488,7 +1489,7 @@ i am curious about, in no particular order.
   <section class="project-section">
     <h2 class="section-title">this page and style</h2>
     <div class="project-detail-text doc-text">
-    <p>This page is <code>content/reference.md</code>, written with the elements above. The <a href="/style/">style</a> page is <code>content/style.md</code>, where a comment like <code>&lt;!-- type | sample text --&gt;</code> inserts a generated block, such as the type scale, with the lines below it as notes. Its values are read from <code>style.css</code> and <code>build.py</code> at build time.</p>
+    <p>This page is <code>content/reference.md</code>, written with the elements above. The <a href="/style/">style</a> page is <code>content/style.md</code>, where a comment like <code>&lt;!-- type | sample text --&gt;</code> inserts a generated block, such as the type scale, with the lines below it as notes. Its values are read from <code>style.css</code> and <code>build.py</code> at build time, and its component demos use the generic content in <code>content/samples.md</code>.</p>
     </div>
   </section>
 

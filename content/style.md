@@ -10,7 +10,7 @@ Everything is live: hover the components, switch to dark mode, or pick a season 
 
 One typeface for everything, loaded from Google Fonts in three weights. Code uses the system monospace.
 
-<!-- fonts | curious about everything, 0123456789 -->
+<!-- fonts | the quick brown fox jumps over the lazy dog, 0123456789 -->
 - font-sans: text, headings and interface. 400 by default, 500 for headings, 700 for names and labels.
 - font-mono: code on the reference page.
 
@@ -18,7 +18,7 @@ One typeface for everything, loaded from Google Fonts in three weights. Code use
 
 Six sizes on a minor-third scale. The four larger sizes are fluid: they grow with the screen between their mobile and desktop values.
 
-<!-- type | curious about everything -->
+<!-- type | the quick brown fox -->
 - text-display: hero heading
 - text-heading: page intros, section titles, case study heading
 - text-subhead: hero tagline
@@ -30,7 +30,7 @@ Six sizes on a minor-third scale. The four larger sizes are fluid: they grow wit
 
 Small text gets a little extra room. Line height is 1 for display, 1.05 for section titles, 1.4 for small text and 1.5 for everything else.
 
-<!-- tracking | curious about everything -->
+<!-- tracking | the quick brown fox jumps over the lazy dog -->
 - ls-ui: interface text at `--text-ui`: nav, buttons, tags
 - ls-label: small text at `--text-small`: meta, footer, captions
 
@@ -98,6 +98,6 @@ Everything you can click is a bordered box. On hover it fills with the accent, i
 - name: accent words in headings and taglines
 - project: a project card, linking to its case study
 - article: a published piece, linking out
-- lately-item: one thing i have been up to
+- lately-item: one thing from the lately list
 - rolodex-item: one random link from a category
 - playground-card: an outside project, with a preview

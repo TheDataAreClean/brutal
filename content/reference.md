@@ -10,11 +10,11 @@ For fonts, colours, spacing and components, see the [style](/style/) page.
 
 ## inline text
 
-Text can be **bold** or *italic*. Links look like [this](https://thedataareclean.com) and open in a new tab, while links to a page on this site, like the [style](/style/) page, open in the same one. File names and keys are written as `inline code`.
+Text can be **bold** or *italic*. Links look like [this](https://example.com/) and open in a new tab, while links to a page on this site, like the [style](/style/) page, open in the same one. File names and keys are written as `inline code`.
 
 ```
 Text can be **bold** or *italic*.
-Links look like [this](https://thedataareclean.com).
+Links look like [this](https://example.com/).
 Links to a page on this site, like the [style](/style/) page, open in the same tab.
 File names and keys are written as `inline code`.
 ```
@@ -26,9 +26,9 @@ Bold, italic and links work in case study paragraphs and lists, team lists and t
 In headings and taglines, `**bold**` turns a word the accent colour instead of making it bold, like the heading at the top of this page. A `<br>` forces a line break.
 
 ```
-# hello, i am **arpit** !
-during **play**,<br>i do **whatever i want**.
-# **toolkit** at work
+# hello, i am **sam** !
+a first line,<br>then a second with an **accent** word.
+# **section** title
 ```
 
 This works in the hero, the page intros, every section title and the `heading` lines in `meta.md`, which are also drawn on the share images.
@@ -42,9 +42,9 @@ Each `##` heading starts a section, shown as a small accent label like the ones 
 The smallest heading level in a file becomes the section level, and one level deeper becomes a sub-heading. A section with nothing in it is skipped.
 
 ```
-## what i did
+## approach
 
-### research
+### first step
 ```
 
 ## paragraphs
@@ -74,10 +74,10 @@ Blank lines between them are optional and ignored.
 
 An image sits on its own line. The text in the brackets is its caption and alt text; leave it empty for no caption.
 
-![Data For India's folders, a caption sits under the image.](/assets/projects/dfi-folders.webp)
+![A caption sits under the image.](/assets/samples/placeholder.svg)
 
 ```
-![A caption sits under the image.](/assets/projects/dfi-folders.webp)
+![A caption sits under the image.](/assets/projects/sample.webp)
 ```
 
 Two images in a row stack flush, with no gap between them. Images live in `assets/` and must be WebP: run `python3 build.py --optimize-images` after adding a PNG or JPG. The build warns about any case study image it can't find.
@@ -106,22 +106,23 @@ Each project is one file in `content/work/projects/`. The lines before the first
 
 ```
 <!-- CARD -->
-- problem: How do you measure which interventions work?
-- org: Udhyam Vyapaar
-- year: 2022–2024
-- tags: monitoring & evaluation, product, impact
+- problem: How might a small library understand what its readers need?
+- org: Sample Studio
+- year: 2024–2025
+- tags: research, design, data
 
 <!-- IDENTITY -->
-- url: https://www.udhyam.org/vyapaar
-- slug: vyapaar-mne
-- added: Apr 2026
+- url: https://example.com/
+- slug: sample-studio
+- added: Jan 2025
 
 <!-- CASE STUDY -->
 ## overview
-Udhyam Vyapaar works with nano-entrepreneurs across India.
+Sample Studio helps small libraries plan their collections.
 
 ## team
-- Arpit Arora, Senior Manager, Monitoring and Evaluation
+- [Sam Example](https://example.com/), Lead Researcher
+- Alex Sample, Designer
 ```
 
 - **problem** is the heading on the card, the page and the share image.
@@ -135,11 +136,11 @@ Udhyam Vyapaar works with nano-entrepreneurs across India.
 Published writing lives in `content/work/articles.md`, newest first. The first six show, and a button reveals the rest.
 
 ```
-## Visualising data for social development
-- publisher: infogr8
-- date: Apr 2024
-- tags: data viz, social impact, interview
-- url: https://infogr8.com/arpit-arora-on-visualising-data-for-social-development/
+## A field guide to reading charts
+- publisher: The Sample Review
+- date: Jan 2025
+- tags: data viz, essay
+- url: https://example.com/
 ```
 
 ## playground
@@ -147,7 +148,7 @@ Published writing lives in `content/work/articles.md`, newest first. The first s
 Each playground card is one line in `content/play/playground.md`: a link, an image from `assets/playground/`, a one-line description, and an optional year, split by `|`.
 
 ```
-[musings](https://musings.thedataareclean.com) | musings.webp | a place for my thoughts and ideas. | 2026
+[sample project](https://example.com/) | sample.webp | a one-line description of the project. | 2025
 ```
 
 ## lately
@@ -155,8 +156,8 @@ Each playground card is one line in `content/play/playground.md`: a link, an ima
 `content/play/lately.md` holds one line per activity. A link makes the row clickable, plain text shows it unlinked, and an empty value hides the row.
 
 ```
-- read: [The Once and Future Riot](https://www.goodreads.com/book/show/222376500)
-- listened: Decoder, The Verge
+- read: [A Book About Maps](https://example.com/)
+- listened: A Sample Podcast
 - watched:
 ```
 
@@ -168,8 +169,8 @@ The keys are read, listened, watched, cooked, explored, played, built, learned, 
 
 ```
 <!-- data & visualisation | bar_chart -->
-- [Flowing Data](https://flowingdata.com)
-- [Our World in Data](https://ourworldindata.org)
+- [A Sample Blog](https://example.com/)
+- [Another Sample Site](https://example.org/)
 ```
 
 The icon must be one of the icons on the [style](/style/) page. A new one has to be added to `ICON_NAMES` in `build.py` first.
@@ -179,11 +180,11 @@ The icon must be one of the icons on the [style](/style/) page. A new one has to
 The toolkit (`content/work/toolkit.md`) and interests (`content/play/interests.md`) are plain lists, one tag per line. In interests, a line between the heading and the list becomes a subtitle.
 
 ```
-# **other** things
-i am curious about, in no particular order.
+# **section** title
+an optional subtitle line.
 
-- walking
-- squirrels
+- first tag
+- second tag
 ```
 
 ## site text
@@ -196,4 +197,4 @@ i am curious about, in no particular order.
 
 ## this page and style
 
-This page is `content/reference.md`, written with the elements above. The [style](/style/) page is `content/style.md`, where a comment like `<!-- type | sample text -->` inserts a generated block, such as the type scale, with the lines below it as notes. Its values are read from `style.css` and `build.py` at build time.
+This page is `content/reference.md`, written with the elements above. The [style](/style/) page is `content/style.md`, where a comment like `<!-- type | sample text -->` inserts a generated block, such as the type scale, with the lines below it as notes. Its values are read from `style.css` and `build.py` at build time, and its component demos use the generic content in `content/samples.md`.
