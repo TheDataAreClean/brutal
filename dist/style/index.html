@@ -1,0 +1,1850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>style | thedataareclean</title>
+  <link rel="icon" type="image/png" href="../assets/favicon.png">
+  <meta name="description" content="the design tokens and components this site is built from.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="style | thedataareclean">
+  <meta property="og:description" content="the design tokens and components this site is built from.">
+  <meta property="og:url" content="https://thedataareclean.com/style/">
+  <meta property="og:image" content="https://thedataareclean.com/assets/og/style.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="style | thedataareclean">
+  <meta name="twitter:description" content="the design tokens and components this site is built from.">
+  <meta name="twitter:image" content="https://thedataareclean.com/assets/og/style.png">
+  <script>try{var t=sessionStorage.getItem('theme');if(!t&&matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700&display=swap" as="style">
+  <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="alternate" type="application/rss+xml" title="arpit&#x27;s universe" href="../feed.xml">
+  <style>
+    @font-face {
+      font-family: 'Material Symbols Sharp';
+      font-style: normal;
+      font-weight: 100 700;
+      font-display: block;
+      src: url(../assets/fonts/MaterialSymbolsSharp.woff2?v=6260ca18) format('woff2');
+    }
+    .material-symbols-sharp {
+      font-family: 'Material Symbols Sharp';
+      font-weight: normal;
+      font-style: normal;
+      font-size: var(--icon-sz-xl);
+      line-height: 1;
+      letter-spacing: normal;
+      text-transform: none;
+      display: inline-block;
+      white-space: nowrap;
+      word-wrap: normal;
+      direction: ltr;
+      font-feature-settings: 'liga';
+      -webkit-font-feature-settings: 'liga';
+      -webkit-font-smoothing: antialiased;
+    }
+    :root {
+      --font-sans: 'Schibsted Grotesk', sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      --black: #1a1a1a;
+      --white: #ffffff;
+      --on-accent: #ffffff;
+      --inner-gap: 8px;
+      --icon-sz: 16px;
+      --icon-sz-lg: 18px;
+      --icon-sz-xl: 24px;
+      --space-xs: 4px;
+      --nav-logo-sz: 14px;
+      --ls-ui: 1px;
+      --ls-label: 0.5px;
+      --accent: var(--accent-light);
+      --accent-light: #7d4abf;
+      --accent-dark: #a878d8;
+      --space-lg: clamp(48px, 7vh, 80px);
+      --space-md: clamp(24px, 3vw, 40px);
+      --space-sm: 12px;
+      --padding: clamp(24px, 5vw, 64px);
+      --box-gap: var(--space-sm);
+      --box-pad: 12px 16px;
+      --tag-pad: 2px 8px;
+      --tag-gap: 6px;
+      --bar-h: 40px;
+      --bar-pad: 20px;
+      --btn-pad-x: 16px;
+      --text-display: clamp(32px, 9vw, 128px);
+      --text-heading: clamp(24px, 4vw, 36px);
+      --text-subhead: clamp(18px, 2.5vw, 24px);
+      --text-body: clamp(15px, 1.3vw, 17px);
+      --text-small: 13px;
+      --text-ui: 11px;
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    ::selection {
+      background: var(--accent);
+      color: var(--on-accent);
+    }
+    body {
+      font-family: var(--font-sans);
+      font-weight: 400;
+      background: var(--white);
+      color: var(--black);
+    }
+    .highlight,
+    .name {
+      color: var(--accent);
+    }
+    [data-theme="dark"] {
+      --black: #ffffff;
+      --white: #000000;
+      --accent: var(--accent-dark);
+      --on-accent: #000000;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme]) {
+        --black: #ffffff;
+        --white: #000000;
+        --accent: var(--accent-dark);
+        --on-accent: #000000;
+      }
+      :root:not([data-theme]) .icon-sun { display: inline; }
+      :root:not([data-theme]) .icon-moon { display: none; }
+    }
+    .skip-to-content {
+      position: absolute;
+      top: -100%;
+      left: var(--padding);
+      background: var(--accent);
+      color: var(--on-accent);
+      padding: var(--box-pad);
+      font-size: var(--text-ui);
+      font-weight: 700;
+      letter-spacing: var(--ls-ui);
+      text-decoration: none;
+      z-index: 100;
+    }
+    .skip-to-content:focus {
+      top: 0;
+    }
+    .top-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--bar-pad) var(--padding) var(--box-gap);
+      background: var(--white);
+    }
+    .top-bar-center {
+      display: flex;
+      align-items: center;
+      gap: var(--box-gap);
+    }
+    .nav-logo-wrap {
+      position: relative;
+      width: var(--bar-h);
+      height: var(--bar-h);
+      background: var(--accent);
+    }
+    .nav-logo-home {
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: var(--nav-logo-sz);
+      cursor: pointer;
+    }
+    .nav-logo-season {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: var(--nav-logo-sz);
+      height: var(--nav-logo-sz);
+      background: var(--black);
+      border: none;
+      cursor: pointer;
+      padding: 0;
+    }
+    .nav-logo-season::after {
+      content: '';
+      position: absolute;
+      inset: calc((var(--nav-logo-sz) - var(--icon-sz-xl)) / 2);
+    }
+    @media (hover: hover) {
+      .nav-logo-season:hover {
+        background: var(--white);
+      }
+    }
+    .bar-box {
+      border: 1px solid var(--black);
+      width: var(--bar-h);
+      height: var(--bar-h);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+      text-decoration: none;
+      background: none;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    @media (hover: hover) {
+      .bar-box:hover {
+        background: var(--accent);
+        color: var(--on-accent);
+        border-color: var(--accent);
+      }
+    }
+    .bar-box .material-symbols-sharp {
+      font-size: var(--icon-sz-lg);
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 18;
+    }
+    .bar-box svg {
+      width: var(--icon-sz);
+      height: var(--icon-sz);
+      fill: currentColor;
+    }
+    .icon-sun { display: none; }
+    .icon-moon { display: inline; }
+    [data-theme="dark"] .icon-sun { display: inline; }
+    [data-theme="dark"] .icon-moon { display: none; }
+    .season-dropdown {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      margin-top: var(--inner-gap);
+      background: var(--black);
+      color: var(--white);
+      font-size: var(--text-ui);
+      letter-spacing: var(--ls-ui);
+      white-space: nowrap;
+      z-index: 20;
+    }
+    .season-dropdown.open {
+      display: block;
+    }
+    .season-option {
+      display: flex;
+      align-items: center;
+      gap: var(--inner-gap);
+      padding: var(--inner-gap);
+      cursor: pointer;
+      background: none;
+      border: none;
+      color: inherit;
+      font: inherit;
+      letter-spacing: inherit;
+      width: 100%;
+      text-align: left;
+    }
+    .season-option.active {
+      background: var(--accent);
+      color: var(--on-accent);
+    }
+    @media (hover: hover) {
+      .season-option:hover {
+        background: var(--accent);
+        color: var(--on-accent);
+      }
+    }
+    .season-swatch {
+      width: var(--nav-logo-sz);
+      height: var(--nav-logo-sz);
+      flex-shrink: 0;
+      background: var(--swatch-light);
+    }
+    [data-theme="dark"] .season-swatch {
+      background: var(--swatch-dark);
+    }
+    .season-info {
+      padding: var(--inner-gap);
+      opacity: 0.65;
+      border-top: 1px solid currentColor;
+      white-space: normal;
+    }
+    nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--box-gap) var(--padding) var(--bar-pad);
+      background: var(--white);
+    }
+    .nav-link-box {
+      border: 1px solid var(--black);
+      height: var(--bar-h);
+      display: inline-flex;
+      align-items: center;
+      padding: 0 var(--btn-pad-x);
+      font-size: var(--text-ui);
+      font-weight: 700;
+      letter-spacing: var(--ls-ui);
+      text-decoration: none;
+      color: var(--accent);
+    }
+    .nav-link-box.active {
+      background: var(--accent);
+      color: var(--on-accent);
+      border-color: var(--accent);
+      text-decoration: none;
+    }
+    @media (hover: hover) {
+      .nav-link-box:hover {
+        background: var(--accent);
+        color: var(--on-accent);
+        border-color: var(--accent);
+        text-decoration: none;
+      }
+    }
+    .content-box {
+      position: fixed;
+      top: calc(var(--bar-h) + var(--bar-pad) + 2 * var(--box-gap));
+      bottom: calc(var(--bar-h) + var(--bar-pad) + 2 * var(--box-gap));
+      left: var(--padding);
+      right: var(--padding);
+      border: 1px solid var(--black);
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--accent) transparent;
+      padding: var(--box-gap) 0;
+    }
+    .content-box::-webkit-scrollbar {
+      width: var(--space-xs);
+      background: transparent;
+    }
+    .content-box::-webkit-scrollbar-thumb {
+      background: var(--accent);
+    }
+    .toast {
+      height: var(--bar-h);
+      display: flex;
+      align-items: center;
+      background: var(--accent);
+      color: var(--on-accent);
+      font-size: var(--text-ui);
+      font-weight: 700;
+      letter-spacing: var(--ls-ui);
+      padding: 0 var(--btn-pad-x);
+      opacity: 0;
+      pointer-events: none;
+    }
+    .toast.visible {
+      opacity: 1;
+    }
+    .hero {
+      min-height: calc(100% + var(--box-gap));
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 0 var(--padding);
+      padding-bottom: var(--padding);
+    }
+    .hero h1 {
+      font-size: var(--text-display);
+      line-height: 1;
+    }
+    .tagline {
+      font-size: var(--text-subhead);
+      color: var(--black);
+      max-width: 700px;
+      line-height: 1.5;
+    }
+    .hero .tagline {
+      margin-top: var(--space-md);
+    }
+    .page-intro {
+      min-height: calc(100% + var(--box-gap));
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 0 var(--padding);
+      padding-bottom: var(--padding);
+    }
+    .page-intro .tagline {
+      font-size: var(--text-heading);
+      max-width: none;
+    }
+    .project-header {
+      min-height: calc(100% + var(--box-gap));
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 0 var(--padding);
+      padding-bottom: var(--padding);
+      gap: var(--space-sm);
+    }
+    .project-problem-heading {
+      font-size: var(--text-heading);
+      font-weight: 500;
+      line-height: 1.3;
+    }
+    .project-detail-meta {
+      font-size: var(--text-body);
+      line-height: 1.5;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: var(--inner-gap);
+    }
+    .project-header-tags {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: var(--box-gap);
+    }
+    .project-header-tags .project-tag {
+      height: var(--bar-h);
+      display: inline-flex;
+      align-items: center;
+      padding: 0 var(--btn-pad-x);
+      font-size: var(--text-small);
+      letter-spacing: var(--ls-label);
+    }
+    .project-visit-btn.bar-box {
+      flex-shrink: 0;
+    }
+    .project-section {
+      padding-top: var(--space-md);
+      padding-bottom: 0;
+    }
+    .project-section .section-title {
+      font-size: var(--text-ui);
+      font-weight: 500;
+      letter-spacing: var(--ls-ui);
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: var(--space-sm);
+      line-height: 1.4;
+    }
+    .project-detail-text {
+      max-width: 68ch;
+    }
+    .project-back-section {
+      padding-top: var(--space-md);
+    }
+    section {
+      padding: var(--space-lg) var(--padding);
+    }
+    .section-title {
+      font-size: var(--text-heading);
+      font-weight: 500;
+      line-height: 1.05;
+      margin-bottom: var(--space-md);
+    }
+    .section-subtitle {
+      font-size: var(--text-body);
+      line-height: 1.5;
+      margin-top: calc(-1 * var(--space-md) + var(--btn-pad-x));
+      margin-bottom: var(--space-md);
+    }
+    .about-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-md);
+      align-items: start;
+    }
+    .about-content h2 {
+      font-size: var(--text-heading);
+      font-weight: 500;
+      line-height: 1.5;
+    }
+    .about-content h2 .thin {
+      display: block;
+    }
+    .about-text {
+      font-size: var(--text-body);
+      line-height: 1.5;
+      border: 1px solid var(--black);
+      padding: var(--box-pad);
+    }
+    .about-text p + p {
+      margin-top: var(--space-md);
+    }
+    .offerings {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--box-gap);
+    }
+    .offering-tag,
+    .interest-tag {
+      border: 1px solid var(--black);
+      padding: var(--box-pad);
+      font-size: var(--text-small);
+      line-height: 1.5;
+    }
+    .projects {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--box-gap);
+    }
+    .project {
+      border: 1px solid var(--black);
+      padding: var(--box-pad);
+      display: grid;
+      grid-template-rows: 1fr auto auto;
+      gap: var(--inner-gap);
+      text-decoration: none;
+      color: inherit;
+    }
+    @media (hover: hover) {
+      .project:hover {
+        background: var(--accent);
+        color: var(--on-accent);
+        border-color: var(--accent);
+      }
+      .project:hover .project-org {
+        color: var(--on-accent);
+      }
+      .project:hover .project-tag {
+        border-color: var(--on-accent);
+        color: var(--on-accent);
+      }
+    }
+    .project-problem {
+      font-size: var(--text-body);
+      font-weight: 700;
+      line-height: 1.5;
+    }
+    .project-meta {
+      display: flex;
+      align-items: center;
+      gap: var(--inner-gap);
+    }
+    .project-org {
+      font-size: var(--text-small);
+      letter-spacing: var(--ls-label);
+      color: var(--accent);
+      line-height: 1.4;
+    }
+    .project-year {
+      font-size: var(--text-small);
+      letter-spacing: var(--ls-label);
+      line-height: 1.4;
+    }
+    .project-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--tag-gap);
+    }
+    .project-tag {
+      font-size: var(--text-ui);
+      letter-spacing: var(--ls-ui);
+      border: 1px solid var(--black);
+      padding: var(--tag-pad);
+      line-height: 1.4;
+    }
+    .playground-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--box-gap);
+    }
+    .playground-card {
+      border: 1px solid var(--black);
+      display: flex;
+      flex-direction: column;
+      text-decoration: none;
+      color: inherit;
+      min-width: 0;
+    }
+    .playground-card-img {
+      padding: var(--box-pad);
+      padding-bottom: 0;
+    }
+    .playground-card-img img {
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      object-fit: cover;
+      display: block;
+    }
+    .playground-card-body {
+      padding: var(--box-pad);
+      display: flex;
+      flex-direction: column;
+      gap: var(--inner-gap);
+    }
+    .playground-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: var(--inner-gap);
+    }
+    .playground-card-name {
+      font-size: var(--text-body);
+      font-weight: 700;
+      line-height: 1.5;
+    }
+    .playground-card-arrow {
+      font-size: var(--icon-sz-lg);
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 18;
+      color: var(--accent);
+      flex-shrink: 0;
+      line-height: 1.5;
+    }
+    .playground-card-year {
+      font-size: var(--text-small);
+      line-height: 1.4;
+      letter-spacing: var(--ls-label);
+      color: var(--accent);
+    }
+    .playground-card-desc {
+      font-size: var(--text-small);
+      line-height: 1.4;
+    }
+    @media (hover: hover) {
+      .playground-card:hover {
+        background: var(--accent);
+        color: var(--on-accent);
+        border-color: var(--accent);
+      }
+      .playground-card:hover .playground-card-arrow,
+      .playground-card:hover .playground-card-year {
+        color: var(--on-accent);
+      }
+    }
+    .project-detail-text :is(p, li) a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .project-detail-text p {
+      font-size: var(--text-body);
+      line-height: 1.6;
+      margin-bottom: var(--space-sm);
+    }
+    .project-detail-text p:last-child {
+      margin-bottom: 0;
+    }
+    .project-detail-text p + .project-figure {
+      margin-top: 0;
+    }
+    .project-detail-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+      margin-bottom: var(--space-sm);
+    }
+    .project-detail-list li {
+      font-size: var(--text-body);
+      line-height: 1.6;
+      padding-left: var(--btn-pad-x);
+      position: relative;
+    }
+    .project-detail-list li::before {
+      content: '—';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+    }
+    .project-figure {
+      margin: var(--space-md) 0;
+      border: 1px solid var(--black);
+    }
+    .project-figure img {
+      width: 100%;
+      display: block;
+    }
+    .project-figcaption {
+      padding: var(--inner-gap) var(--box-gap);
+      font-size: var(--text-small);
+      letter-spacing: var(--ls-label);
+      border-top: 1px solid var(--black);
+    }
+    .project-figure + .project-figure {
+      margin-top: 0;
+    }
+    .project-subheading {
+      font-size: var(--text-ui);
+      font-weight: 500;
+      letter-spacing: var(--ls-ui);
+      text-transform: uppercase;
+      margin-top: var(--space-md);
+      margin-bottom: var(--space-sm);
+    }
+    .project-subheading:first-child {
+      margin-top: 0;
+    }
+    .project-highlights {
+      display: flex;
+      flex-direction: column;
+      gap: var(--inner-gap);
+    }
+    .project-highlight a {
+      font-size: var(--text-body);
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .project-back.bar-box {
+      width: fit-content;
+      padding: 0 var(--btn-pad-x);
+      font-size: var(--text-ui);
+      font-weight: 700;
+      letter-spacing: var(--ls-ui);
+    }
+    .project-detail-text code {
+      font-family: var(--font-mono);
+    }
+    .code-block {
+      border: 1px solid var(--black);
+      padding: var(--box-pad);
+      margin-bottom: var(--space-sm);
+      overflow-x: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--accent) transparent;
+      font-family: var(--font-sans);
+      font-size: var(--text-body);
+    }
+    .code-block code {
+      font-size: var(--text-small);
+      line-height: 1.6;
+    }
+    .doc-text {
+      max-width: none;
+    }
+    .doc-text > p,
+    .doc-text > ul,
+    .doc-text > pre,
+    .doc-text > .project-subheading,
+    .doc-text > .project-figure {
+      max-width: 68ch;
+    }
+    .style-tokens,
+    .style-specimens {
+      display: flex;
+      flex-direction: column;
+      gap: var(--box-gap);
+      margin-bottom: var(--space-sm);
+    }
+    .style-token {
+      border: 1px solid var(--black);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    }
+    .style-token-meta,
+    .style-specimen-meta {
+      padding: var(--box-pad);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+      font-size: var(--text-small);
+      letter-spacing: var(--ls-label);
+      line-height: 1.4;
+    }
+    .style-token-meta {
+      border-right: 1px solid var(--black);
+    }
+    .style-token-name {
+      font-family: var(--font-mono);
+      letter-spacing: normal;
+      color: var(--accent);
+    }
+    .style-token-note {
+      opacity: 0.65;
+    }
+    .style-token-preview {
+      padding: var(--box-pad);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      gap: var(--space-xs);
+      min-width: 0;
+      overflow: hidden;
+    }
+    .style-font-sample {
+      font-size: var(--text-subhead);
+      line-height: 1.5;
+    }
+    .style-type-sample {
+      line-height: 1.05;
+      overflow-wrap: anywhere;
+    }
+    .style-tracking-sample {
+      font-size: var(--text-small);
+      line-height: 1.4;
+    }
+    .style-swatch {
+      align-self: stretch;
+      min-height: var(--space-lg);
+      border: 1px solid var(--black);
+    }
+    .style-space-bar {
+      display: block;
+      height: var(--space-sm);
+      background: var(--accent);
+    }
+    .style-space-box {
+      display: inline-block;
+      background: var(--accent);
+    }
+    .style-space-box > span {
+      display: block;
+      width: var(--bar-h);
+      height: var(--bar-h);
+      background: var(--white);
+    }
+    .style-icon-sample {
+      color: var(--accent);
+    }
+    .style-square {
+      display: block;
+      background: var(--accent);
+    }
+    .style-seasons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--box-gap);
+      margin-bottom: var(--space-sm);
+    }
+    .style-season {
+      border: 1px solid var(--black);
+      background: none;
+      color: inherit;
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    .style-season-swatch {
+      height: var(--space-lg);
+      background: var(--swatch-light);
+      border-bottom: 1px solid var(--black);
+    }
+    [data-theme="dark"] .style-season-swatch {
+      background: var(--swatch-dark);
+    }
+    .style-season-meta {
+      padding: var(--box-pad);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+      font-size: var(--text-small);
+      letter-spacing: var(--ls-label);
+      line-height: 1.4;
+    }
+    .style-season-name {
+      font-weight: 700;
+    }
+    @media (hover: hover) {
+      .style-season:hover {
+        background: var(--accent);
+        color: var(--on-accent);
+        border-color: var(--accent);
+      }
+    }
+    .style-icons {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: var(--box-gap);
+      margin-bottom: var(--space-sm);
+    }
+    .style-icon {
+      border: 1px solid var(--black);
+      padding: var(--box-pad);
+      display: flex;
+      flex-direction: column;
+      gap: var(--inner-gap);
+      font-size: var(--text-ui);
+      letter-spacing: var(--ls-ui);
+      line-height: 1.4;
+      overflow-wrap: anywhere;
+    }
+    .style-icon .material-symbols-sharp {
+      color: var(--accent);
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .style-specimen {
+      border: 1px solid var(--black);
+    }
+    .style-specimen-meta {
+      border-bottom: 1px solid var(--black);
+    }
+    .style-specimen-demo {
+      padding: var(--space-md);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: var(--box-gap);
+    }
+    .style-specimen-demo > .projects,
+    .style-specimen-demo > .articles,
+    .style-specimen-demo > .lately-list,
+    .style-specimen-demo > .rolodex,
+    .style-specimen-demo > .playground-grid {
+      flex: 1 1 100%;
+    }
+    .style-specimen-demo > .rolodex {
+      margin-top: 0;
+    }
+    .style-specimen-demo > .tagline {
+      font-size: var(--text-heading);
+    }
+    .articles {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--box-gap);
+    }
+    .article {
+      border: 1px solid var(--black);
+      padding: var(--box-pad);
+      display: grid;
+      grid-template-rows: 1fr auto auto;
+      gap: var(--inner-gap);
+      text-decoration: none;
+      color: inherit;
+      position: relative;
+    }
+    @media (hover: hover) {
+      .article:hover {
+        background: var(--accent);
+        color: var(--on-accent);
+        border-color: var(--accent);
+      }
+      .article:hover .article-publisher,
+      .article:hover .article-arrow {
+        color: var(--on-accent);
+      }
+      .article:hover .article-tag {
+        border-color: var(--on-accent);
+        color: var(--on-accent);
+      }
+    }
+    .article-name {
+      font-size: var(--text-body);
+      font-weight: 700;
+      line-height: 1.5;
+      padding-right: var(--btn-pad-x);
+    }
+    .article-meta {
+      display: flex;
+      align-items: center;
+      gap: var(--inner-gap);
+    }
+    .article-publisher {
+      font-size: var(--text-small);
+      letter-spacing: var(--ls-label);
+      color: var(--accent);
+      line-height: 1.4;
+    }
+    .article-date {
+      font-size: var(--text-small);
+      letter-spacing: var(--ls-label);
+      line-height: 1.4;
+    }
+    .article-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--tag-gap);
+    }
+    .article-tag {
+      font-size: var(--text-ui);
+      letter-spacing: var(--ls-ui);
+      border: 1px solid var(--black);
+      padding: var(--tag-pad);
+      line-height: 1.4;
+    }
+    .article-arrow {
+      color: var(--accent);
+      position: absolute;
+      top: var(--box-gap);
+      right: var(--btn-pad-x);
+      flex-shrink: 0;
+    }
+    .article-arrow .material-symbols-sharp {
+      font-size: var(--icon-sz-lg);
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 18;
+    }
+    .lately-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--box-gap);
+      align-items: flex-start;
+    }
+    .lately-item {
+      border: 1px solid var(--black);
+      padding: var(--box-pad);
+      display: flex;
+      align-items: center;
+      gap: var(--inner-gap);
+      text-decoration: none;
+      color: inherit;
+    }
+    .lately-label {
+      display: flex;
+      align-items: center;
+      gap: var(--tag-gap);
+      font-size: var(--text-small);
+      line-height: 1.4;
+      letter-spacing: var(--ls-label);
+      color: var(--accent);
+    }
+    .lately-label .material-symbols-sharp {
+      font-size: var(--icon-sz);
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 16;
+    }
+    .lately-value {
+      font-size: var(--text-small);
+      font-weight: 700;
+      line-height: 1.4;
+    }
+    .lately-arrow {
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+    }
+    .lately-arrow .material-symbols-sharp {
+      font-size: var(--icon-sz);
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 16;
+    }
+    @media (hover: hover) {
+      .lately-item:hover {
+        background: var(--accent);
+        color: var(--on-accent);
+        border-color: var(--accent);
+      }
+      .lately-item:hover .lately-label,
+      .lately-item:hover .lately-arrow {
+        color: var(--on-accent);
+      }
+    }
+    .interests {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--box-gap);
+    }
+    .rolodex-header {
+      display: flex;
+      align-items: center;
+      gap: var(--box-gap);
+    }
+    .rolodex-header .section-title {
+      margin-bottom: 0;
+    }
+    .rolodex-header .bar-box {
+      flex-shrink: 0;
+    }
+    .rolodex {
+      margin-top: var(--space-md);
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--box-gap);
+    }
+    .rolodex-item {
+      border: 1px solid var(--black);
+      padding: var(--box-pad);
+      display: flex;
+      align-items: center;
+      gap: var(--inner-gap);
+      text-decoration: none;
+      color: inherit;
+    }
+    @media (hover: hover) {
+      .rolodex-item:hover {
+        background: var(--accent);
+        color: var(--on-accent);
+        border-color: var(--accent);
+      }
+      .rolodex-item:hover .rolodex-icon,
+      .rolodex-item:hover .rolodex-arrow {
+        color: var(--on-accent);
+      }
+    }
+    .rolodex-name {
+      font-size: var(--text-small);
+      font-weight: 700;
+      line-height: 1.4;
+    }
+    .rolodex-icon {
+      color: var(--accent);
+      font-size: var(--icon-sz);
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 16;
+    }
+    .rolodex-arrow {
+      color: var(--accent);
+    }
+    .rolodex-arrow .material-symbols-sharp {
+      font-size: var(--icon-sz);
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 16;
+    }
+    .article-hidden {
+      display: none;
+    }
+    .articles-show-more.bar-box {
+      width: 100%;
+      padding: 0 var(--btn-pad-x);
+      margin-top: var(--space-md);
+      font-size: var(--text-ui);
+      font-weight: 700;
+      letter-spacing: var(--ls-ui);
+      gap: var(--inner-gap);
+    }
+    footer {
+      padding: var(--space-lg) var(--padding);
+    }
+    .footer-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--box-gap);
+      font-size: var(--text-small);
+    }
+    .footer-meta > span,
+    .footer-bottom > span {
+      border: 1px solid var(--black);
+      padding: var(--box-pad);
+      line-height: 1.4;
+      letter-spacing: var(--ls-label);
+    }
+    .footer-meta a,
+    .footer-bottom a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    @media (hover: hover) {
+      .footer-meta a:hover,
+      .footer-bottom a:hover {
+        text-decoration: underline;
+      }
+    }
+    .footer-bottom {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--box-gap);
+      margin-top: var(--space-lg);
+      font-size: var(--text-small);
+    }
+    @media (max-width: 1024px) {
+      .projects,
+      .articles {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .style-seasons {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .style-icons {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+    @media (max-width: 768px) {
+      .projects,
+      .articles,
+      .playground-grid {
+        grid-template-columns: 1fr;
+      }
+      .article {
+        grid-template-rows: auto auto auto;
+      }
+      .style-token {
+        grid-template-columns: 1fr;
+      }
+      .style-token-meta {
+        border-right: none;
+        border-bottom: 1px solid var(--black);
+      }
+      .style-seasons,
+      .style-icons {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .about-content {
+        grid-template-columns: 1fr;
+        gap: var(--space-md);
+      }
+      .lately-list {
+        align-items: stretch;
+      }
+      .lately-item {
+        flex-wrap: wrap;
+        position: relative;
+      }
+      .lately-value {
+        flex: 1 1 100%;
+      }
+      .lately-arrow {
+        position: absolute;
+        top: var(--box-gap);
+        right: var(--btn-pad-x);
+      }
+      .footer-meta,
+      .footer-bottom {
+        align-items: flex-start;
+      }
+    }
+    @media (hover: none) {
+      .bar-box:active,
+      .nav-link-box:active {
+        background: var(--accent);
+        color: var(--on-accent);
+        border-color: var(--accent);
+      }
+      .project:active {
+        background: var(--accent);
+        color: var(--on-accent);
+        border-color: var(--accent);
+      }
+      .project:active .project-org {
+        color: var(--on-accent);
+      }
+      .project:active .project-tag {
+        border-color: var(--on-accent);
+        color: var(--on-accent);
+      }
+      .article:active {
+        background: var(--accent);
+        color: var(--on-accent);
+        border-color: var(--accent);
+      }
+      .article:active .article-publisher,
+      .article:active .article-arrow {
+        color: var(--on-accent);
+      }
+      .article:active .article-tag {
+        border-color: var(--on-accent);
+        color: var(--on-accent);
+      }
+      .playground-card:active {
+        background: var(--accent);
+        color: var(--on-accent);
+        border-color: var(--accent);
+      }
+      .playground-card:active .playground-card-arrow,
+      .playground-card:active .playground-card-year {
+        color: var(--on-accent);
+      }
+      .lately-item:active {
+        background: var(--accent);
+        color: var(--on-accent);
+        border-color: var(--accent);
+      }
+      .lately-item:active .lately-label,
+      .lately-item:active .lately-arrow {
+        color: var(--on-accent);
+      }
+      .rolodex-item:active {
+        background: var(--accent);
+        color: var(--on-accent);
+        border-color: var(--accent);
+      }
+      .rolodex-item:active .rolodex-icon,
+      .rolodex-item:active .rolodex-arrow {
+        color: var(--on-accent);
+      }
+      .style-season:active {
+        background: var(--accent);
+        color: var(--on-accent);
+        border-color: var(--accent);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <a class="skip-to-content" href="#main-content">Skip to content</a>
+
+  <div class="top-bar">
+    <div class="nav-logo-wrap">
+      <a class="nav-logo-home" href="../" aria-label="Home"></a>
+      <button type="button" class="nav-logo-season" onclick="toggleSeasons(event)" aria-label="Change accent color" aria-haspopup="true" aria-expanded="false" aria-controls="season-dropdown"></button>
+      <div class="season-dropdown" id="season-dropdown" data-info="colours from bengaluru&#x27;s seasonal blooms"></div>
+    </div>
+    <div class="top-bar-center">
+      <button type="button" class="bar-box" onclick="copyEmail(this)" data-email="hello@thedataareclean.com" aria-label="Copy email address">
+        <span class="material-symbols-sharp" aria-hidden="true">mail</span>
+      </button>
+      <a class="bar-box" href="https://www.instagram.com/thedataareclean/" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg viewBox="0 0 24 24"><path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2m-.2 2A3.6 3.6 0 0 0 4 7.6v8.8C4 18.39 5.61 20 7.6 20h8.8a3.6 3.6 0 0 0 3.6-3.6V7.6C20 5.61 18.39 4 16.4 4H7.6m9.65 1.5a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5M12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10m0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/></svg>
+      </a>
+      <a class="bar-box" href="https://www.linkedin.com/in/thedataareclean/" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
+      </a>
+    </div>
+    <button type="button" class="bar-box" onclick="toggleTheme()" aria-label="Toggle dark mode">
+      <span class="material-symbols-sharp icon-moon" aria-hidden="true">dark_mode</span>
+      <span class="material-symbols-sharp icon-sun" aria-hidden="true">light_mode</span>
+    </button>
+  </div>
+
+  <nav>
+    <a class="nav-link-box "  href="../work/">work</a>
+    <div class="toast" id="toast" role="status" aria-live="polite" data-copied="email copied" data-failed="couldn&#x27;t copy email"></div>
+    <a class="nav-link-box "  href="../play/">play</a>
+  </nav>
+
+  <div class="content-box" id="main-content">
+  <section class="page-intro">
+    <p class="tagline">the <span class="name">style</span>,<br>tokens and components this site is built from.</p>
+  </section>
+
+  <section class="project-section">
+    <h2 class="section-title">about this page</h2>
+    <div class="project-detail-text doc-text">
+    <p>These are the design tokens and components this site is built from. Every value below is read from <code>style.css</code> and <code>build.py</code> when the site is built, so this page can&#x27;t drift from the real thing.</p>
+    <p>Everything is live: hover the components, switch to dark mode, or pick a season to recolour the page. For how to write each content element, see the <a href="/reference/">reference</a> page.</p>
+    </div>
+  </section>
+
+  <section class="project-section">
+    <h2 class="section-title">fonts</h2>
+    <div class="project-detail-text doc-text">
+    <p>One typeface for everything, loaded from Google Fonts in three weights. Code uses the system monospace.</p>
+    <div class="style-tokens">
+      <div class="style-token">
+        <div class="style-token-meta"><code class="style-token-name">--font-sans</code><span class="style-token-value">&#x27;Schibsted Grotesk&#x27;, sans-serif</span><span class="style-token-value">400 · 500 · 700</span><span class="style-token-note">text, headings and interface. 400 by default, 500 for headings, 700 for names and labels.</span></div>
+        <div class="style-token-preview"><p class="style-font-sample" style="font-family:var(--font-sans);font-weight:400">curious about everything, 0123456789</p><p class="style-font-sample" style="font-family:var(--font-sans);font-weight:500">curious about everything, 0123456789</p><p class="style-font-sample" style="font-family:var(--font-sans);font-weight:700">curious about everything, 0123456789</p></div>
+      </div>
+      <div class="style-token">
+        <div class="style-token-meta"><code class="style-token-name">--font-mono</code><span class="style-token-value">ui-monospace, SFMono-Regular, Menlo, Consolas, monospace</span><span class="style-token-note">code on the reference page.</span></div>
+        <div class="style-token-preview"><p class="style-font-sample" style="font-family:var(--font-mono);font-weight:400">curious about everything, 0123456789</p></div>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <section class="project-section">
+    <h2 class="section-title">type scale</h2>
+    <div class="project-detail-text doc-text">
+    <p>Six sizes on a minor-third scale. The four larger sizes are fluid: they grow with the screen between their mobile and desktop values.</p>
+    <div class="style-tokens">
+      <div class="style-token">
+        <div class="style-token-meta"><code class="style-token-name">--text-display</code><span class="style-token-value">clamp(32px, 9vw, 128px)</span><span class="style-token-note">hero heading</span></div>
+        <div class="style-token-preview"><p class="style-type-sample" style="font-size:var(--text-display)">curious about everything</p></div>
+      </div>
+      <div class="style-token">
+        <div class="style-token-meta"><code class="style-token-name">--text-heading</code><span class="style-token-value">clamp(24px, 4vw, 36px)</span><span class="style-token-note">page intros, section titles, case study heading</span></div>
+        <div class="style-token-preview"><p class="style-type-sample" style="font-size:var(--text-heading)">curious about everything</p></div>
+      </div>
+      <div class="style-token">
+        <div class="style-token-meta"><code class="style-token-name">--text-subhead</code><span class="style-token-value">clamp(18px, 2.5vw, 24px)</span><span class="style-token-note">hero tagline</span></div>
+        <div class="style-token-preview"><p class="style-type-sample" style="font-size:var(--text-subhead)">curious about everything</p></div>
+      </div>
+      <div class="style-token">
+        <div class="style-token-meta"><code class="style-token-name">--text-body</code><span class="style-token-value">clamp(15px, 1.3vw, 17px)</span><span class="style-token-note">body text, card titles, toolkit and interests</span></div>
+        <div class="style-token-preview"><p class="style-type-sample" style="font-size:var(--text-body)">curious about everything</p></div>
+      </div>
+      <div class="style-token">
+        <div class="style-token-meta"><code class="style-token-name">--text-small</code><span class="style-token-value">13px</span><span class="style-token-note">meta, footer, lately, rolodex, captions</span></div>
+        <div class="style-token-preview"><p class="style-type-sample" style="font-size:var(--text-small)">curious about everything</p></div>
+      </div>
+      <div class="style-token">
+        <div class="style-token-meta"><code class="style-token-name">--text-ui</code><span class="style-token-value">11px</span><span class="style-token-note">nav, buttons, tags, section labels</span></div>
+        <div class="style-token-preview"><p class="style-type-sample" style="font-size:var(--text-ui)">curious about everything</p></div>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <section class="project-section">
+    <h2 class="section-title">letter-spacing</h2>
+    <div class="project-detail-text doc-text">
+    <p>Small text gets a little extra room. Line height is 1 for display, 1.05 for section titles, 1.4 for small text and 1.5 for everything else.</p>
+    <div class="style-tokens">
+      <div class="style-token">
+        <div class="style-token-meta"><code class="style-token-name">--ls-ui</code><span class="style-token-value">1px</span><span class="style-token-note">interface text at <code>--text-ui</code>: nav, buttons, tags</span></div>
+        <div class="style-token-preview"><p class="style-tracking-sample" style="letter-spacing:var(--ls-ui)">curious about everything</p></div>
+      </div>
+      <div class="style-token">
+        <div class="style-token-meta"><code class="style-token-name">--ls-label</code><span class="style-token-value">0.5px</span><span class="style-token-note">small text at <code>--text-small</code>: meta, footer, captions</span></div>
+        <div class="style-token-preview"><p class="style-tracking-sample" style="letter-spacing:var(--ls-label)">curious about everything</p></div>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <section class="project-section">
+    <h2 class="section-title">colour</h2>
+    <div class="project-detail-text doc-text">
+    <p>Two colours and an accent. <code>--black</code> and <code>--white</code> swap in dark mode, which is why nothing uses a raw colour.</p>
+    <div class="style-tokens">
+      <div class="style-token">
+        <div class="style-token-meta"><code class="style-token-name">--black</code><span class="style-token-value">light #1a1a1a</span><span class="style-token-value">dark #ffffff</span><span class="style-token-note">text and borders</span></div>
+        <div class="style-token-preview"><span class="style-swatch" style="background:var(--black)"></span></div>
+      </div>
+      <div class="style-token">
+        <div class="style-token-meta"><code class="style-token-name">--white</code><span class="style-token-value">light #ffffff</span><span class="style-token-value">dark #000000</span><span class="style-token-note">background</span></div>
+        <div class="style-token-preview"><span class="style-swatch" style="background:var(--white)"></span></div>
+      </div>
+      <div class="style-token">
+        <div class="style-token-meta"><code class="style-token-name">--accent</code><span class="style-token-value">light var(--accent-light)</span><span class="style-token-value">dark var(--accent-dark)</span><span class="style-token-note">links, accent words and hover fills. Set each month from the seasons below.</span></div>
+        <div class="style-token-preview"><span class="style-swatch" style="background:var(--accent)"></span></div>
+      </div>
+      <div class="style-token">
+        <div class="style-token-meta"><code class="style-token-name">--on-accent</code><span class="style-token-value">light #ffffff</span><span class="style-token-value">dark #000000</span><span class="style-token-note">text and icons on an accent fill</span></div>
+        <div class="style-token-preview"><span class="style-swatch" style="background:var(--on-accent)"></span></div>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <section class="project-section">
+    <h2 class="section-title">seasons</h2>
+    <div class="project-detail-text doc-text">
+    <p>The accent follows Bengaluru&#x27;s seasonal blooms, one per month. Every light accent passes 4.5:1 against white and every dark accent 4.5:1 against black. Pick one to recolour the page.</p>
+    <div class="style-seasons">
+      <button type="button" class="style-season" style="--swatch-light:#c84520;--swatch-dark:#e87040" onclick="applySeason(0, true)" aria-label="Jan — Flame of Forest"><span class="style-season-swatch"></span><span class="style-season-meta"><span class="style-season-name">Jan — Flame of Forest</span><span>light #c84520</span><span>dark #e87040</span></span></button>
+      <button type="button" class="style-season" style="--swatch-light:#7d4abf;--swatch-dark:#a878d8" onclick="applySeason(1, true)" aria-label="Feb — Jacaranda"><span class="style-season-swatch"></span><span class="style-season-meta"><span class="style-season-name">Feb — Jacaranda</span><span>light #7d4abf</span><span>dark #a878d8</span></span></button>
+      <button type="button" class="style-season" style="--swatch-light:#8f64a9;--swatch-dark:#b898d0" onclick="applySeason(2, true)" aria-label="Mar — Pongamia"><span class="style-season-swatch"></span><span class="style-season-meta"><span class="style-season-name">Mar — Pongamia</span><span>light #8f64a9</span><span>dark #b898d0</span></span></button>
+      <button type="button" class="style-season" style="--swatch-light:#90700c;--swatch-dark:#d8b030" onclick="applySeason(3, true)" aria-label="Apr — Golden Shower"><span class="style-season-swatch"></span><span class="style-season-meta"><span class="style-season-name">Apr — Golden Shower</span><span>light #90700c</span><span>dark #d8b030</span></span></button>
+      <button type="button" class="style-season" style="--swatch-light:#c83020;--swatch-dark:#e86040" onclick="applySeason(4, true)" aria-label="May — Gulmohar"><span class="style-season-swatch"></span><span class="style-season-meta"><span class="style-season-name">May — Gulmohar</span><span>light #c83020</span><span>dark #e86040</span></span></button>
+      <button type="button" class="style-season" style="--swatch-light:#887413;--swatch-dark:#c8b030" onclick="applySeason(5, true)" aria-label="Jun — Copper Pod"><span class="style-season-swatch"></span><span class="style-season-meta"><span class="style-season-name">Jun — Copper Pod</span><span>light #887413</span><span>dark #c8b030</span></span></button>
+      <button type="button" class="style-season" style="--swatch-light:#c84568;--swatch-dark:#e87898" onclick="applySeason(6, true)" aria-label="Jul — Oleander"><span class="style-season-swatch"></span><span class="style-season-meta"><span class="style-season-name">Jul — Oleander</span><span>light #c84568</span><span>dark #e87898</span></span></button>
+      <button type="button" class="style-season" style="--swatch-light:#c82852;--swatch-dark:#f0456a" onclick="applySeason(7, true)" aria-label="Aug — Bougainvillea"><span class="style-season-swatch"></span><span class="style-season-meta"><span class="style-season-name">Aug — Bougainvillea</span><span>light #c82852</span><span>dark #f0456a</span></span></button>
+      <button type="button" class="style-season" style="--swatch-light:#8040a8;--swatch-dark:#a868c8" onclick="applySeason(8, true)" aria-label="Sep — Purple Bauhinia"><span class="style-season-swatch"></span><span class="style-season-meta"><span class="style-season-name">Sep — Purple Bauhinia</span><span>light #8040a8</span><span>dark #a868c8</span></span></button>
+      <button type="button" class="style-season" style="--swatch-light:#c5477a;--swatch-dark:#e880a8" onclick="applySeason(9, true)" aria-label="Oct — Tabebuia Rosea"><span class="style-season-swatch"></span><span class="style-season-meta"><span class="style-season-name">Oct — Tabebuia Rosea</span><span>light #c5477a</span><span>dark #e880a8</span></span></button>
+      <button type="button" class="style-season" style="--swatch-light:#ab5f5f;--swatch-dark:#d0a0a0" onclick="applySeason(10, true)" aria-label="Nov — Rain Tree"><span class="style-season-swatch"></span><span class="style-season-meta"><span class="style-season-name">Nov — Rain Tree</span><span>light #ab5f5f</span><span>dark #d0a0a0</span></span></button>
+      <button type="button" class="style-season" style="--swatch-light:#c02838;--swatch-dark:#e85060" onclick="applySeason(11, true)" aria-label="Dec — Poinsettia"><span class="style-season-swatch"></span><span class="style-season-meta"><span class="style-season-name">Dec — Poinsettia</span><span>light #c02838</span><span>dark #e85060</span></span></button>
+    </div>
+    </div>
+  </section>
+
+  <section class="project-section">
+    <h2 class="section-title">spacing</h2>
+    <div class="project-detail-text doc-text">
+    <div class="style-tokens">
+      <div class="style-token">
+        <div class="style-token-meta"><code class="style-token-name">--space-xs</code><span class="style-token-value">4px</span><span class="style-token-note">tight gaps, list rows, scrollbar</span></div>
+        <div class="style-token-preview"><span class="style-space-bar" style="width:var(--space-xs)"></span></div>
+      </div>
+      <div class="style-token">
+        <div class="style-token-meta"><code class="style-token-name">--inner-gap</code><span class="style-token-value">8px</span><span class="style-token-note">gaps inside cards and list items</span></div>
+        <div class="style-token-preview"><span class="style-space-bar" style="width:var(--inner-gap)"></span></div>
+      </div>
+      <div class="style-token">
+        <div class="style-token-meta"><code class="style-token-name">--tag-gap</code><span class="style-token-value">6px</span><span class="style-token-note">between tags</span></div>
+        <div class="style-token-preview"><span class="style-space-bar" style="width:var(--tag-gap)"></span></div>
+      </div>
+      <div class="style-token">
+        <div class="style-token-meta"><code class="style-token-name">--space-sm</code><span class="style-token-value">12px</span><span class="style-token-note">between boxes, also <code>--box-gap</code></span></div>
+        <div class="style-token-preview"><span class="style-space-bar" style="width:var(--space-sm)"></span></div>
+      </div>
+      <div class="style-token">
+        <div class="style-token-meta"><code class="style-token-name">--btn-pad-x</code><span class="style-token-value">16px</span><span class="style-token-note">side padding in text buttons</span></div>
+        <div class="style-token-preview"><span class="style-space-bar" style="width:var(--btn-pad-x)"></span></div>
+      </div>
+      <div class="style-token">
+        <div class="style-token-meta"><code class="style-token-name">--bar-pad</code><span class="style-token-value">20px</span><span class="style-token-note">above and below the top bar and nav</span></div>
+        <div class="style-token-preview"><span class="style-space-bar" style="width:var(--bar-pad)"></span></div>
+      </div>
+      <div class="style-token">
+        <div class="style-token-meta"><code class="style-token-name">--bar-h</code><span class="style-token-value">40px</span><span class="style-token-note">height of every bar and button</span></div>
+        <div class="style-token-preview"><span class="style-space-bar" style="width:var(--bar-h)"></span></div>
+      </div>
+      <div class="style-token">
+        <div class="style-token-meta"><code class="style-token-name">--space-md</code><span class="style-token-value">clamp(24px, 3vw, 40px)</span><span class="style-token-note">title to content, inner gaps</span></div>
+        <div class="style-token-preview"><span class="style-space-bar" style="width:var(--space-md)"></span></div>
+      </div>
+      <div class="style-token">
+        <div class="style-token-meta"><code class="style-token-name">--padding</code><span class="style-token-value">clamp(24px, 5vw, 64px)</span><span class="style-token-note">page margin</span></div>
+        <div class="style-token-preview"><span class="style-space-bar" style="width:var(--padding)"></span></div>
+      </div>
+      <div class="style-token">
+        <div class="style-token-meta"><code class="style-token-name">--space-lg</code><span class="style-token-value">clamp(48px, 7vh, 80px)</span><span class="style-token-note">between sections</span></div>
+        <div class="style-token-preview"><span class="style-space-bar" style="width:var(--space-lg)"></span></div>
+      </div>
+      <div class="style-token">
+        <div class="style-token-meta"><code class="style-token-name">--tag-pad</code><span class="style-token-value">2px 8px</span><span class="style-token-note">inside tags</span></div>
+        <div class="style-token-preview"><span class="style-space-box" style="padding:var(--tag-pad)"><span></span></span></div>
+      </div>
+      <div class="style-token">
+        <div class="style-token-meta"><code class="style-token-name">--box-pad</code><span class="style-token-value">12px 16px</span><span class="style-token-note">inside bordered boxes</span></div>
+        <div class="style-token-preview"><span class="style-space-box" style="padding:var(--box-pad)"><span></span></span></div>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <section class="project-section">
+    <h2 class="section-title">icons</h2>
+    <div class="project-detail-text doc-text">
+    <p>Material Symbols Sharp, cut down at build time to just the icons below. Its optical size always matches the size it&#x27;s drawn at.</p>
+    <div class="style-tokens">
+      <div class="style-token">
+        <div class="style-token-meta"><code class="style-token-name">--icon-sz</code><span class="style-token-value">16px</span><span class="style-token-note">inline icons</span></div>
+        <div class="style-token-preview"><span class="material-symbols-sharp style-icon-sample" style="font-size:var(--icon-sz);font-variation-settings:'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 16">mail</span></div>
+      </div>
+      <div class="style-token">
+        <div class="style-token-meta"><code class="style-token-name">--icon-sz-lg</code><span class="style-token-value">18px</span><span class="style-token-note">icons in buttons</span></div>
+        <div class="style-token-preview"><span class="material-symbols-sharp style-icon-sample" style="font-size:var(--icon-sz-lg);font-variation-settings:'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 18">mail</span></div>
+      </div>
+      <div class="style-token">
+        <div class="style-token-meta"><code class="style-token-name">--icon-sz-xl</code><span class="style-token-value">24px</span><span class="style-token-note">every other icon</span></div>
+        <div class="style-token-preview"><span class="material-symbols-sharp style-icon-sample" style="font-size:var(--icon-sz-xl);font-variation-settings:'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24">mail</span></div>
+      </div>
+      <div class="style-token">
+        <div class="style-token-meta"><code class="style-token-name">--nav-logo-sz</code><span class="style-token-value">14px</span><span class="style-token-note">the season picker square</span></div>
+        <div class="style-token-preview"><span class="style-square" style="width:var(--nav-logo-sz);height:var(--nav-logo-sz)"></span></div>
+      </div>
+    </div>
+    <div class="style-icons">
+      <span class="style-icon"><span class="material-symbols-sharp" aria-hidden="true">arrow_outward</span>arrow_outward</span>
+      <span class="style-icon"><span class="material-symbols-sharp" aria-hidden="true">bar_chart</span>bar_chart</span>
+      <span class="style-icon"><span class="material-symbols-sharp" aria-hidden="true">close</span>close</span>
+      <span class="style-icon"><span class="material-symbols-sharp" aria-hidden="true">coffee</span>coffee</span>
+      <span class="style-icon"><span class="material-symbols-sharp" aria-hidden="true">construction</span>construction</span>
+      <span class="style-icon"><span class="material-symbols-sharp" aria-hidden="true">dark_mode</span>dark_mode</span>
+      <span class="style-icon"><span class="material-symbols-sharp" aria-hidden="true">devices</span>devices</span>
+      <span class="style-icon"><span class="material-symbols-sharp" aria-hidden="true">directions_run</span>directions_run</span>
+      <span class="style-icon"><span class="material-symbols-sharp" aria-hidden="true">edit_note</span>edit_note</span>
+      <span class="style-icon"><span class="material-symbols-sharp" aria-hidden="true">explore</span>explore</span>
+      <span class="style-icon"><span class="material-symbols-sharp" aria-hidden="true">group</span>group</span>
+      <span class="style-icon"><span class="material-symbols-sharp" aria-hidden="true">handyman</span>handyman</span>
+      <span class="style-icon"><span class="material-symbols-sharp" aria-hidden="true">headphones</span>headphones</span>
+      <span class="style-icon"><span class="material-symbols-sharp" aria-hidden="true">info</span>info</span>
+      <span class="style-icon"><span class="material-symbols-sharp" aria-hidden="true">keyboard_arrow_down</span>keyboard_arrow_down</span>
+      <span class="style-icon"><span class="material-symbols-sharp" aria-hidden="true">light_mode</span>light_mode</span>
+      <span class="style-icon"><span class="material-symbols-sharp" aria-hidden="true">lightbulb</span>lightbulb</span>
+      <span class="style-icon"><span class="material-symbols-sharp" aria-hidden="true">mail</span>mail</span>
+      <span class="style-icon"><span class="material-symbols-sharp" aria-hidden="true">menu_book</span>menu_book</span>
+      <span class="style-icon"><span class="material-symbols-sharp" aria-hidden="true">mood</span>mood</span>
+      <span class="style-icon"><span class="material-symbols-sharp" aria-hidden="true">movie</span>movie</span>
+      <span class="style-icon"><span class="material-symbols-sharp" aria-hidden="true">newspaper</span>newspaper</span>
+      <span class="style-icon"><span class="material-symbols-sharp" aria-hidden="true">pedal_bike</span>pedal_bike</span>
+      <span class="style-icon"><span class="material-symbols-sharp" aria-hidden="true">photo_camera</span>photo_camera</span>
+      <span class="style-icon"><span class="material-symbols-sharp" aria-hidden="true">place</span>place</span>
+      <span class="style-icon"><span class="material-symbols-sharp" aria-hidden="true">refresh</span>refresh</span>
+      <span class="style-icon"><span class="material-symbols-sharp" aria-hidden="true">school</span>school</span>
+      <span class="style-icon"><span class="material-symbols-sharp" aria-hidden="true">science</span>science</span>
+      <span class="style-icon"><span class="material-symbols-sharp" aria-hidden="true">skillet</span>skillet</span>
+      <span class="style-icon"><span class="material-symbols-sharp" aria-hidden="true">sports_esports</span>sports_esports</span>
+      <span class="style-icon"><span class="material-symbols-sharp" aria-hidden="true">sports_soccer</span>sports_soccer</span>
+    </div>
+    </div>
+  </section>
+
+  <section class="project-section">
+    <h2 class="section-title">layout</h2>
+    <div class="project-detail-text doc-text">
+    <ul class="project-detail-list">
+      <li>Above 1024px, project and article grids have three columns.</li>
+      <li>Up to 1024px, they have two.</li>
+      <li>Up to 768px, everything is one column.</li>
+    </ul>
+    <p>The top bar and nav are fixed, and the content scrolls inside a bordered box between them.</p>
+    </div>
+  </section>
+
+  <section class="project-section">
+    <h2 class="section-title">components</h2>
+    <div class="project-detail-text doc-text">
+    <p>Everything you can click is a bordered box. On hover it fills with the accent, its text turns <code>--on-accent</code>, and its border takes the accent too. On touch screens the same fill shows while pressed.</p>
+    <div class="style-specimens">
+      <div class="style-specimen">
+        <div class="style-specimen-meta"><code class="style-token-name">.bar-box</code><span class="style-token-note">the one interactive element, for icon and text buttons</span></div>
+        <div class="style-specimen-demo">
+<button type="button" class="bar-box" aria-label="Copy email address"><span class="material-symbols-sharp" aria-hidden="true">mail</span></button><button type="button" class="bar-box" aria-label="Shuffle"><span class="material-symbols-sharp" aria-hidden="true">refresh</span></button><a class="bar-box project-back" href="../work/">← back to work</a>
+        </div>
+      </div>
+      <div class="style-specimen">
+        <div class="style-specimen-meta"><code class="style-token-name">.nav-link-box</code><span class="style-token-note">the bottom nav; the current page is filled</span></div>
+        <div class="style-specimen-demo">
+<a class="nav-link-box active" href="../work/">work</a><a class="nav-link-box" href="../play/">play</a>
+        </div>
+      </div>
+      <div class="style-specimen">
+        <div class="style-specimen-meta"><code class="style-token-name">.toast</code><span class="style-token-note">confirms an action, like copying the email</span></div>
+        <div class="style-specimen-demo">
+<div class="toast visible">email copied</div>
+        </div>
+      </div>
+      <div class="style-specimen">
+        <div class="style-specimen-meta"><code class="style-token-name">.project-tag</code><span class="style-token-note">tags on cards and case studies, beside the larger toolkit and interests boxes</span></div>
+        <div class="style-specimen-demo">
+<span class="project-tags"><span class="project-tag">product</span><span class="project-tag">design</span><span class="project-tag">ux</span></span><span class="offering-tag">data storytelling</span><span class="offering-tag">data visualisation</span>
+        </div>
+      </div>
+      <div class="style-specimen">
+        <div class="style-specimen-meta"><code class="style-token-name">.name</code><span class="style-token-note">accent words in headings and taglines</span></div>
+        <div class="style-specimen-demo">
+<p class="tagline">at work,<br>i am a multi-disciplinary <span class="name">data communicator</span>.</p>
+        </div>
+      </div>
+      <div class="style-specimen">
+        <div class="style-specimen-meta"><code class="style-token-name">.project</code><span class="style-token-note">a project card, linking to its case study</span></div>
+        <div class="style-specimen-demo">
+<div class="projects">
+      <a class="project" href="../work/data-for-india-product/">
+        <p class="project-problem">How do you build a digital platform that advances understanding of India through data?</p>
+        <span class="project-meta"><span class="project-org">Data For India</span> <span class="project-year">2024–ongoing</span></span>
+        <span class="project-tags"><span class="project-tag">product</span><span class="project-tag">design</span><span class="project-tag">ux</span></span>
+      </a>
+</div>
+        </div>
+      </div>
+      <div class="style-specimen">
+        <div class="style-specimen-meta"><code class="style-token-name">.article</code><span class="style-token-note">a published piece, linking out</span></div>
+        <div class="style-specimen-demo">
+<div class="articles">
+      <a class="article" href="https://infogr8.com/arpit-arora-on-visualising-data-for-social-development/" target="_blank" rel="noopener">
+        <span class="article-name">Visualising data for social development</span>
+        <span class="article-meta"><span class="article-publisher">infogr8</span> <span class="article-date">Apr 2024</span></span>
+        <span class="article-tags"><span class="article-tag">data viz</span><span class="article-tag">social impact</span><span class="article-tag">interview</span></span>
+        <span class="article-arrow"><span class="material-symbols-sharp" aria-hidden="true">arrow_outward</span></span>
+      </a>
+</div>
+        </div>
+      </div>
+      <div class="style-specimen">
+        <div class="style-specimen-meta"><code class="style-token-name">.lately-item</code><span class="style-token-note">one thing i have been up to</span></div>
+        <div class="style-specimen-demo">
+<div class="lately-list">
+      <a class="lately-item" href="https://www.goodreads.com/book/show/222376500-the-once-and-future-riot" target="_blank" rel="noopener">
+        <span class="lately-label"><span class="material-symbols-sharp" aria-hidden="true">menu_book</span> reading</span>
+        <span class="lately-value">The Once and Future Riot by Joe Sacco</span>
+        <span class="lately-arrow"><span class="material-symbols-sharp" aria-hidden="true">arrow_outward</span></span>
+      </a>
+</div>
+        </div>
+      </div>
+      <div class="style-specimen">
+        <div class="style-specimen-meta"><code class="style-token-name">.rolodex-item</code><span class="style-token-note">one random link from a category</span></div>
+        <div class="style-specimen-demo">
+<div class="rolodex">
+      <a class="rolodex-item" href="https://www.dsquires.net" target="_blank" rel="noopener"><span class="rolodex-icon material-symbols-sharp" title="comics" aria-hidden="true">mood</span><span class="rolodex-name">David Squires</span><span class="rolodex-arrow"><span class="material-symbols-sharp" aria-hidden="true">arrow_outward</span></span></a>
+</div>
+        </div>
+      </div>
+      <div class="style-specimen">
+        <div class="style-specimen-meta"><code class="style-token-name">.playground-card</code><span class="style-token-note">an outside project, with a preview</span></div>
+        <div class="style-specimen-demo">
+<div class="playground-grid">
+      <a class="playground-card" href="https://photos.thedataareclean.com" target="_blank" rel="noopener" aria-label="memories">
+        <div class="playground-card-img">
+          <img src="../assets/playground/photos.webp" alt="memories" loading="lazy">
+        </div>
+        <div class="playground-card-body">
+          <div class="playground-card-header">
+            <span class="playground-card-name">memories</span>
+            <span class="material-symbols-sharp playground-card-arrow" aria-hidden="true">arrow_outward</span>
+          </div>
+          <span class="playground-card-year">2026</span>
+          <span class="playground-card-desc">experiments behind the viewfinder.</span>
+        </div>
+      </a>
+</div>
+        </div>
+      </div>
+    </div>
+    </div>
+  </section>
+
+    <!-- FOOTER -->
+    <footer>
+    <div class="footer-meta">
+      <span>Bengaluru, India</span>
+      <span id="local-time">--:--</span>
+      <span id="temperature">--</span>
+      <span>AQI <span id="aqi">--</span></span>
+    </div>
+
+    <div class="footer-bottom">
+      <span>designed by <a href="https://github.com/TheDataAreClean" target="_blank" rel="noopener">yours truly</a></span>
+      <span>developed using <a href="https://claude.com/product/claude-code" target="_blank" rel="noopener">Claude Code</a></span>
+      <span><a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY</a> · 2026</span>
+    </div>
+    </footer>
+  </div>
+
+  <script type="application/json" id="site-data">{"seasons": [["#c84520", "#e87040"], ["#7d4abf", "#a878d8"], ["#8f64a9", "#b898d0"], ["#90700c", "#d8b030"], ["#c83020", "#e86040"], ["#887413", "#c8b030"], ["#c84568", "#e87898"], ["#c82852", "#f0456a"], ["#8040a8", "#a868c8"], ["#c5477a", "#e880a8"], ["#ab5f5f", "#d0a0a0"], ["#c02838", "#e85060"]], "season-names": ["Flame of Forest", "Jacaranda", "Pongamia", "Golden Shower", "Gulmohar", "Copper Pod", "Oleander", "Bougainvillea", "Purple Bauhinia", "Tabebuia Rosea", "Rain Tree", "Poinsettia"], "month-names": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], "time-suffix": "IST", "pair-separator": "—", "temp-unit": "°C", "aqi-good": "Good", "aqi-moderate": "Moderate", "aqi-sensitive": "Unhealthy for some", "aqi-unhealthy": "Unhealthy", "aqi-poor": "Poor"}</script>
+  <script>
+    // Storage can throw (blocked cookies, sandboxed frames, some private modes) — never let it stop the script
+    function storageGet(kind, key) {
+      try { return window[kind].getItem(key); } catch (e) { return null; }
+    }
+    function storageSet(kind, key, value) {
+      try { window[kind].setItem(key, value); } catch (e) {}
+    }
+    // Copy (content/labels.md) and the season colour table (build.py) arrive via the site-data JSON block
+    var siteData = (function() {
+      try { return JSON.parse(document.getElementById('site-data').textContent); } catch (e) { return {}; }
+    })();
+    function toggleTheme() {
+      var html = document.documentElement;
+      var current = html.getAttribute('data-theme');
+      var next = current === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      storageSet('sessionStorage', 'theme', next);
+    }
+    var toastTimer;
+    function showToast(message) {
+      var toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('visible');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(function() {
+        toast.classList.remove('visible');
+        toast.textContent = '';
+      }, 2000);
+    }
+    // Clipboard API where available (secure contexts), else the legacy copy command; always say how it went
+    function copyEmail(btn) {
+      var toast = document.getElementById('toast');
+      var ok = function() { showToast(toast.dataset.copied); };
+      var fail = function() { showToast(toast.dataset.failed); };
+      function legacyCopy() {
+        var field = document.createElement('textarea');
+        field.value = btn.dataset.email;
+        field.setAttribute('readonly', '');
+        field.style.position = 'fixed';
+        field.style.opacity = '0';
+        document.body.appendChild(field);
+        field.select();
+        var copied = false;
+        try { copied = document.execCommand('copy'); } catch (e) {}
+        document.body.removeChild(field);
+        (copied ? ok : fail)();
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(btn.dataset.email).then(ok, legacyCopy);
+      } else {
+        legacyCopy();
+      }
+    }
+    // Seasonal accent — Bengaluru blooms
+    var seasons = (siteData.seasons || []).map(function(pair) { return { light: pair[0], dark: pair[1] }; });
+    var seasonNames = siteData['season-names'] || [];
+    var monthNames = siteData['month-names'] || [];
+    var activeSeason = new Date().getMonth();
+    function applySeason(index, save) {
+      if (!seasons[index]) return;
+      activeSeason = index;
+      document.documentElement.style.setProperty('--accent-light', seasons[index].light);
+      document.documentElement.style.setProperty('--accent-dark', seasons[index].dark);
+      var btns = document.querySelectorAll('.season-option');
+      btns.forEach(function(btn, i) {
+        btn.classList.toggle('active', i === index);
+      });
+      if (save) storageSet('sessionStorage', 'season', index);
+    }
+    // Restore season from session, else default to current month
+    var savedSeason = parseInt(storageGet('sessionStorage', 'season'), 10);
+    applySeason(savedSeason >= 0 && savedSeason < seasons.length ? savedSeason : new Date().getMonth());
+    // Build dropdown (safe DOM — no innerHTML)
+    (function() {
+      var dropdown = document.getElementById('season-dropdown');
+      seasons.forEach(function(s, i) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'season-option' + (i === activeSeason ? ' active' : '');
+        var swatch = document.createElement('span');
+        swatch.className = 'season-swatch';
+        swatch.style.setProperty('--swatch-light', s.light);
+        swatch.style.setProperty('--swatch-dark', s.dark);
+        btn.appendChild(swatch);
+        btn.appendChild(document.createTextNode((monthNames[i] || '') + ' ' + siteData['pair-separator'] + ' ' + (seasonNames[i] || '')));
+        btn.onclick = function(e) {
+          e.stopPropagation();
+          applySeason(i, true);
+          setSeasonsOpen(false);
+        };
+        dropdown.appendChild(btn);
+      });
+      var info = document.createElement('div');
+      info.className = 'season-info';
+      info.textContent = dropdown.dataset.info || '';
+      info.addEventListener('click', function(e) { e.stopPropagation(); });
+      dropdown.appendChild(info);
+    })();
+    function setSeasonsOpen(open) {
+      document.getElementById('season-dropdown').classList.toggle('open', open);
+      var toggle = document.querySelector('.nav-logo-season');
+      if (toggle) toggle.setAttribute('aria-expanded', String(open));
+    }
+    function toggleSeasons(e) {
+      e.stopPropagation();
+      setSeasonsOpen(!document.getElementById('season-dropdown').classList.contains('open'));
+    }
+    document.addEventListener('click', function() { setSeasonsOpen(false); });
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') setSeasonsOpen(false);
+    });
+    // Local time (pauses when tab is hidden)
+    (function() {
+      var timer;
+      function updateTime() {
+        var now = new Date().toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: true });
+        document.getElementById('local-time').textContent = now + ' ' + (siteData['time-suffix'] || '');
+      }
+      // One interval at most, and none while the tab is hidden
+      function stop() { clearInterval(timer); timer = null; }
+      function start() {
+        stop();
+        if (document.hidden) return;
+        updateTime();
+        timer = setInterval(updateTime, 60000);
+      }
+      start();
+      document.addEventListener('visibilitychange', start);
+    })();
+    // Cached fetch helper (localStorage, 1h TTL)
+    function cachedFetch(key, url, parse, onSuccess, onError) {
+      var cached = storageGet('localStorage', key);
+      var ts = storageGet('localStorage', key + '_ts');
+      if (cached && ts && Date.now() - Number(ts) < 3600000) {
+        onSuccess(cached);
+        return;
+      }
+      fetch(url)
+        .then(parse)
+        .then(function(value) {
+          storageSet('localStorage', key, value);
+          storageSet('localStorage', key + '_ts', String(Date.now()));
+          onSuccess(value);
+        })
+        .catch(function() { onError(); });
+    }
+    // Temperature from Open-Meteo (cached 1h)
+    cachedFetch(
+      'weather_temp',
+      'https://api.open-meteo.com/v1/forecast?latitude=12.97&longitude=77.59&current=temperature_2m',
+      function(r) {
+        return r.json().then(function(d) {
+          var temp = d.current.temperature_2m;
+          if (typeof temp !== 'number') throw new Error('no temperature');
+          return Math.round(temp) + siteData['temp-unit'];
+        });
+      },
+      function(v) { document.getElementById('temperature').textContent = v; },
+      function() { document.getElementById('temperature').textContent = '--'; }
+    );
+    // AQI from Open-Meteo (cached 1h)
+    cachedFetch(
+      'weather_aqi',
+      'https://air-quality-api.open-meteo.com/v1/air-quality?latitude=12.97&longitude=77.59&current=us_aqi',
+      function(r) {
+        return r.json().then(function(d) {
+          var aqi = d.current.us_aqi;
+          if (typeof aqi !== 'number') throw new Error('no AQI');
+          var label = aqi <= 50 ? siteData['aqi-good'] : aqi <= 100 ? siteData['aqi-moderate'] : aqi <= 150 ? siteData['aqi-sensitive'] : aqi <= 200 ? siteData['aqi-unhealthy'] : siteData['aqi-poor'];
+          return aqi + ' ' + siteData['pair-separator'] + ' ' + label;
+        });
+      },
+      function(v) { document.getElementById('aqi').textContent = v; },
+      function() { document.getElementById('aqi').textContent = '--'; }
+    );
+    // Articles "show more": reveal the next batch, drop the button when none are left
+    (function() {
+      var btn = document.getElementById('articles-show-more');
+      if (!btn) return;
+      var batch = parseInt(btn.dataset.batch, 10) || 6;
+      btn.addEventListener('click', function() {
+        Array.from(document.querySelectorAll('.article-hidden')).slice(0, batch).forEach(function(el) {
+          el.classList.remove('article-hidden');
+        });
+        if (!document.querySelector('.article-hidden')) btn.remove();
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -20,3 +20,15 @@
 - description: here i do whatever i want.
 - heading: my **playground**
 - tagline: reading, creating, coffee, and everything in between.
+
+## reference
+- title: reference | thedataareclean
+- description: every element this site can render, and how to write each one.
+- heading: the **reference**
+- tagline: every element this site can render, and how to write each one.
+
+## style
+- title: style | thedataareclean
+- description: the design tokens and components this site is built from.
+- heading: the **style**
+- tagline: the design tokens and components this site is built from.
