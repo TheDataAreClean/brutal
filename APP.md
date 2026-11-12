@@ -367,6 +367,15 @@ Intentional exceptions: the season picker square (`.nav-logo-season`) swaps to `
 
 Footer buttons (second row): each box is one link stretched over the whole box (`a::after`), and follows the standard hover and `:active` fill.
 
+### Focus
+
+Keyboard focus (`:focus-visible`) draws a `var(--focus-w)` outline in `var(--accent)`, offset by `var(--focus-w)`, so it recolours with the season. Every accent passes 4.5:1 on the page background, above the 3:1 a focus ring needs.
+
+Exceptions, all where the ring would sit on something other than the page background:
+- `.season-option` sits on the inverted dropdown, where several accents fall under 3:1, so its ring is `var(--white)` (the dropdown's text colour) drawn inside the row.
+- The nav logo is an accent fill: the home link rings the whole `.nav-logo-wrap`, and `.nav-logo-season` turns `var(--white)` with a `var(--black)` ring, like its hover.
+- Footer buttons put the ring on the box, not the link inside it.
+
 ## Build pipeline
 
 Each `python3 build.py` run:

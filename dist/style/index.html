@@ -52,6 +52,7 @@
       --white: #ffffff;
       --on-accent: #ffffff;
       --inner-gap: 8px;
+      --focus-w: 2px;
       --icon-sz: 16px;
       --icon-sz-lg: 18px;
       --icon-sz-xl: 24px;
@@ -91,6 +92,10 @@
     ::selection {
       background: var(--accent);
       color: var(--on-accent);
+    }
+    :focus-visible {
+      outline: var(--focus-w) solid var(--accent);
+      outline-offset: var(--focus-w);
     }
     body {
       font-family: var(--font-sans);
@@ -187,6 +192,18 @@
         background: var(--white);
       }
     }
+    .nav-logo-home:focus-visible {
+      outline: none;
+    }
+    .nav-logo-wrap:has(.nav-logo-home:focus-visible) {
+      outline: var(--focus-w) solid var(--accent);
+      outline-offset: var(--focus-w);
+    }
+    .nav-logo-season:focus-visible {
+      background: var(--white);
+      outline-color: var(--black);
+      outline-offset: 0;
+    }
     .bar-box {
       border: 1px solid var(--black);
       width: var(--bar-h);
@@ -268,6 +285,10 @@
     }
     [data-theme="dark"] .season-swatch {
       background: var(--swatch-dark);
+    }
+    .season-option:focus-visible {
+      outline-color: var(--white);
+      outline-offset: calc(-2 * var(--focus-w));
     }
     .season-info {
       padding: var(--inner-gap);
@@ -1124,9 +1145,12 @@
       color: var(--accent);
       text-decoration: none;
     }
+    .footer-bottom a:focus-visible {
+      outline: none;
+    }
     .footer-bottom > span:has(a:focus-visible) {
-      outline: 2px solid var(--accent);
-      outline-offset: 2px;
+      outline: var(--focus-w) solid var(--accent);
+      outline-offset: var(--focus-w);
     }
     @media (hover: hover) {
       .footer-bottom > span:has(a):hover {
@@ -1440,6 +1464,10 @@
     <div class="project-detail-text doc-text">
     <div class="style-tokens">
       <div class="style-token">
+        <div class="style-token-meta"><code class="style-token-name">--focus-w</code><span class="style-token-value">2px</span><span class="style-token-note">the keyboard focus ring, and its gap</span></div>
+        <div class="style-token-preview"><span class="style-space-bar" style="width:var(--focus-w)"></span></div>
+      </div>
+      <div class="style-token">
         <div class="style-token-meta"><code class="style-token-name">--space-xs</code><span class="style-token-value">4px</span><span class="style-token-note">tight gaps, list rows, scrollbar</span></div>
         <div class="style-token-preview"><span class="style-space-bar" style="width:var(--space-xs)"></span></div>
       </div>
@@ -1564,7 +1592,7 @@
   <section class="project-section">
     <h2 class="section-title">components</h2>
     <div class="project-detail-text doc-text">
-    <p>Everything you can click is a bordered box. On hover it fills with the accent, its text turns <code>--on-accent</code>, and its border takes the accent too. On touch screens the same fill shows while pressed.</p>
+    <p>Everything you can click is a bordered box. On hover it fills with the accent, its text turns <code>--on-accent</code>, and its border takes the accent too. On touch screens the same fill shows while pressed. With the keyboard, a ring in the accent marks where you are.</p>
     <div class="style-specimens">
       <div class="style-specimen">
         <div class="style-specimen-meta"><code class="style-token-name">.bar-box</code><span class="style-token-note">the one interactive element, for icon and text buttons</span></div>

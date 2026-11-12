@@ -53,6 +53,7 @@ The accent follows Bengaluru's seasonal blooms, one per month. Every light accen
 ## spacing
 
 <!-- space -->
+- focus-w: the keyboard focus ring, and its gap
 - space-xs: tight gaps, list rows, scrollbar
 - inner-gap: gaps inside cards and list items
 - tag-gap: between tags
@@ -88,7 +89,7 @@ The top bar and nav are fixed, and the content scrolls inside a bordered box bet
 
 ## components
 
-Everything you can click is a bordered box. On hover it fills with the accent, its text turns `--on-accent`, and its border takes the accent too. On touch screens the same fill shows while pressed.
+Everything you can click is a bordered box. On hover it fills with the accent, its text turns `--on-accent`, and its border takes the accent too. On touch screens the same fill shows while pressed. With the keyboard, a ring in the accent marks where you are.
 
 <!-- components -->
 - bar-box: the one interactive element, for icon and text buttons
