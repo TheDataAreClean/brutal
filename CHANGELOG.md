@@ -6,6 +6,10 @@ Reverse-chronological. Versioning: **major** = redesign · **minor** = new featu
 
 ## UNRELEASED
 
+---
+
+## v4.6.1 — 2026-11-12
+
 - Keyboard focus outlines follow the season accent everywhere (was the browser default), with a new `--focus-w` token. Where the accent would sit on the dropdown or the logo's accent fill, focus uses black/white instead
 
 ---
