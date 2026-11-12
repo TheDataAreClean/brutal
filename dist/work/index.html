@@ -402,17 +402,9 @@
     }
     .project-header-tags {
       display: flex;
-      align-items: flex-end;
+      align-items: center;
       justify-content: space-between;
       gap: var(--box-gap);
-    }
-    .project-header-tags .project-tag {
-      height: var(--bar-h);
-      display: inline-flex;
-      align-items: center;
-      padding: 0 var(--btn-pad-x);
-      font-size: var(--text-small);
-      letter-spacing: var(--ls-label);
     }
     .project-visit-btn.bar-box {
       flex-shrink: 0;
@@ -479,8 +471,7 @@
       flex-wrap: wrap;
       gap: var(--box-gap);
     }
-    .offering-tag,
-    .interest-tag {
+    .tag-lg {
       border: 1px solid var(--black);
       padding: var(--box-pad);
       font-size: var(--text-small);
@@ -509,7 +500,7 @@
       .project:hover .project-org {
         color: var(--on-accent);
       }
-      .project:hover .project-tag {
+      .project:hover .tag {
         border-color: var(--on-accent);
         color: var(--on-accent);
       }
@@ -535,12 +526,17 @@
       letter-spacing: var(--ls-label);
       line-height: 1.4;
     }
-    .project-tags {
+    .tags {
       display: flex;
       flex-wrap: wrap;
       gap: var(--tag-gap);
     }
-    .project-tag {
+    .tags-lg {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--box-gap);
+    }
+    .tag {
       font-size: var(--text-ui);
       letter-spacing: var(--ls-ui);
       border: 1px solid var(--black);
@@ -919,7 +915,7 @@
       .article:hover .article-arrow {
         color: var(--on-accent);
       }
-      .article:hover .article-tag {
+      .article:hover .tag {
         border-color: var(--on-accent);
         color: var(--on-accent);
       }
@@ -944,18 +940,6 @@
     .article-date {
       font-size: var(--text-small);
       letter-spacing: var(--ls-label);
-      line-height: 1.4;
-    }
-    .article-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--tag-gap);
-    }
-    .article-tag {
-      font-size: var(--text-ui);
-      letter-spacing: var(--ls-ui);
-      border: 1px solid var(--black);
-      padding: var(--tag-pad);
       line-height: 1.4;
     }
     .article-arrow {
@@ -1198,7 +1182,7 @@
       .project:active .project-org {
         color: var(--on-accent);
       }
-      .project:active .project-tag {
+      .project:active .tag {
         border-color: var(--on-accent);
         color: var(--on-accent);
       }
@@ -1211,7 +1195,7 @@
       .article:active .article-arrow {
         color: var(--on-accent);
       }
-      .article:active .article-tag {
+      .article:active .tag {
         border-color: var(--on-accent);
         color: var(--on-accent);
       }
@@ -1311,17 +1295,17 @@
   <section>
     <h2 class="section-title"><span class="highlight">toolkit</span> at work</h2>
     <div class="offerings">
-      <span class="offering-tag">data storytelling</span>
-      <span class="offering-tag">data visualisation</span>
-      <span class="offering-tag">information design</span>
-      <span class="offering-tag">data journalism</span>
-      <span class="offering-tag">audience research and strategy</span>
-      <span class="offering-tag">product strategy</span>
-      <span class="offering-tag">data systems design</span>
-      <span class="offering-tag">monitoring &amp; evaluation</span>
-      <span class="offering-tag">editorial curation</span>
-      <span class="offering-tag">community building</span>
-      <span class="offering-tag">data training and workshops</span>
+      <span class="tag-lg">data storytelling</span>
+      <span class="tag-lg">data visualisation</span>
+      <span class="tag-lg">information design</span>
+      <span class="tag-lg">data journalism</span>
+      <span class="tag-lg">audience research and strategy</span>
+      <span class="tag-lg">product strategy</span>
+      <span class="tag-lg">data systems design</span>
+      <span class="tag-lg">monitoring &amp; evaluation</span>
+      <span class="tag-lg">editorial curation</span>
+      <span class="tag-lg">community building</span>
+      <span class="tag-lg">data training and workshops</span>
     </div>
   </section>
 
@@ -1334,27 +1318,27 @@
       <a class="project" href="../work/data-for-india-product/">
         <p class="project-problem">How do you build a digital platform that advances understanding of India through data?</p>
         <span class="project-meta"><span class="project-org">Data For India</span> <span class="project-year">2024–ongoing</span></span>
-        <span class="project-tags"><span class="project-tag">product</span><span class="project-tag">design</span><span class="project-tag">ux</span></span>
+        <span class="tags"><span class="tag">product</span><span class="tag">design</span><span class="tag">ux</span></span>
       </a>
       <a class="project" href="../work/data-for-india-viz/">
         <p class="project-problem">How do you create a data visualisation system that extends seamlessly across mediums?</p>
         <span class="project-meta"><span class="project-org">Data For India</span> <span class="project-year">2024–2025</span></span>
-        <span class="project-tags"><span class="project-tag">data viz</span><span class="project-tag">info design</span><span class="project-tag">systems</span></span>
+        <span class="tags"><span class="tag">data viz</span><span class="tag">info design</span><span class="tag">systems</span></span>
       </a>
       <a class="project" href="../work/vizchitra-editorial/">
         <p class="project-problem">How do you curate the lineup for India&#x27;s premier data visualization conference and community?</p>
         <span class="project-meta"><span class="project-org">VizChitra</span> <span class="project-year">2024–2026</span></span>
-        <span class="project-tags"><span class="project-tag">data viz</span><span class="project-tag">community</span><span class="project-tag">editorial</span></span>
+        <span class="tags"><span class="tag">data viz</span><span class="tag">community</span><span class="tag">editorial</span></span>
       </a>
       <a class="project" href="../work/vizchitra-bengaluru/">
         <p class="project-problem">How do you build a local data viz community to foster creation and connection?</p>
         <span class="project-meta"><span class="project-org">VizChitra</span> <span class="project-year">2025–2026</span></span>
-        <span class="project-tags"><span class="project-tag">community</span><span class="project-tag">events</span></span>
+        <span class="tags"><span class="tag">community</span><span class="tag">events</span></span>
       </a>
       <a class="project" href="../work/vyapaar-mne/">
         <p class="project-problem">How do you measure which interventions effectively strengthen nano‑entrepreneurs&#x27; livelihoods?</p>
         <span class="project-meta"><span class="project-org">Udhyam Vyapaar</span> <span class="project-year">2022–2024</span></span>
-        <span class="project-tags"><span class="project-tag">monitoring &amp; evaluation</span><span class="project-tag">product</span><span class="project-tag">impact</span></span>
+        <span class="tags"><span class="tag">monitoring &amp; evaluation</span><span class="tag">product</span><span class="tag">impact</span></span>
       </a>
     </div>
   </section>
@@ -1368,67 +1352,67 @@
       <a class="article" href="https://infogr8.com/arpit-arora-on-visualising-data-for-social-development/" target="_blank" rel="noopener">
         <span class="article-name">Visualising data for social development</span>
         <span class="article-meta"><span class="article-publisher">infogr8</span> <span class="article-date">Apr 2024</span></span>
-        <span class="article-tags"><span class="article-tag">data viz</span><span class="article-tag">social impact</span><span class="article-tag">interview</span></span>
+        <span class="tags"><span class="tag">data viz</span><span class="tag">social impact</span><span class="tag">interview</span></span>
         <span class="article-arrow"><span class="material-symbols-sharp" aria-hidden="true">arrow_outward</span></span>
       </a>
       <a class="article" href="https://infogr8.com/enabling-non-profit-leaders-through-compelling-data-experiences/" target="_blank" rel="noopener">
         <span class="article-name">Enabling non-profit leaders through compelling data experiences</span>
         <span class="article-meta"><span class="article-publisher">infogr8</span> <span class="article-date">Aug 2023</span></span>
-        <span class="article-tags"><span class="article-tag">data viz</span><span class="article-tag">non-profit</span><span class="article-tag">case study</span></span>
+        <span class="tags"><span class="tag">data viz</span><span class="tag">non-profit</span><span class="tag">case study</span></span>
         <span class="article-arrow"><span class="material-symbols-sharp" aria-hidden="true">arrow_outward</span></span>
       </a>
       <a class="article" href="https://the-ken.com/story/spam-gushes-through-the-cracks-in-trais-do-not-disturb-dam/" target="_blank" rel="noopener">
         <span class="article-name">Spam gushes through the cracks in Trai&#x27;s Do Not Disturb dam</span>
         <span class="article-meta"><span class="article-publisher">The Ken</span> <span class="article-date">Apr 2022</span></span>
-        <span class="article-tags"><span class="article-tag">telecom</span><span class="article-tag">regulation</span><span class="article-tag">data</span></span>
+        <span class="tags"><span class="tag">telecom</span><span class="tag">regulation</span><span class="tag">data</span></span>
         <span class="article-arrow"><span class="material-symbols-sharp" aria-hidden="true">arrow_outward</span></span>
       </a>
       <a class="article" href="https://the-ken.com/story/hasura-open-source-strength-commercial-weakness/" target="_blank" rel="noopener">
         <span class="article-name">Hasura&#x27;s biggest open source strength is its greatest commercial weakness</span>
         <span class="article-meta"><span class="article-publisher">The Ken</span> <span class="article-date">Apr 2022</span></span>
-        <span class="article-tags"><span class="article-tag">open source</span><span class="article-tag">developer tools</span><span class="article-tag">business</span></span>
+        <span class="tags"><span class="tag">open source</span><span class="tag">developer tools</span><span class="tag">business</span></span>
         <span class="article-arrow"><span class="material-symbols-sharp" aria-hidden="true">arrow_outward</span></span>
       </a>
       <a class="article" href="https://the-ken.com/story/community-shaped-hole-skillshare-vs-frontrow-unlu/" target="_blank" rel="noopener">
         <span class="article-name">The community-shaped hole in Skillshare&#x27;s plan to take on FrontRow, Unlu</span>
         <span class="article-meta"><span class="article-publisher">The Ken</span> <span class="article-date">Apr 2022</span></span>
-        <span class="article-tags"><span class="article-tag">edtech</span><span class="article-tag">community</span><span class="article-tag">product</span></span>
+        <span class="tags"><span class="tag">edtech</span><span class="tag">community</span><span class="tag">product</span></span>
         <span class="article-arrow"><span class="material-symbols-sharp" aria-hidden="true">arrow_outward</span></span>
       </a>
       <a class="article" href="https://the-ken.com/story/aicte-to-heci-autonomy-india-technical-institutions/" target="_blank" rel="noopener">
         <span class="article-name">AICTE to HECI: Alphabet soup for India&#x27;s autonomy-starved technical institutions</span>
         <span class="article-meta"><span class="article-publisher">The Ken</span> <span class="article-date">Mar 2022</span></span>
-        <span class="article-tags"><span class="article-tag">education</span><span class="article-tag">policy</span><span class="article-tag">regulation</span></span>
+        <span class="tags"><span class="tag">education</span><span class="tag">policy</span><span class="tag">regulation</span></span>
         <span class="article-arrow"><span class="material-symbols-sharp" aria-hidden="true">arrow_outward</span></span>
       </a>
       <a class="article article-hidden" href="https://the-ken.com/story/the-speed-bumps-in-leads-plan-to-digitise-indias-budget-private-schools/" target="_blank" rel="noopener">
         <span class="article-name">The speed bumps in LEAD&#x27;s plan to digitise India&#x27;s budget private schools</span>
         <span class="article-meta"><span class="article-publisher">The Ken</span> <span class="article-date">Feb 2022</span></span>
-        <span class="article-tags"><span class="article-tag">edtech</span><span class="article-tag">product</span><span class="article-tag">schools</span></span>
+        <span class="tags"><span class="tag">edtech</span><span class="tag">product</span><span class="tag">schools</span></span>
         <span class="article-arrow"><span class="material-symbols-sharp" aria-hidden="true">arrow_outward</span></span>
       </a>
       <a class="article article-hidden" href="https://the-ken.com/story/beyond-whitehat-jr-the-hinterland-niche-calling-indias-coding-edtechs/" target="_blank" rel="noopener">
         <span class="article-name">Beyond WhiteHat Jr: the hinterland niche calling India&#x27;s coding edtechs</span>
         <span class="article-meta"><span class="article-publisher">The Ken</span> <span class="article-date">Feb 2022</span></span>
-        <span class="article-tags"><span class="article-tag">edtech</span><span class="article-tag">coding</span><span class="article-tag">market</span></span>
+        <span class="tags"><span class="tag">edtech</span><span class="tag">coding</span><span class="tag">market</span></span>
         <span class="article-arrow"><span class="material-symbols-sharp" aria-hidden="true">arrow_outward</span></span>
       </a>
       <a class="article article-hidden" href="https://the-ken.com/story/amazons-steep-learning-curve-in-indias-crowded-online-test-prep-market/" target="_blank" rel="noopener">
         <span class="article-name">Amazon&#x27;s steep learning curve in India&#x27;s crowded online test prep market</span>
         <span class="article-meta"><span class="article-publisher">The Ken</span> <span class="article-date">Jan 2022</span></span>
-        <span class="article-tags"><span class="article-tag">edtech</span><span class="article-tag">amazon</span><span class="article-tag">test prep</span></span>
+        <span class="tags"><span class="tag">edtech</span><span class="tag">amazon</span><span class="tag">test prep</span></span>
         <span class="article-arrow"><span class="material-symbols-sharp" aria-hidden="true">arrow_outward</span></span>
       </a>
       <a class="article article-hidden" href="https://the-ken.com/story/up-in-the-air-the-vague-byjus-niti-aayog-stab-at-public-edtech/" target="_blank" rel="noopener">
         <span class="article-name">Up in the air: The vague Byju&#x27;s-NITI Aayog stab at public edtech</span>
         <span class="article-meta"><span class="article-publisher">The Ken</span> <span class="article-date">Dec 2021</span></span>
-        <span class="article-tags"><span class="article-tag">edtech</span><span class="article-tag">public policy</span><span class="article-tag">government</span></span>
+        <span class="tags"><span class="tag">edtech</span><span class="tag">public policy</span><span class="tag">government</span></span>
         <span class="article-arrow"><span class="material-symbols-sharp" aria-hidden="true">arrow_outward</span></span>
       </a>
       <a class="article article-hidden" href="https://state-of-foss.in/" target="_blank" rel="noopener">
         <span class="article-name">The State of Free &amp; Open Source Software in India</span>
         <span class="article-meta"><span class="article-publisher">CivicDataLab</span> <span class="article-date">Jan 2021</span></span>
-        <span class="article-tags"><span class="article-tag">open source</span><span class="article-tag">research</span><span class="article-tag">india</span></span>
+        <span class="tags"><span class="tag">open source</span><span class="tag">research</span><span class="tag">india</span></span>
         <span class="article-arrow"><span class="material-symbols-sharp" aria-hidden="true">arrow_outward</span></span>
       </a>
     </div>

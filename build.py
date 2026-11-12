@@ -610,11 +610,11 @@ def _project_card(p, href=None):
     tags_html = ''
     if p['tags']:
         tag_spans = ''.join(
-            f'<span class="project-tag">{escape(t.strip())}</span>'
+            f'<span class="tag">{escape(t.strip())}</span>'
             for t in p['tags'].split(',') if t.strip()
         )
         if tag_spans:
-            tags_html = f'\n        <span class="project-tags">{tag_spans}</span>'
+            tags_html = f'\n        <span class="tags">{tag_spans}</span>'
     return (
         f'      <a class="project" href="{escape(href) if href else f"{{{{nav_root}}}}work/{p['slug']}/"}">\n'
         f'        <p class="project-problem">{problem}</p>\n'
@@ -678,12 +678,12 @@ def _article_card(a, hidden=False):
     tags_html = ''
     if a.get('tags'):
         tag_spans = ''.join(
-            f'<span class="article-tag">{escape(t.strip())}</span>'
+            f'<span class="tag">{escape(t.strip())}</span>'
             for t in a['tags'].split(',')
             if t.strip()
         )
         if tag_spans:
-            tags_html = f'\n        <span class="article-tags">{tag_spans}</span>'
+            tags_html = f'\n        <span class="tags">{tag_spans}</span>'
     hidden_cls = ' article-hidden' if hidden else ''
     return (
         f'      <a class="article{hidden_cls}" href="{escape(a["url"])}" target="_blank" rel="noopener">\n'
@@ -816,7 +816,7 @@ def render_toolkit(md):
     title = apply_highlight(title)
 
     boxes = '\n'.join(
-        f'      <span class="offering-tag">{escape(s)}</span>'
+        f'      <span class="tag-lg">{escape(s)}</span>'
         for s in items
     )
 
@@ -954,7 +954,7 @@ def render_interests(md):
     title = apply_highlight(title)
 
     tag_html = '\n'.join(
-        f'      <span class="interest-tag">{escape(t)}</span>'
+        f'      <span class="tag-lg">{escape(t)}</span>'
         for t in tags
     )
     subtitle_html = f'    <p class="section-subtitle">{escape(subtitle)}</p>\n' if subtitle else ''
@@ -1374,7 +1374,7 @@ def style_blocks(css, template, labels, demo):
         lately = next((h for k, v in demo['lately'] for h in [_lately_item(k, v, labels)] if h), '')
         rolodex = demo['rolodex'][0] if demo['rolodex'] else None
         playground = demo['playground'][0] if demo['playground'] else None
-        project_tags = ''.join(f'<span class="project-tag">{escape(t.strip())}</span>'
+        project_tags = ''.join(f'<span class="tag">{escape(t.strip())}</span>'
                                for t in (project['tags'] if project else '').split(',') if t.strip())
         specimens = {
             'bar-box': (
@@ -1385,9 +1385,8 @@ def style_blocks(css, template, labels, demo):
                 f'<a class="nav-link-box active" href="{{{{nav_root}}}}work/">{lb("nav-work")}</a>'
                 f'<a class="nav-link-box" href="{{{{nav_root}}}}play/">{lb("nav-play")}</a>'),
             'toast': f'<div class="toast visible">{lb("email-copied")}</div>',
-            'project-tag': (
-                f'<span class="project-tags">{project_tags}</span>'
-                + ''.join(f'<span class="offering-tag">{escape(t)}</span>' for t in demo['toolkit'])),
+            'tag': f'<span class="tags">{project_tags}</span>',
+            'tag-lg': ''.join(f'<span class="tag-lg">{escape(t)}</span>' for t in demo['toolkit']),
             'name': f'<p class="tagline">{apply_name(demo["intro"])}</p>',
             'project': f'<div class="projects">\n{_project_card(project, project["url"] or "#")}\n</div>' if project else '',
             'article': f'<div class="articles">\n{_article_card(article)}\n</div>' if article else '',
@@ -1440,12 +1439,12 @@ def render_project_page(md, labels):
     heading = escape(problem) if problem else escape(org)
 
     tag_spans = ''.join(
-        f'<span class="project-tag">{escape(t.strip())}</span>'
+        f'<span class="tag-lg">{escape(t.strip())}</span>'
         for t in tags.split(',') if t.strip()
     ) if tags else ''
     tags_row = (
         f'    <div class="project-header-tags">'
-        f'<span class="project-tags">{tag_spans}</span>'
+        f'<span class="tags-lg">{tag_spans}</span>'
         + visit_btn +
         f'</div>\n'
     ) if (tag_spans or visit_btn) else ''

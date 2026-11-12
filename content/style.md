@@ -94,7 +94,8 @@ Everything you can click is a bordered box. On hover it fills with the accent, i
 - bar-box: the one interactive element, for icon and text buttons
 - nav-link-box: the bottom nav; the current page is filled
 - toast: confirms an action, like copying the email
-- project-tag: tags on cards and case studies, beside the larger toolkit and interests boxes
+- tag: the small tag, for inside project and article cards
+- tag-lg: the large tag, a standalone box for toolkit, interests and case study headers
 - name: accent words in headings and taglines
 - project: a project card, linking to its case study
 - article: a published piece, linking out

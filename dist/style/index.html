@@ -402,17 +402,9 @@
     }
     .project-header-tags {
       display: flex;
-      align-items: flex-end;
+      align-items: center;
       justify-content: space-between;
       gap: var(--box-gap);
-    }
-    .project-header-tags .project-tag {
-      height: var(--bar-h);
-      display: inline-flex;
-      align-items: center;
-      padding: 0 var(--btn-pad-x);
-      font-size: var(--text-small);
-      letter-spacing: var(--ls-label);
     }
     .project-visit-btn.bar-box {
       flex-shrink: 0;
@@ -479,8 +471,7 @@
       flex-wrap: wrap;
       gap: var(--box-gap);
     }
-    .offering-tag,
-    .interest-tag {
+    .tag-lg {
       border: 1px solid var(--black);
       padding: var(--box-pad);
       font-size: var(--text-small);
@@ -509,7 +500,7 @@
       .project:hover .project-org {
         color: var(--on-accent);
       }
-      .project:hover .project-tag {
+      .project:hover .tag {
         border-color: var(--on-accent);
         color: var(--on-accent);
       }
@@ -535,12 +526,17 @@
       letter-spacing: var(--ls-label);
       line-height: 1.4;
     }
-    .project-tags {
+    .tags {
       display: flex;
       flex-wrap: wrap;
       gap: var(--tag-gap);
     }
-    .project-tag {
+    .tags-lg {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--box-gap);
+    }
+    .tag {
       font-size: var(--text-ui);
       letter-spacing: var(--ls-ui);
       border: 1px solid var(--black);
@@ -919,7 +915,7 @@
       .article:hover .article-arrow {
         color: var(--on-accent);
       }
-      .article:hover .article-tag {
+      .article:hover .tag {
         border-color: var(--on-accent);
         color: var(--on-accent);
       }
@@ -944,18 +940,6 @@
     .article-date {
       font-size: var(--text-small);
       letter-spacing: var(--ls-label);
-      line-height: 1.4;
-    }
-    .article-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--tag-gap);
-    }
-    .article-tag {
-      font-size: var(--text-ui);
-      letter-spacing: var(--ls-ui);
-      border: 1px solid var(--black);
-      padding: var(--tag-pad);
       line-height: 1.4;
     }
     .article-arrow {
@@ -1198,7 +1182,7 @@
       .project:active .project-org {
         color: var(--on-accent);
       }
-      .project:active .project-tag {
+      .project:active .tag {
         border-color: var(--on-accent);
         color: var(--on-accent);
       }
@@ -1211,7 +1195,7 @@
       .article:active .article-arrow {
         color: var(--on-accent);
       }
-      .article:active .article-tag {
+      .article:active .tag {
         border-color: var(--on-accent);
         color: var(--on-accent);
       }
@@ -1559,9 +1543,15 @@
         </div>
       </div>
       <div class="style-specimen">
-        <div class="style-specimen-meta"><code class="style-token-name">.project-tag</code><span class="style-token-note">tags on cards and case studies, beside the larger toolkit and interests boxes</span></div>
+        <div class="style-specimen-meta"><code class="style-token-name">.tag</code><span class="style-token-note">the small tag, for inside project and article cards</span></div>
         <div class="style-specimen-demo">
-<span class="project-tags"><span class="project-tag">research</span><span class="project-tag">design</span><span class="project-tag">data</span></span><span class="offering-tag">first tag</span><span class="offering-tag">second tag</span>
+<span class="tags"><span class="tag">research</span><span class="tag">design</span><span class="tag">data</span></span>
+        </div>
+      </div>
+      <div class="style-specimen">
+        <div class="style-specimen-meta"><code class="style-token-name">.tag-lg</code><span class="style-token-note">the large tag, a standalone box for toolkit, interests and case study headers</span></div>
+        <div class="style-specimen-demo">
+<span class="tag-lg">first tag</span><span class="tag-lg">second tag</span>
         </div>
       </div>
       <div class="style-specimen">
@@ -1577,7 +1567,7 @@
       <a class="project" href="https://example.com/">
         <p class="project-problem">How might a small library understand what its readers need?</p>
         <span class="project-meta"><span class="project-org">Sample Studio</span> <span class="project-year">2025</span></span>
-        <span class="project-tags"><span class="project-tag">research</span><span class="project-tag">design</span><span class="project-tag">data</span></span>
+        <span class="tags"><span class="tag">research</span><span class="tag">design</span><span class="tag">data</span></span>
       </a>
 </div>
         </div>
@@ -1589,7 +1579,7 @@
       <a class="article" href="https://example.com/" target="_blank" rel="noopener">
         <span class="article-name">A field guide to reading charts</span>
         <span class="article-meta"><span class="article-publisher">The Sample Review</span> <span class="article-date">Jan 2025</span></span>
-        <span class="article-tags"><span class="article-tag">data viz</span><span class="article-tag">essay</span></span>
+        <span class="tags"><span class="tag">data viz</span><span class="tag">essay</span></span>
         <span class="article-arrow"><span class="material-symbols-sharp" aria-hidden="true">arrow_outward</span></span>
       </a>
 </div>

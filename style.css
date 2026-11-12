@@ -511,18 +511,9 @@
 
     .project-header-tags {
       display: flex;
-      align-items: flex-end;
+      align-items: center;
       justify-content: space-between;
       gap: var(--box-gap);
-    }
-
-    .project-header-tags .project-tag {
-      height: var(--bar-h);
-      display: inline-flex;
-      align-items: center;
-      padding: 0 var(--btn-pad-x);
-      font-size: var(--text-small);
-      letter-spacing: var(--ls-label);
     }
 
     .project-visit-btn.bar-box {
@@ -608,8 +599,8 @@
       gap: var(--box-gap);
     }
 
-    .offering-tag,
-    .interest-tag {
+    /* LARGE TAG — standalone boxes (toolkit, interests, case study header). Small tags live inside cards (.tag). */
+    .tag-lg {
       border: 1px solid var(--black);
       padding: var(--box-pad);
       font-size: var(--text-small);
@@ -644,7 +635,7 @@
         color: var(--on-accent);
       }
 
-      .project:hover .project-tag {
+      .project:hover .tag {
         border-color: var(--on-accent);
         color: var(--on-accent);
       }
@@ -675,13 +666,20 @@
       line-height: 1.4;
     }
 
-    .project-tags {
+    .tags {
       display: flex;
       flex-wrap: wrap;
       gap: var(--tag-gap);
     }
 
-    .project-tag {
+    .tags-lg {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--box-gap);
+    }
+
+    /* SMALL TAG — inside project and article cards */
+    .tag {
       font-size: var(--text-ui);
       letter-spacing: var(--ls-ui);
       border: 1px solid var(--black);
@@ -1141,7 +1139,7 @@
         color: var(--on-accent);
       }
 
-      .article:hover .article-tag {
+      .article:hover .tag {
         border-color: var(--on-accent);
         color: var(--on-accent);
       }
@@ -1170,20 +1168,6 @@
     .article-date {
       font-size: var(--text-small);
       letter-spacing: var(--ls-label);
-      line-height: 1.4;
-    }
-
-    .article-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--tag-gap);
-    }
-
-    .article-tag {
-      font-size: var(--text-ui);
-      letter-spacing: var(--ls-ui);
-      border: 1px solid var(--black);
-      padding: var(--tag-pad);
       line-height: 1.4;
     }
 
@@ -1483,7 +1467,7 @@
         color: var(--on-accent);
       }
 
-      .project:active .project-tag {
+      .project:active .tag {
         border-color: var(--on-accent);
         color: var(--on-accent);
       }
@@ -1499,7 +1483,7 @@
         color: var(--on-accent);
       }
 
-      .article:active .article-tag {
+      .article:active .tag {
         border-color: var(--on-accent);
         color: var(--on-accent);
       }

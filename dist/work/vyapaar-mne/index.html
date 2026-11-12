@@ -402,17 +402,9 @@
     }
     .project-header-tags {
       display: flex;
-      align-items: flex-end;
+      align-items: center;
       justify-content: space-between;
       gap: var(--box-gap);
-    }
-    .project-header-tags .project-tag {
-      height: var(--bar-h);
-      display: inline-flex;
-      align-items: center;
-      padding: 0 var(--btn-pad-x);
-      font-size: var(--text-small);
-      letter-spacing: var(--ls-label);
     }
     .project-visit-btn.bar-box {
       flex-shrink: 0;
@@ -479,8 +471,7 @@
       flex-wrap: wrap;
       gap: var(--box-gap);
     }
-    .offering-tag,
-    .interest-tag {
+    .tag-lg {
       border: 1px solid var(--black);
       padding: var(--box-pad);
       font-size: var(--text-small);
@@ -509,7 +500,7 @@
       .project:hover .project-org {
         color: var(--on-accent);
       }
-      .project:hover .project-tag {
+      .project:hover .tag {
         border-color: var(--on-accent);
         color: var(--on-accent);
       }
@@ -535,12 +526,17 @@
       letter-spacing: var(--ls-label);
       line-height: 1.4;
     }
-    .project-tags {
+    .tags {
       display: flex;
       flex-wrap: wrap;
       gap: var(--tag-gap);
     }
-    .project-tag {
+    .tags-lg {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--box-gap);
+    }
+    .tag {
       font-size: var(--text-ui);
       letter-spacing: var(--ls-ui);
       border: 1px solid var(--black);
@@ -919,7 +915,7 @@
       .article:hover .article-arrow {
         color: var(--on-accent);
       }
-      .article:hover .article-tag {
+      .article:hover .tag {
         border-color: var(--on-accent);
         color: var(--on-accent);
       }
@@ -944,18 +940,6 @@
     .article-date {
       font-size: var(--text-small);
       letter-spacing: var(--ls-label);
-      line-height: 1.4;
-    }
-    .article-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--tag-gap);
-    }
-    .article-tag {
-      font-size: var(--text-ui);
-      letter-spacing: var(--ls-ui);
-      border: 1px solid var(--black);
-      padding: var(--tag-pad);
       line-height: 1.4;
     }
     .article-arrow {
@@ -1198,7 +1182,7 @@
       .project:active .project-org {
         color: var(--on-accent);
       }
-      .project:active .project-tag {
+      .project:active .tag {
         border-color: var(--on-accent);
         color: var(--on-accent);
       }
@@ -1211,7 +1195,7 @@
       .article:active .article-arrow {
         color: var(--on-accent);
       }
-      .article:active .article-tag {
+      .article:active .tag {
         border-color: var(--on-accent);
         color: var(--on-accent);
       }
@@ -1288,7 +1272,7 @@
   <section class="project-header">
     <h1 class="project-problem-heading">How do you measure which interventions effectively strengthen nano‑entrepreneurs&#x27; livelihoods?</h1>
     <p class="project-detail-meta">Udhyam Vyapaar · 2022–2024</p>
-    <div class="project-header-tags"><span class="project-tags"><span class="project-tag">monitoring &amp; evaluation</span><span class="project-tag">product</span><span class="project-tag">impact</span></span><a class="bar-box project-visit-btn" href="https://www.udhyam.org/vyapaar" target="_blank" rel="noopener" aria-label="visit site"><span class="material-symbols-sharp" aria-hidden="true">arrow_outward</span></a></div>
+    <div class="project-header-tags"><span class="tags-lg"><span class="tag-lg">monitoring &amp; evaluation</span><span class="tag-lg">product</span><span class="tag-lg">impact</span></span><a class="bar-box project-visit-btn" href="https://www.udhyam.org/vyapaar" target="_blank" rel="noopener" aria-label="visit site"><span class="material-symbols-sharp" aria-hidden="true">arrow_outward</span></a></div>
   </section>
 
   <section class="project-section">
