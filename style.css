@@ -73,6 +73,7 @@
      *   --bar-pad   : 20px                   — space above/below bars (top-bar, nav)
      *   --btn-pad-x : 16px                   — horizontal padding for text bar-boxes
      *   --inner-gap : 8px                    — tight gap within component items (cards, list items)
+     *   --focus-w   : 2px                    — keyboard focus outline width and offset
      *
      * ICON SIZES (Material Symbols optical size must match font-size value)
      *
@@ -100,6 +101,7 @@
       --on-accent: #ffffff;
 
       --inner-gap: 8px;
+      --focus-w: 2px;
       --icon-sz: 16px;
       --icon-sz-lg: 18px;
       --icon-sz-xl: 24px;
@@ -145,6 +147,12 @@
     ::selection {
       background: var(--accent);
       color: var(--on-accent);
+    }
+
+    /* Keyboard focus follows the season accent. Every accent passes 4.5:1 on the page background. */
+    :focus-visible {
+      outline: var(--focus-w) solid var(--accent);
+      outline-offset: var(--focus-w);
     }
 
     body {
@@ -263,6 +271,23 @@
       }
     }
 
+    /* The logo is an accent fill, so an accent ring would vanish on it: the home link rings the whole logo,
+       and the season square turns white with a black ring, like its hover */
+    .nav-logo-home:focus-visible {
+      outline: none;
+    }
+
+    .nav-logo-wrap:has(.nav-logo-home:focus-visible) {
+      outline: var(--focus-w) solid var(--accent);
+      outline-offset: var(--focus-w);
+    }
+
+    .nav-logo-season:focus-visible {
+      background: var(--white);
+      outline-color: var(--black);
+      outline-offset: 0;
+    }
+
     .bar-box {
       border: 1px solid var(--black);
       width: var(--bar-h);
@@ -358,6 +383,12 @@
 
     [data-theme="dark"] .season-swatch {
       background: var(--swatch-dark);
+    }
+
+    /* The dropdown is inverted, where some accents fall under 3:1, so focus uses the dropdown's text colour, drawn inside the row */
+    .season-option:focus-visible {
+      outline-color: var(--white);
+      outline-offset: calc(-2 * var(--focus-w));
     }
 
     .season-info {
@@ -1401,9 +1432,14 @@
       text-decoration: none;
     }
 
+    /* The whole box is the button, so the box takes the focus ring, not the link inside it */
+    .footer-bottom a:focus-visible {
+      outline: none;
+    }
+
     .footer-bottom > span:has(a:focus-visible) {
-      outline: 2px solid var(--accent);
-      outline-offset: 2px;
+      outline: var(--focus-w) solid var(--accent);
+      outline-offset: var(--focus-w);
     }
 
     @media (hover: hover) {
