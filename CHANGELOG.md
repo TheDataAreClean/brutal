@@ -6,6 +6,13 @@ Reverse-chronological. Versioning: **major** = redesign · **minor** = new featu
 
 ## UNRELEASED
 
+- New `/reference` page: every content element the site renders and how to write it, with generic examples
+- New `/style` page: fonts, type scale, colours, seasons, spacing, icons and live components, read from `style.css` and `build.py` at build time
+- Tags consolidated into two styles: `.tag` (inside cards) and `.tag-lg` (standalone, now also used for case study header tags); replaces `project-tag`, `article-tag`, `offering-tag`, `interest-tag`
+- Case study sections now support ``` code blocks and `inline code`
+- New tokens: `--opacity-muted`, `--measure-prose`, `--measure-tagline`, `--font-sans`, `--font-mono`
+- Docs: tag sizes and line heights corrected; intentional hover exceptions written down
+
 ---
 
 ## v4.5.0 — 2026-11-10

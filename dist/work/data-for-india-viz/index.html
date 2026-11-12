@@ -57,6 +57,9 @@
       --icon-sz-xl: 24px;
       --space-xs: 4px;
       --nav-logo-sz: 14px;
+      --opacity-muted: 0.65;
+      --measure-prose: 68ch;
+      --measure-tagline: 700px;
       --ls-ui: 1px;
       --ls-label: 0.5px;
       --accent: var(--accent-light);
@@ -268,7 +271,7 @@
     }
     .season-info {
       padding: var(--inner-gap);
-      opacity: 0.65;
+      opacity: var(--opacity-muted);
       border-top: 1px solid currentColor;
       white-space: normal;
     }
@@ -360,7 +363,7 @@
     .tagline {
       font-size: var(--text-subhead);
       color: var(--black);
-      max-width: 700px;
+      max-width: var(--measure-tagline);
       line-height: 1.5;
     }
     .hero .tagline {
@@ -423,7 +426,7 @@
       line-height: 1.4;
     }
     .project-detail-text {
-      max-width: 68ch;
+      max-width: var(--measure-prose);
     }
     .project-back-section {
       padding-top: var(--space-md);
@@ -715,7 +718,7 @@
     .doc-text > pre,
     .doc-text > .project-subheading,
     .doc-text > .project-figure {
-      max-width: 68ch;
+      max-width: var(--measure-prose);
     }
     .style-tokens,
     .style-specimens {
@@ -748,7 +751,7 @@
       color: var(--accent);
     }
     .style-token-note {
-      opacity: 0.65;
+      opacity: var(--opacity-muted);
     }
     .style-token-preview {
       padding: var(--box-pad);

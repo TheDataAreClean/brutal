@@ -34,20 +34,26 @@
      *   --text-display : clamp(32px, 9vw, 128px)  — hero h1
      *   --text-heading : clamp(24px, 4vw, 36px)   — page intros, section titles, about h2
      *   --text-subhead : clamp(18px, 2.5vw, 24px) — hero tagline
-     *   --text-body    : clamp(15px, 1.3vw, 17px) — about text, toolkit/interest tags, project/article names, subtitles
-     *   --text-small   : 13px                     — article meta, footer, lately, rolodex
-     *   --text-ui      : 11px                     — nav links, toast, season picker, article/project tags
+     *   --text-body    : clamp(15px, 1.3vw, 17px) — about text, case study prose, project/article names, subtitles
+     *   --text-small   : 13px                     — article meta, footer, lately, rolodex, large tags (toolkit, interests, case study header)
+     *   --text-ui      : 11px                     — nav links, toast, season picker, small tags (inside cards)
      *
      * Mobile: 11 → 13 → 15 → 18 → 24 → 32  (minor-third ~1.2x)
      * Desktop: 11 → 13 → 17 → 24 → 36 → 128
      *
      * WEIGHT: 400 default, 500 headings (section-title, about h2), 700 bold (project/article name, lately value, nav, toast, rolodex name)
-     * LINE-HEIGHT: 1 display, 1.05 section titles, 1.4 --text-small, 1.5 --text-body and above (except section titles)
+     * LINE-HEIGHT: 1 display, 1.05 section titles, 1.3 case study heading, 1.4 --text-small, 1.5 --text-body and above (except section titles), 1.6 case study prose
      *
      * LETTER-SPACING
      *
      *   --ls-ui    : 1px   — nav, toast, tags, buttons (text-ui contexts)
      *   --ls-label : 0.5px — meta labels, footer, small text (text-small contexts)
+     *
+     * OPACITY / MEASURE
+     *
+     *   --opacity-muted    : 0.65  — secondary text (season picker footnote, notes on the style page)
+     *   --measure-prose    : 68ch  — max width of case study and reference prose
+     *   --measure-tagline  : 700px — max width of the hero tagline
      *
      * SPACING
      *
@@ -99,6 +105,10 @@
       --icon-sz-xl: 24px;
       --space-xs: 4px;
       --nav-logo-sz: 14px;
+
+      --opacity-muted: 0.65;
+      --measure-prose: 68ch;
+      --measure-tagline: 700px;
 
       --ls-ui: 1px;
       --ls-label: 0.5px;
@@ -352,7 +362,7 @@
 
     .season-info {
       padding: var(--inner-gap);
-      opacity: 0.65;
+      opacity: var(--opacity-muted);
       border-top: 1px solid currentColor;
       white-space: normal;
     }
@@ -460,7 +470,7 @@
     .tagline {
       font-size: var(--text-subhead);
       color: var(--black);
-      max-width: 700px;
+      max-width: var(--measure-tagline);
       line-height: 1.5;
     }
 
@@ -537,7 +547,7 @@
     }
 
     .project-detail-text {
-      max-width: 68ch;
+      max-width: var(--measure-prose);
     }
 
     .project-back-section {
@@ -900,7 +910,7 @@
     .doc-text > pre,
     .doc-text > .project-subheading,
     .doc-text > .project-figure {
-      max-width: 68ch;
+      max-width: var(--measure-prose);
     }
 
     .style-tokens,
@@ -939,7 +949,7 @@
     }
 
     .style-token-note {
-      opacity: 0.65;
+      opacity: var(--opacity-muted);
     }
 
     .style-token-preview {
