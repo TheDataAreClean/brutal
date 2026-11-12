@@ -1186,7 +1186,7 @@ def _render_section(sec, blocks=None, text_cls='project-detail-text'):
             elif kind == 'img':
                 inner_parts.append(_render_figure(g[1], g[2]))
             elif kind == 'code':
-                inner_parts.append(f'    <pre class="code-block"><code>{escape(g[1])}</code></pre>')
+                inner_parts.append(f'    <pre class="code-block" tabindex="0"><code>{escape(g[1])}</code></pre>')
             elif kind == 'block':
                 inner_parts.append(g[1])
         if in_list:

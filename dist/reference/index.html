@@ -1327,7 +1327,7 @@
     <h2 class="section-title">inline text</h2>
     <div class="project-detail-text doc-text">
     <p>Text can be <strong>bold</strong> or <em>italic</em>. Links look like <a href="https://example.com/" target="_blank" rel="noopener">this</a> and open in a new tab, while links to a page on this site, like the <a href="/style/">style</a> page, open in the same one. File names and keys are written as <code>inline code</code>.</p>
-    <pre class="code-block"><code>Text can be **bold** or *italic*.
+    <pre class="code-block" tabindex="0"><code>Text can be **bold** or *italic*.
 Links look like [this](https://example.com/).
 Links to a page on this site, like the [style](/style/) page, open in the same tab.
 File names and keys are written as `inline code`.</code></pre>
@@ -1339,7 +1339,7 @@ File names and keys are written as `inline code`.</code></pre>
     <h2 class="section-title">accent words</h2>
     <div class="project-detail-text doc-text">
     <p>In headings and taglines, <code>**bold**</code> turns a word the accent colour instead of making it bold, like the heading at the top of this page. A <code>&lt;br&gt;</code> forces a line break.</p>
-    <pre class="code-block"><code># hello, i am **sam** !
+    <pre class="code-block" tabindex="0"><code># hello, i am **sam** !
 a first line,&lt;br&gt;then a second with an **accent** word.
 # **section** title</code></pre>
     <p>This works in the hero, the page intros, every section title and the <code>heading</code> lines in <code>meta.md</code>, which are also drawn on the share images.</p>
@@ -1352,7 +1352,7 @@ a first line,&lt;br&gt;then a second with an **accent** word.
     <p>Each <code>##</code> heading starts a section, shown as a small accent label like the ones on this page. A <code>###</code> heading is a sub-heading inside it.</p>
     <h3 class="project-subheading">this is a sub-heading</h3>
     <p>The smallest heading level in a file becomes the section level, and one level deeper becomes a sub-heading. A section with nothing in it is skipped.</p>
-    <pre class="code-block"><code>## approach
+    <pre class="code-block" tabindex="0"><code>## approach
 
 ### first step</code></pre>
     </div>
@@ -1363,7 +1363,7 @@ a first line,&lt;br&gt;then a second with an **accent** word.
     <div class="project-detail-text doc-text">
     <p>Every line is its own paragraph.</p>
     <p>Blank lines between them are optional and ignored, so a paragraph can&#x27;t wrap across lines in the file.</p>
-    <pre class="code-block"><code>Every line is its own paragraph.
+    <pre class="code-block" tabindex="0"><code>Every line is its own paragraph.
 
 Blank lines between them are optional and ignored.</code></pre>
     </div>
@@ -1377,7 +1377,7 @@ Blank lines between them are optional and ignored.</code></pre>
       <li>Numbered items render the same way, so order is shown by position, not numbers.</li>
       <li>A list can sit between paragraphs, and a section with nothing but a list (like <strong>team</strong>) renders as one list.</li>
     </ul>
-    <pre class="code-block"><code>- Bullets start with a dash and a space.
+    <pre class="code-block" tabindex="0"><code>- Bullets start with a dash and a space.
 1. Numbered items render the same way.</code></pre>
     </div>
   </section>
@@ -1390,7 +1390,7 @@ Blank lines between them are optional and ignored.</code></pre>
       <img src="/assets/samples/placeholder.svg" alt="A caption sits under the image." loading="lazy">
       <figcaption class="project-figcaption">A caption sits under the image.</figcaption>
     </figure>
-    <pre class="code-block"><code>![A caption sits under the image.](/assets/projects/sample.webp)</code></pre>
+    <pre class="code-block" tabindex="0"><code>![A caption sits under the image.](/assets/projects/sample.webp)</code></pre>
     <p>Two images in a row stack flush, with no gap between them. Images live in <code>assets/</code> and must be WebP: run <code>python3 build.py --optimize-images</code> after adding a PNG or JPG. The build warns about any case study image it can&#x27;t find.</p>
     </div>
   </section>
@@ -1399,7 +1399,7 @@ Blank lines between them are optional and ignored.</code></pre>
     <h2 class="section-title">code</h2>
     <div class="project-detail-text doc-text">
     <p>Code blocks are wrapped in a line of three backticks above and below. They keep their spacing and scroll sideways instead of wrapping.</p>
-    <pre class="code-block"><code>python3 build.py
+    <pre class="code-block" tabindex="0"><code>python3 build.py
 python3 build.py --optimize-images
 python3 build.py --gen-monthly</code></pre>
     </div>
@@ -1409,7 +1409,7 @@ python3 build.py --gen-monthly</code></pre>
     <h2 class="section-title">comments</h2>
     <div class="project-detail-text doc-text">
     <p>Anything between <code>&lt;!--</code> and <code>--&gt;</code> is hidden. Case studies use comments to label their parts, and the rolodex uses them to name categories.</p>
-    <pre class="code-block"><code>&lt;!-- CARD --&gt;</code></pre>
+    <pre class="code-block" tabindex="0"><code>&lt;!-- CARD --&gt;</code></pre>
     </div>
   </section>
 
@@ -1417,7 +1417,7 @@ python3 build.py --gen-monthly</code></pre>
     <h2 class="section-title">case studies</h2>
     <div class="project-detail-text doc-text">
     <p>Each project is one file in <code>content/work/projects/</code>. The lines before the first <code>##</code> heading fill the project card and the top of its page; everything after is the case study, written with the elements above.</p>
-    <pre class="code-block"><code>&lt;!-- CARD --&gt;
+    <pre class="code-block" tabindex="0"><code>&lt;!-- CARD --&gt;
 - problem: How might a small library understand what its readers need?
 - org: Sample Studio
 - year: 2024–2025
@@ -1449,7 +1449,7 @@ Sample Studio helps small libraries plan their collections.
     <h2 class="section-title">articles</h2>
     <div class="project-detail-text doc-text">
     <p>Published writing lives in <code>content/work/articles.md</code>, newest first. The first six show, and a button reveals the rest.</p>
-    <pre class="code-block"><code>## A field guide to reading charts
+    <pre class="code-block" tabindex="0"><code>## A field guide to reading charts
 - publisher: The Sample Review
 - date: Jan 2025
 - tags: data viz, essay
@@ -1461,7 +1461,7 @@ Sample Studio helps small libraries plan their collections.
     <h2 class="section-title">playground</h2>
     <div class="project-detail-text doc-text">
     <p>Each playground card is one line in <code>content/play/playground.md</code>: a link, an image from <code>assets/playground/</code>, a one-line description, and an optional year, split by <code>|</code>.</p>
-    <pre class="code-block"><code>[sample project](https://example.com/) | sample.webp | a one-line description of the project. | 2025</code></pre>
+    <pre class="code-block" tabindex="0"><code>[sample project](https://example.com/) | sample.webp | a one-line description of the project. | 2025</code></pre>
     </div>
   </section>
 
@@ -1469,7 +1469,7 @@ Sample Studio helps small libraries plan their collections.
     <h2 class="section-title">lately</h2>
     <div class="project-detail-text doc-text">
     <p><code>content/play/lately.md</code> holds one line per activity. A link makes the row clickable, plain text shows it unlinked, and an empty value hides the row.</p>
-    <pre class="code-block"><code>- read: [A Book About Maps](https://example.com/)
+    <pre class="code-block" tabindex="0"><code>- read: [A Book About Maps](https://example.com/)
 - listened: A Sample Podcast
 - watched:</code></pre>
     <p>The keys are read, listened, watched, cooked, explored, played, built, learned, ran, cycled, photographed, brewed, visited and wrote. Each one&#x27;s icon is fixed, and the verb shown beside it is set in <code>labels.md</code>. Changed rows are logged to <code>lately-archive.md</code> on every commit, which feeds the RSS feed.</p>
@@ -1480,7 +1480,7 @@ Sample Studio helps small libraries plan their collections.
     <h2 class="section-title">rolodex</h2>
     <div class="project-detail-text doc-text">
     <p><code>content/play/ideas.md</code> groups links into categories. A comment names each category and its icon, and one random link per category shows on each visit.</p>
-    <pre class="code-block"><code>&lt;!-- data &amp; visualisation | bar_chart --&gt;
+    <pre class="code-block" tabindex="0"><code>&lt;!-- data &amp; visualisation | bar_chart --&gt;
 - [A Sample Blog](https://example.com/)
 - [Another Sample Site](https://example.org/)</code></pre>
     <p>The icon must be one of the icons on the <a href="/style/">style</a> page. A new one has to be added to <code>ICON_NAMES</code> in <code>build.py</code> first.</p>
@@ -1491,7 +1491,7 @@ Sample Studio helps small libraries plan their collections.
     <h2 class="section-title">tags</h2>
     <div class="project-detail-text doc-text">
     <p>The toolkit (<code>content/work/toolkit.md</code>) and interests (<code>content/play/interests.md</code>) are plain lists, one tag per line. In interests, a line between the heading and the list becomes a subtitle.</p>
-    <pre class="code-block"><code># **section** title
+    <pre class="code-block" tabindex="0"><code># **section** title
 an optional subtitle line.
 
 - first tag
