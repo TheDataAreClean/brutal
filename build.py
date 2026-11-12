@@ -19,6 +19,7 @@ import json
 import re
 import shutil
 import sys
+import textwrap
 import urllib.request
 from datetime import datetime
 from html import escape
@@ -75,7 +76,7 @@ REQUIRED_LABEL_KEYS = (
     'case-study', 'visit-site', 'back-to-work', 'show-more', 'email-copied', 'email-copy-failed', 'season-info',
     'feed-title', 'skip-to-content', 'nav-home', 'change-accent', 'copy-email', 'toggle-dark',
     'nav-work', 'nav-play', 'nav-instagram', 'nav-linkedin', 'shuffle', 'aqi', 'separator',
-    'feed-case-study', 'feed-lately', 'feed-playground',
+    'feed-case-study', 'feed-lately', 'feed-playground', 'style-light', 'style-dark',
     *JS_LABEL_KEYS,
     *(f'lately-{k}' for k in LATELY_ICONS),
 )
@@ -99,6 +100,8 @@ _SECTION_HDG_RE = re.compile(r'^(#{2,4})(\s|$)')
 _IMG_RE = re.compile(r'^!\[([^\]]*)\]\(([^)]+)\)$')
 # [text](url) — url may contain one level of balanced parens, e.g. Wikipedia's Foo_(bar)
 _ROLODEX_CATEGORY_RE = re.compile(r'^<!--\s*(.+?)\s*\|\s*([a-z0-9_]+)\s*-->$')
+# `<!-- name | arg -->` directive in a doc page (reference.md, style.md) that inserts a generated block
+_BLOCK_RE = re.compile(r'^<!--\s*([a-z][a-z-]*)\s*(?:\|\s*(.*?))?\s*-->$')
 _LINK_RE = re.compile(r'\[(.+?)\]\(((?:[^()\s]|\([^()\s]*\))+)\)')
 
 
@@ -427,23 +430,33 @@ def apply_name(text):
 
 
 def render_inline(text):
-    """HTML-escape then convert **bold**, *italic*, [link](url) to inline HTML."""
+    """HTML-escape then convert `code`, **bold**, *italic*, [link](url) to inline HTML.
+
+    Links to a site path ('/style/') open in the same tab; every other link opens a new one.
+    """
     def fmt(t):
         return _ITALIC_RE.sub(r'<em>\1</em>', _BOLD_RE.sub(r'<strong>\1</strong>', t))
 
-    # Links are lifted out before bold/italic run so a '*' inside a URL isn't read as emphasis
-    links = []
+    # Code spans, then links, are lifted out before bold/italic run so a '*' inside them isn't read as emphasis
+    codes, links = [], []
+
+    def stash_code(m):
+        codes.append(m.group(1))
+        return f'\x01{len(codes) - 1}\x01'
 
     def stash(m):
         links.append(m)
         return f'\x00{len(links) - 1}\x00'
 
-    text = fmt(_LINK_RE.sub(stash, escape(text)))
-    return re.sub(
-        r'\x00(\d+)\x00',
-        lambda m: f'<a href="{_safe_href(links[int(m.group(1))].group(2))}" target="_blank" rel="noopener">{fmt(links[int(m.group(1))].group(1))}</a>',
-        text,
-    )
+    def link(m):
+        lm = links[int(m.group(1))]
+        href = _safe_href(lm.group(2))
+        target = '' if href.startswith('/') and not href.startswith('//') else ' target="_blank" rel="noopener"'
+        return f'<a href="{href}"{target}>{fmt(lm.group(1))}</a>'
+
+    text = re.sub(r'`([^`]+)`', stash_code, escape(text))
+    text = re.sub(r'\x00(\d+)\x00', link, fmt(_LINK_RE.sub(stash, text)))
+    return re.sub(r'\x01(\d+)\x01', lambda m: f'<code>{codes[int(m.group(1))]}</code>', text)
 
 
 def parse_kv_list(text):
@@ -572,29 +585,7 @@ def render_projects(heading_md, project_mds, labels):
     title = apply_highlight(heading_md.strip().lstrip('# '))
     projects = [f for f in (_project_fields(md) for md in project_mds) if f['org']]
 
-    proj_parts = []
-    for p in projects:
-        problem = escape(p['problem'])
-        year_html = (
-            f' <span class="project-year">{escape(p["year"])}</span>'
-            if p['year'] else ''
-        )
-        tags_html = ''
-        if p['tags']:
-            tag_spans = ''.join(
-                f'<span class="project-tag">{escape(t.strip())}</span>'
-                for t in p['tags'].split(',') if t.strip()
-            )
-            if tag_spans:
-                tags_html = f'\n        <span class="project-tags">{tag_spans}</span>'
-        proj_parts.append(
-            f'      <a class="project" href="{{{{nav_root}}}}work/{p["slug"]}/">\n'
-            f'        <p class="project-problem">{problem}</p>\n'
-            f'        <span class="project-meta"><span class="project-org">{escape(p["org"])}</span>{year_html}</span>{tags_html}\n'
-            f'      </a>'
-        )
-
-    projects_inner = '\n'.join(proj_parts)
+    projects_inner = '\n'.join(_project_card(p) for p in projects)
 
     return (
         '  <!-- PROJECTS -->\n'
@@ -606,6 +597,29 @@ def render_projects(heading_md, project_mds, labels):
         f'{projects_inner}\n'
         '    </div>\n'
         '  </section>'
+    )
+
+
+def _project_card(p, href=None):
+    """One project grid card, from _project_fields() output. `href` overrides the case study link."""
+    problem = escape(p['problem'])
+    year_html = (
+        f' <span class="project-year">{escape(p["year"])}</span>'
+        if p['year'] else ''
+    )
+    tags_html = ''
+    if p['tags']:
+        tag_spans = ''.join(
+            f'<span class="tag">{escape(t.strip())}</span>'
+            for t in p['tags'].split(',') if t.strip()
+        )
+        if tag_spans:
+            tags_html = f'\n        <span class="tags">{tag_spans}</span>'
+    return (
+        f'      <a class="project" href="{escape(href) if href else f"{{{{nav_root}}}}work/{p['slug']}/"}">\n'
+        f'        <p class="project-problem">{problem}</p>\n'
+        f'        <span class="project-meta"><span class="project-org">{escape(p["org"])}</span>{year_html}</span>{tags_html}\n'
+        f'      </a>'
     )
 
 
@@ -658,6 +672,28 @@ def parse_playground(md):
     return title, cards
 
 
+def _article_card(a, hidden=False):
+    """One article card, from parse_articles() output. Cards past the first batch start hidden."""
+    date_html = f' <span class="article-date">{escape(a["date"])}</span>' if a['date'] else ''
+    tags_html = ''
+    if a.get('tags'):
+        tag_spans = ''.join(
+            f'<span class="tag">{escape(t.strip())}</span>'
+            for t in a['tags'].split(',')
+            if t.strip()
+        )
+        if tag_spans:
+            tags_html = f'\n        <span class="tags">{tag_spans}</span>'
+    hidden_cls = ' article-hidden' if hidden else ''
+    return (
+        f'      <a class="article{hidden_cls}" href="{escape(a["url"])}" target="_blank" rel="noopener">\n'
+        f'        <span class="article-name">{escape(a["name"])}</span>\n'
+        f'        <span class="article-meta"><span class="article-publisher">{escape(a["publisher"])}</span>{date_html}</span>{tags_html}\n'
+        '        <span class="article-arrow"><span class="material-symbols-sharp">arrow_outward</span></span>\n'
+        '      </a>'
+    )
+
+
 def render_articles(md, labels):
     """Parse articles.md into a list of article cards."""
     title, articles = parse_articles(md)
@@ -665,28 +701,7 @@ def render_articles(md, labels):
     title = apply_highlight(title)
 
     initial = 6
-    parts = []
-    for idx, a in enumerate(articles):
-        date_html = f' <span class="article-date">{escape(a["date"])}</span>' if a['date'] else ''
-        tags_html = ''
-        if a.get('tags'):
-            tag_spans = ''.join(
-                f'<span class="article-tag">{escape(t.strip())}</span>'
-                for t in a['tags'].split(',')
-                if t.strip()
-            )
-            if tag_spans:
-                tags_html = f'\n        <span class="article-tags">{tag_spans}</span>'
-        hidden = ' article-hidden' if idx >= initial else ''
-        parts.append(
-            f'      <a class="article{hidden}" href="{escape(a["url"])}" target="_blank" rel="noopener">\n'
-            f'        <span class="article-name">{escape(a["name"])}</span>\n'
-            f'        <span class="article-meta"><span class="article-publisher">{escape(a["publisher"])}</span>{date_html}</span>{tags_html}\n'
-            '        <span class="article-arrow"><span class="material-symbols-sharp">arrow_outward</span></span>\n'
-            '      </a>'
-        )
-
-    articles_inner = '\n'.join(parts)
+    articles_inner = '\n'.join(_article_card(a, idx >= initial) for idx, a in enumerate(articles))
 
     show_more_label = escape(_label(labels, 'show-more'))
     has_more = len(articles) > initial
@@ -709,42 +724,47 @@ def render_articles(md, labels):
     )
 
 
-def render_lately(md, labels):
-    lines = md.strip().split('\n')
+def _lately_item(key, raw, labels):
+    """One lately row ('' for an empty value or unknown key). Linked when the value holds a URL."""
+    raw = raw.strip()
+    if not raw or key not in LATELY_ICONS:
+        return ''
+    icon = LATELY_ICONS[key]
+    label = escape(_label(labels, f'lately-{key}'))
+    display, url = _link_parts(raw)
+    if url:
+        return (
+            f'      <a class="lately-item" href="{escape(url)}" target="_blank" rel="noopener">\n'
+            f'        <span class="lately-label"><span class="material-symbols-sharp">{icon}</span> {label}</span>\n'
+            f'        <span class="lately-value">{escape(display)}</span>\n'
+            '        <span class="lately-arrow"><span class="material-symbols-sharp">arrow_outward</span></span>\n'
+            '      </a>'
+        )
+    return (
+        '      <div class="lately-item">\n'
+        f'        <span class="lately-label"><span class="material-symbols-sharp">{icon}</span> {label}</span>\n'
+        f'        <span class="lately-value">{escape(raw)}</span>\n'
+        '      </div>'
+    )
+
+
+def parse_lately(md):
+    """Parse lately.md into (title, [(key, value)])."""
     title = ''
     kv_lines = []
-    for line in lines:
+    for line in md.strip().split('\n'):
         stripped = line.strip()
         if stripped.startswith('# '):
             title = stripped[2:]
         else:
             kv_lines.append(line)
-    title = apply_highlight(title)
-    items = parse_kv_list('\n'.join(kv_lines))
+    return title, parse_kv_list('\n'.join(kv_lines))
 
-    parts = []
-    for key, raw in items:
-        raw = raw.strip()
-        if not raw or key not in LATELY_ICONS:
-            continue
-        icon = LATELY_ICONS[key]
-        label = escape(_label(labels, f'lately-{key}'))
-        display, url = _link_parts(raw)
-        if url:
-            parts.append(
-                f'      <a class="lately-item" href="{escape(url)}" target="_blank" rel="noopener">\n'
-                f'        <span class="lately-label"><span class="material-symbols-sharp">{icon}</span> {label}</span>\n'
-                f'        <span class="lately-value">{escape(display)}</span>\n'
-                '        <span class="lately-arrow"><span class="material-symbols-sharp">arrow_outward</span></span>\n'
-                '      </a>'
-            )
-        else:
-            parts.append(
-                '      <div class="lately-item">\n'
-                f'        <span class="lately-label"><span class="material-symbols-sharp">{icon}</span> {label}</span>\n'
-                f'        <span class="lately-value">{escape(raw)}</span>\n'
-                '      </div>'
-            )
+
+def render_lately(md, labels):
+    title, items = parse_lately(md)
+    title = apply_highlight(title)
+    parts = [h for key, raw in items for h in [_lately_item(key, raw, labels)] if h]
 
     return (
         '  <!-- LATELY -->\n'
@@ -769,7 +789,7 @@ def render_footer(footer_md, labels):
         f'      <span>{location}</span>\n'
         '      <span id="local-time">--:--</span>\n'
         '      <span id="temperature">--</span>\n'
-        f'      <span>{escape(_label(labels, "aqi"))} <span id="aqi">--</span></span>\n'
+        f'      <span class="footer-aqi">{escape(_label(labels, "aqi"))} <span id="aqi">--</span></span>\n'
         '    </div>\n'
         '\n'
         '    <div class="footer-bottom">\n'
@@ -796,7 +816,7 @@ def render_toolkit(md):
     title = apply_highlight(title)
 
     boxes = '\n'.join(
-        f'      <span class="offering-tag">{escape(s)}</span>'
+        f'      <span class="tag-lg">{escape(s)}</span>'
         for s in items
     )
 
@@ -849,6 +869,26 @@ def fetch_icon_font(cache):
         print(f'Warning: icon font download failed ({e}), keeping existing file.')
 
 
+def _playground_card(c, img_dir='assets/playground/'):
+    """One playground card, from parse_playground() output. Images come from `img_dir`."""
+    year_html = f'          <span class="playground-card-year">{escape(c["year"])}</span>\n' if c['year'] else ''
+    return (
+        f'      <a class="playground-card" href="{escape(c["url"])}" target="_blank" rel="noopener" aria-label="{escape(c["name"])}">\n'
+        f'        <div class="playground-card-img">\n'
+        f'          <img src="{{{{nav_root}}}}{img_dir}{escape(c["img"])}" alt="{escape(c["name"])}" loading="lazy">\n'
+        f'        </div>\n'
+        f'        <div class="playground-card-body">\n'
+        f'          <div class="playground-card-header">\n'
+        f'            <span class="playground-card-name">{escape(c["name"])}</span>\n'
+        f'            <span class="material-symbols-sharp playground-card-arrow" aria-hidden="true">arrow_outward</span>\n'
+        f'          </div>\n'
+        f'{year_html}'
+        f'          <span class="playground-card-desc">{escape(c["desc"])}</span>\n'
+        f'        </div>\n'
+        f'      </a>'
+    )
+
+
 def render_playground(md):
     """Render playground section: linked image cards for external projects.
 
@@ -861,25 +901,6 @@ def render_playground(md):
     if not cards:
         return ''
 
-    card_parts = []
-    for c in cards:
-        year_html = f'          <span class="playground-card-year">{escape(c["year"])}</span>\n' if c['year'] else ''
-        card_parts.append(
-            f'      <a class="playground-card" href="{escape(c["url"])}" target="_blank" rel="noopener" aria-label="{escape(c["name"])}">\n'
-            f'        <div class="playground-card-img">\n'
-            f'          <img src="{{{{nav_root}}}}assets/playground/{escape(c["img"])}" alt="{escape(c["name"])}" loading="lazy">\n'
-            f'        </div>\n'
-            f'        <div class="playground-card-body">\n'
-            f'          <div class="playground-card-header">\n'
-            f'            <span class="playground-card-name">{escape(c["name"])}</span>\n'
-            f'            <span class="material-symbols-sharp playground-card-arrow" aria-hidden="true">arrow_outward</span>\n'
-            f'          </div>\n'
-            f'{year_html}'
-            f'          <span class="playground-card-desc">{escape(c["desc"])}</span>\n'
-            f'        </div>\n'
-            f'      </a>'
-        )
-
     return (
         '  <!-- PLAYGROUND -->\n'
         '  <section>\n'
@@ -887,7 +908,7 @@ def render_playground(md):
         f'      {title}\n'
         '    </h2>\n'
         '    <div class="playground-grid">\n'
-        + '\n'.join(card_parts) + '\n'
+        + '\n'.join(_playground_card(c) for c in cards) + '\n'
         + '    </div>\n'
         '  </section>'
     )
@@ -933,7 +954,7 @@ def render_interests(md):
     title = apply_highlight(title)
 
     tag_html = '\n'.join(
-        f'      <span class="interest-tag">{escape(t)}</span>'
+        f'      <span class="tag-lg">{escape(t)}</span>'
         for t in tags
     )
     subtitle_html = f'    <p class="section-subtitle">{escape(subtitle)}</p>\n' if subtitle else ''
@@ -950,8 +971,8 @@ def render_interests(md):
     )
 
 
-def render_rolodex(md, labels):
-    """Parse ideas.md into a hidden list, JS picks one random link per category on each load.
+def parse_rolodex(md):
+    """Parse ideas.md into (title, [{'name', 'url', 'category', 'icon'}]).
 
     A `<!-- category name | icon_name -->` comment starts a category: the links below it carry
     that icon (and the category name as its tooltip). Links above the first one have no icon.
@@ -972,7 +993,23 @@ def render_rolodex(md, labels):
             if m:
                 items.append({'name': m.group(1), 'url': _safe_href(m.group(2)),
                               'category': category, 'icon': icon})
+    return title, items
 
+
+def _rolodex_item(item):
+    """Static markup for one rolodex link, the same the inline script in render_rolodex() builds."""
+    icon = (f'<span class="rolodex-icon material-symbols-sharp" title="{escape(item["category"])}" aria-hidden="true">'
+            f'{escape(item["icon"])}</span>') if item['icon'] else ''
+    return (
+        f'      <a class="rolodex-item" href="{escape(item["url"])}" target="_blank" rel="noopener">'
+        f'{icon}<span class="rolodex-name">{escape(item["name"])}</span>'
+        '<span class="rolodex-arrow"><span class="material-symbols-sharp">arrow_outward</span></span></a>'
+    )
+
+
+def render_rolodex(md, labels):
+    """Parse ideas.md into a hidden list, JS picks one random link per category on each load."""
+    title, items = parse_rolodex(md)
     title = apply_highlight(title)
     # '<' escaped so a name containing '</script>' can't close the inline script block
     items_json = json.dumps(items).replace('<', '\\u003c')
@@ -1006,20 +1043,24 @@ def render_rolodex(md, labels):
     )
 
 
-def render_project_page(md, labels):
-    """Parse a project detail markdown file into a case study page body."""
+def _collect_sections(md, blocks=()):
+    """Split case-study style markdown into [{'heading', 'lines'}] sections.
+
+    The smallest heading level in the file is the section level; one level deeper is a
+    sub-heading inside the current section, and deeper still starts a new section (skipped depth).
+    Line kinds: ('line', text) | ('subheading', text) | ('code', text) for a ``` fenced block |
+    ('block', (name, arg, items)) for a `<!-- name | arg -->` directive whose name is in `blocks`,
+    with the '- ' lines right after it as its items. Other HTML comments are dropped.
+    """
     lines = md.strip().split('\n')
-
-    # --- Pass 1: extract front-matter key-value pairs (before first ## heading) ---
-    front = _project_fields(md)
-    org, url, problem, tags, year = front['org'], front['url'], front['problem'], front['tags'], front['year']
-
-    # --- Pass 2: collect sections generically ---
-    # Find the minimum heading level in this file — that becomes the section level.
-    # Headings exactly one level deeper become subheadings within the current section.
-    # Headings more than one level deeper start a new top-level section (skipped depth).
+    fenced, in_fence = [], False
+    for line in lines:
+        is_fence = line.strip().startswith('```')
+        fenced.append(in_fence or is_fence)
+        if is_fence:
+            in_fence = not in_fence
     section_level = min(
-        (len(m.group(1)) for line in lines
+        (len(m.group(1)) for line, f in zip(lines, fenced) if not f
          for m in [_SECTION_HDG_RE.match(line.strip())] if m),
         default=2,
     )
@@ -1028,16 +1069,35 @@ def render_project_page(md, labels):
     sections = []
     current = None
     in_comment = False
+    code = None
+    block = None
     for line in lines:
         stripped = line.strip()
+        if stripped.startswith('```'):
+            if code is None:
+                code = []
+            else:
+                if current is not None:
+                    current['lines'].append(('code', textwrap.dedent('\n'.join(code)).strip('\n')))
+                code = None
+            continue
+        if code is not None:
+            code.append(line)
+            continue
         if in_comment:
             in_comment = '-->' not in stripped
             continue
         if stripped.startswith('<!--'):
+            b = _BLOCK_RE.match(stripped)
+            if b and b.group(1) in blocks and current is not None:
+                block = (b.group(1), b.group(2) or '', [])
+                current['lines'].append(('block', block))
+                continue
             in_comment = '-->' not in stripped
             continue
         m = _SECTION_HDG_RE.match(stripped)
         if m:
+            block = None
             level = len(m.group(1))
             heading = stripped[level:].strip()
             if level == subheading_level and current is not None:
@@ -1046,91 +1106,328 @@ def render_project_page(md, labels):
                 current = {'heading': heading, 'lines': []}
                 sections.append(current)
         elif current is not None and stripped:
+            if block is not None and stripped.startswith('- '):
+                block[2].append(stripped[2:])
+                continue
+            block = None
             current['lines'].append(('line', stripped))
+    if code is not None and current is not None:
+        current['lines'].append(('code', textwrap.dedent('\n'.join(code)).strip('\n')))
+    return sections
 
-    # --- Render each section ---
-    def _render_figure(caption, src):
-        alt = escape(caption)
-        s = escape(src)
-        cap_html = f'\n      <figcaption class="project-figcaption">{alt}</figcaption>' if caption else ''
-        return f'    <figure class="project-figure">\n      <img src="{s}" alt="{alt}" loading="lazy">{cap_html}\n    </figure>'
 
-    def _render_section(sec):
-        heading = escape(sec['heading'])
-        raw_lines = sec['lines']
-        if not raw_lines:
-            return None
+def _render_figure(caption, src):
+    alt = escape(caption)
+    s = escape(src)
+    cap_html = f'\n      <figcaption class="project-figcaption">{alt}</figcaption>' if caption else ''
+    return f'    <figure class="project-figure">\n      <img src="{s}" alt="{alt}" loading="lazy">{cap_html}\n    </figure>'
 
-        # Classify each raw line into typed items for rendering
-        # ('p', text) | ('li', text) | ('img', caption, src) | ('sub', text)
-        items = []
-        for kind, text in raw_lines:
-            if kind == 'subheading':
-                items.append(('sub', text))
-            else:
-                m = _IMG_RE.match(text)
-                if m:
-                    items.append(('img', m.group(1), m.group(2)))
-                elif text.startswith('- '):
-                    items.append(('li', text[2:]))
-                elif _NUM_LIST_RE.match(text):
-                    items.append(('li', _NUM_LIST_RE.sub('', text, count=1)))
-                else:
-                    items.append(('p', text))
 
-        if not items:
-            return None
+def _render_section(sec, blocks=None, text_cls='project-detail-text'):
+    """Render one collected section. `blocks` maps directive names to fn(arg, items) -> HTML."""
+    heading = escape(sec['heading'])
+    raw_lines = sec['lines']
+    if not raw_lines:
+        return None
 
-        # Detect pure bullet-list sections (no paragraphs, no images, no subheadings)
-        only_bullets = all(g[0] == 'li' for g in items)
-
-        inner_parts = []
-
-        if only_bullets:
-            lis = '\n'.join(f'        <li>{render_inline(g[1])}</li>' for g in items)
-            inner_parts.append(f'    <ul class="project-detail-list">\n{lis}\n    </ul>')
+    # Classify each raw line into typed items for rendering
+    # ('p', text) | ('li', text) | ('img', caption, src) | ('sub', text) | ('code', text) | ('block', html)
+    items = []
+    for kind, text in raw_lines:
+        if kind == 'subheading':
+            items.append(('sub', text))
+        elif kind == 'code':
+            items.append(('code', text))
+        elif kind == 'block':
+            name, arg, block_items = text
+            html = blocks[name](arg, block_items)
+            if html:
+                items.append(('block', html))
         else:
-            # Track open list state across mixed content
-            in_list = False
-            for g in items:
-                kind = g[0]
-                if kind == 'sub':
-                    if in_list:
-                        inner_parts.append('    </ul>')
-                        in_list = False
-                    inner_parts.append(f'    <h3 class="project-subheading">{escape(g[1])}</h3>')
-                elif kind == 'li':
-                    if not in_list:
-                        inner_parts.append('    <ul class="project-detail-list">')
-                        in_list = True
-                    inner_parts.append(f'      <li>{render_inline(g[1])}</li>')
-                elif kind == 'p':
-                    if in_list:
-                        inner_parts.append('    </ul>')
-                        in_list = False
-                    inner_parts.append(f'    <p>{render_inline(g[1])}</p>')
-                elif kind == 'img':
-                    if in_list:
-                        inner_parts.append('    </ul>')
-                        in_list = False
-                    inner_parts.append(_render_figure(g[1], g[2]))
+            m = _IMG_RE.match(text)
+            if m:
+                items.append(('img', m.group(1), m.group(2)))
+            elif text.startswith('- '):
+                items.append(('li', text[2:]))
+            elif _NUM_LIST_RE.match(text):
+                items.append(('li', _NUM_LIST_RE.sub('', text, count=1)))
+            else:
+                items.append(('p', text))
+
+    if not items:
+        return None
+
+    # Detect pure bullet-list sections (no paragraphs, no images, no subheadings)
+    only_bullets = all(g[0] == 'li' for g in items)
+
+    inner_parts = []
+
+    if only_bullets:
+        lis = '\n'.join(f'        <li>{render_inline(g[1])}</li>' for g in items)
+        inner_parts.append(f'    <ul class="project-detail-list">\n{lis}\n    </ul>')
+    else:
+        # Track open list state across mixed content
+        in_list = False
+        for g in items:
+            kind = g[0]
+            if kind == 'li':
+                if not in_list:
+                    inner_parts.append('    <ul class="project-detail-list">')
+                    in_list = True
+                inner_parts.append(f'      <li>{render_inline(g[1])}</li>')
+                continue
             if in_list:
                 inner_parts.append('    </ul>')
+                in_list = False
+            if kind == 'sub':
+                inner_parts.append(f'    <h3 class="project-subheading">{escape(g[1])}</h3>')
+            elif kind == 'p':
+                inner_parts.append(f'    <p>{render_inline(g[1])}</p>')
+            elif kind == 'img':
+                inner_parts.append(_render_figure(g[1], g[2]))
+            elif kind == 'code':
+                inner_parts.append(f'    <pre class="code-block" tabindex="0"><code>{escape(g[1])}</code></pre>')
+            elif kind == 'block':
+                inner_parts.append(g[1])
+        if in_list:
+            inner_parts.append('    </ul>')
 
-        if not inner_parts:
-            return None
+    if not inner_parts:
+        return None
 
-        inner = '\n'.join(inner_parts)
+    inner = '\n'.join(inner_parts)
+    return (
+        '  <section class="project-section">\n'
+        f'    <h2 class="section-title">{heading}</h2>\n'
+        f'    <div class="{text_cls}">\n'
+        f'{inner}\n'
+        '    </div>\n'
+        '  </section>'
+    )
+
+
+def render_doc_page(md, blocks=None):
+    """Reference/style page body: the '# ' line is the full-height intro (like work/play), then
+    case-study style sections, plus ``` code and `<!-- name | arg -->` generated blocks."""
+    m = re.search(r'(?m)^# (.+)$', md)
+    intro = render_page_intro(m.group(1).strip()) if m else ''
+    body = md[m.end():] if m else md
+    blocks = blocks or {}
+    sections = [s for sec in _collect_sections(body, blocks)
+                for s in [_render_section(sec, blocks, 'project-detail-text doc-text')] if s]
+    return '\n\n'.join(p for p in [intro, *sections] if p)
+
+
+def parse_css_tokens(css, selector):
+    """Custom properties declared directly in the first `selector { … }` rule of style.css, as {name: value}."""
+    m = re.search(re.escape(selector) + r'\s*\{([^}]*)\}', css)
+    return dict(re.findall(r'--([\w-]+)\s*:\s*([^;]+);', m.group(1))) if m else {}
+
+
+def _token_items(items):
+    """'- name: note' block items -> [(name, note)]."""
+    return [(k.strip(), v.strip()) for k, _, v in (i.partition(':') for i in items)]
+
+
+_SAMPLE_RE = re.compile(r'(?m)^<!--\s*(project|article|lately|rolodex|playground|tags|tagline|footer)\s*-->\s*$')
+
+
+def parse_samples(md):
+    """Split content/samples.md on its `<!-- name -->` markers and parse each part with the parser
+    its real file uses, so the style page's specimens show generic content in the real formats."""
+    parts = _SAMPLE_RE.split(md)
+    chunks = {parts[i]: parts[i + 1] for i in range(1, len(parts) - 1, 2)}
+    get = lambda k: chunks.get(k, '')
+    return {
+        'projects': [_project_fields(get('project'))] if get('project').strip() else [],
+        'articles': parse_articles(get('article'))[1],
+        'lately': parse_lately(get('lately'))[1],
+        'rolodex': parse_rolodex(get('rolodex'))[1],
+        'playground': parse_playground(get('playground'))[1],
+        'toolkit': [l.strip()[2:].strip() for l in get('tags').splitlines() if l.strip().startswith('- ')],
+        'intro': get('tagline').strip(),
+        'footer': get('footer'),
+    }
+
+
+def style_blocks(css, template, labels, demo):
+    """Generated blocks for the style page (content/style.md), keyed by directive name.
+
+    Every value comes from style.css (:root and the dark-mode rule), template.html (font weights)
+    or build.py (SEASONS, ICON_NAMES), so the page can't drift from the real thing. Copy (notes,
+    sample text, headings) stays in style.md and labels.md. `demo` holds the sample content
+    (parse_samples) the component specimens are drawn from.
+    """
+    light = parse_css_tokens(css, ':root')
+    dark = parse_css_tokens(css, '[data-theme="dark"]')
+    light_label, dark_label = escape(_label(labels, 'style-light')), escape(_label(labels, 'style-dark'))
+
+    def resolve(value):
+        """Follow var(--x) aliases to the value they point at."""
+        seen = set()
+        while (m := re.fullmatch(r'var\(--([\w-]+)\)', value.strip())) and m.group(1) not in seen:
+            seen.add(m.group(1))
+            value = light.get(m.group(1), value)
+        return value
+
+    def row(name, note, preview, values):
+        if name not in light:
+            print(f'Warning: style.md lists --{name}, which style.css does not define')
+        value_html = ''.join(f'<span class="style-token-value">{v}</span>' for v in values)
         return (
-            '  <section class="project-section">\n'
-            f'    <h2 class="section-title">{heading}</h2>\n'
-            '    <div class="project-detail-text">\n'
-            f'{inner}\n'
-            '    </div>\n'
-            '  </section>'
+            '      <div class="style-token">\n'
+            '        <div class="style-token-meta">'
+            f'<code class="style-token-name">--{escape(name)}</code>{value_html}'
+            f'<span class="style-token-note">{render_inline(note)}</span></div>\n'
+            f'        <div class="style-token-preview">{preview}</div>\n'
+            '      </div>'
         )
 
-    content_sections = [s for sec in sections for s in [_render_section(sec)] if s]
+    def token_list(rows):
+        return '    <div class="style-tokens">\n' + '\n'.join(rows) + '\n    </div>'
+
+    def plain(name):
+        return [escape(light.get(name, ''))]
+
+    def fonts(sample, items):
+        weights = re.search(r'wght@([\d;]+)', template)
+        weights = weights.group(1).split(';') if weights else ['400']
+        rows = []
+        for name, note in _token_items(items):
+            ws = weights if name == 'font-sans' else ['400']
+            preview = ''.join(
+                f'<p class="style-font-sample" style="font-family:var(--{escape(name)});font-weight:{w}">'
+                f'{escape(sample)}</p>' for w in ws)
+            vals = plain(name) + ([escape(' · '.join(ws))] if len(ws) > 1 else [])
+            rows.append(row(name, note, preview, vals))
+        return token_list(rows)
+
+    def type_scale(sample, items):
+        return token_list([
+            row(name, note, f'<p class="style-type-sample" style="font-size:var(--{escape(name)})">{escape(sample)}</p>', plain(name))
+            for name, note in _token_items(items)])
+
+    def tracking(sample, items):
+        return token_list([
+            row(name, note, f'<p class="style-tracking-sample" style="letter-spacing:var(--{escape(name)})">{escape(sample)}</p>', plain(name))
+            for name, note in _token_items(items)])
+
+    def colour(_, items):
+        rows = []
+        for name, note in _token_items(items):
+            vals = [f'{light_label} {escape(light.get(name, ""))}']
+            if name in dark:
+                vals.append(f'{dark_label} {escape(dark[name])}')
+            rows.append(row(name, note, f'<span class="style-swatch" style="background:var(--{escape(name)})"></span>', vals))
+        return token_list(rows)
+
+    def space(_, items):
+        rows = []
+        for name, note in _token_items(items):
+            n = escape(name)
+            if len(resolve(light.get(name, '')).split()) > 1 and 'clamp' not in light.get(name, ''):
+                preview = f'<span class="style-space-box" style="padding:var(--{n})"><span></span></span>'
+            else:
+                preview = f'<span class="style-space-bar" style="width:var(--{n})"></span>'
+            rows.append(row(name, note, preview, plain(name)))
+        return token_list(rows)
+
+    def icon_sizes(glyph, items):
+        rows = []
+        for name, note in _token_items(items):
+            n = escape(name)
+            if name.startswith('icon'):
+                m = re.match(r'\d+', resolve(light.get(name, '')))
+                px = m.group() if m else '24'
+                preview = (f'<span class="material-symbols-sharp style-icon-sample" '
+                           f'style="font-size:var(--{n});font-variation-settings:\'FILL\' 0, \'wght\' 400, \'GRAD\' 0, \'opsz\' {px}">{escape(glyph)}</span>')
+            else:
+                preview = f'<span class="style-square" style="width:var(--{n});height:var(--{n})"></span>'
+            rows.append(row(name, note, preview, plain(name)))
+        return token_list(rows)
+
+    def seasons(_, items):
+        months = [m.strip() for m in _label(labels, 'month-names').split(',')]
+        names = [m.strip() for m in _label(labels, 'season-names').split(',')]
+        pair_sep = escape(_label(labels, 'pair-separator'))
+        cards = []
+        for i, (lt, dk) in enumerate(SEASONS):
+            month = escape(months[i]) if i < len(months) else ''
+            name = escape(names[i]) if i < len(names) else ''
+            cards.append(
+                f'      <button type="button" class="style-season" style="--swatch-light:{lt};--swatch-dark:{dk}" '
+                f'onclick="applySeason({i}, true)" aria-label="{month} {pair_sep} {name}">'
+                '<span class="style-season-swatch"></span>'
+                f'<span class="style-season-meta"><span class="style-season-name">{month} {pair_sep} {name}</span>'
+                f'<span>{light_label} {lt}</span><span>{dark_label} {dk}</span></span></button>')
+        return '    <div class="style-seasons">\n' + '\n'.join(cards) + '\n    </div>'
+
+    def icons(_, items):
+        cells = ''.join(
+            f'      <span class="style-icon"><span class="material-symbols-sharp">{escape(i)}</span>{escape(i)}</span>\n'
+            for i in sorted(ICON_NAMES))
+        return '    <div class="style-icons">\n' + cells + '    </div>'
+
+    def components(_, items):
+        lb = lambda k: escape(_label(labels, k))
+        project = demo['projects'][0] if demo['projects'] else None
+        article = demo['articles'][0] if demo['articles'] else None
+        lately = next((h for k, v in demo['lately'] for h in [_lately_item(k, v, labels)] if h), '')
+        rolodex = demo['rolodex'][0] if demo['rolodex'] else None
+        playground = demo['playground'][0] if demo['playground'] else None
+        project_tags = ''.join(f'<span class="tag">{escape(t.strip())}</span>'
+                               for t in (project['tags'] if project else '').split(',') if t.strip())
+        # The footer's live ids and values are filled by script.js on the real footer; the demo shows fixed ones
+        footer_specimen = render_footer(demo['footer'], labels) if demo['footer'].strip() else ''
+        for fid, sample in (('local-time', '12:00 pm IST'), ('temperature', '24°C'), ('aqi', '42')):
+            footer_specimen = re.sub(rf'<span id="{fid}">[^<]*</span>', f'<span>{sample}</span>', footer_specimen)
+        specimens = {
+            'bar-box': (
+                f'<button type="button" class="bar-box" aria-label="{lb("copy-email")}"><span class="material-symbols-sharp">mail</span></button>'
+                f'<button type="button" class="bar-box" aria-label="{lb("shuffle")}"><span class="material-symbols-sharp">refresh</span></button>'
+                f'<a class="bar-box project-back" href="{{{{nav_root}}}}work/">{lb("back-to-work")}</a>'),
+            'nav-link-box': (
+                f'<a class="nav-link-box active" href="{{{{nav_root}}}}work/">{lb("nav-work")}</a>'
+                f'<a class="nav-link-box" href="{{{{nav_root}}}}play/">{lb("nav-play")}</a>'),
+            'toast': f'<div class="toast visible">{lb("email-copied")}</div>',
+            'tag': f'<span class="tags">{project_tags}</span>',
+            'tag-lg': ''.join(f'<span class="tag-lg">{escape(t)}</span>' for t in demo['toolkit']),
+            'footer': footer_specimen,
+            'name': f'<p class="tagline">{apply_name(demo["intro"])}</p>',
+            'project': f'<div class="projects">\n{_project_card(project, project["url"] or "#")}\n</div>' if project else '',
+            'article': f'<div class="articles">\n{_article_card(article)}\n</div>' if article else '',
+            'lately-item': f'<div class="lately-list">\n{lately}\n</div>' if lately else '',
+            'rolodex-item': f'<div class="rolodex">\n{_rolodex_item(rolodex)}\n</div>' if rolodex else '',
+            'playground-card': f'<div class="playground-grid">\n{_playground_card(playground, "assets/samples/")}\n</div>' if playground else '',
+        }
+        parts = []
+        for key, note in _token_items(items):
+            if key not in specimens:
+                print(f'Warning: style.md lists unknown component "{key}"')
+                continue
+            parts.append(
+                '      <div class="style-specimen">\n'
+                f'        <div class="style-specimen-meta"><code class="style-token-name">.{escape(key)}</code>'
+                f'<span class="style-token-note">{render_inline(note)}</span></div>\n'
+                f'        <div class="style-specimen-demo">\n{specimens[key]}\n        </div>\n'
+                '      </div>')
+        return '    <div class="style-specimens">\n' + '\n'.join(parts) + '\n    </div>'
+
+    return {
+        'fonts': fonts, 'type': type_scale, 'tracking': tracking, 'colour': colour,
+        'space': space, 'icon-sizes': icon_sizes, 'seasons': seasons, 'icons': icons,
+        'components': components,
+    }
+
+
+def render_project_page(md, labels):
+    """Parse a project detail markdown file into a case study page body."""
+    # --- Pass 1: extract front-matter key-value pairs (before first ## heading) ---
+    front = _project_fields(md)
+    org, url, problem, tags, year = front['org'], front['url'], front['problem'], front['tags'], front['year']
+
+    # --- Pass 2: collect and render sections ---
+    content_sections = [s for sec in _collect_sections(md) for s in [_render_section(sec)] if s]
 
     visit_label = escape(_label(labels, 'visit-site'))
     back_label = escape(_label(labels, 'back-to-work'))
@@ -1148,12 +1445,12 @@ def render_project_page(md, labels):
     heading = escape(problem) if problem else escape(org)
 
     tag_spans = ''.join(
-        f'<span class="project-tag">{escape(t.strip())}</span>'
+        f'<span class="tag-lg">{escape(t.strip())}</span>'
         for t in tags.split(',') if t.strip()
     ) if tags else ''
     tags_row = (
         f'    <div class="project-header-tags">'
-        f'<span class="project-tags">{tag_spans}</span>'
+        f'<span class="tags-lg">{tag_spans}</span>'
         + visit_btn +
         f'</div>\n'
     ) if (tag_spans or visit_btn) else ''
@@ -1510,6 +1807,8 @@ def smoke_check(pages, project_fields):
         DIST / 'assets' / 'og-image.png',
         DIST / 'assets' / 'og' / 'work.png',
         DIST / 'assets' / 'og' / 'play.png',
+        DIST / 'assets' / 'og' / 'reference.png',
+        DIST / 'assets' / 'og' / 'style.png',
     ]
     expected += [DIST / 'assets' / 'og' / 'work' / f'{f["slug"]}.png' for f in project_fields]
 
@@ -1572,6 +1871,11 @@ def build():
     ideas_md            = read(CONTENT / 'play' / 'ideas.md')
     interests_md        = read(CONTENT / 'play' / 'interests.md')
 
+    reference_md        = read(CONTENT / 'reference.md')
+    style_md            = read(CONTENT / 'style.md')
+    reference_meta = meta_pages.get('reference', {})
+    style_meta = meta_pages.get('style', {})
+
     labels = parse_labels(read(CONTENT / 'labels.md'))
     for key in REQUIRED_LABEL_KEYS:
         if not labels.get(key):
@@ -1610,6 +1914,11 @@ def build():
 
     work_body = render_work_body(work_intro_md, about_md, toolkit_md, projects_heading_md, project_mds, articles_md, labels)
 
+    # Reference and style pages: the style page's specimens are drawn from content/samples.md
+    reference_body = render_doc_page(reference_md)
+    demo = parse_samples(read(CONTENT / 'samples.md'))
+    style_body = render_doc_page(style_md, style_blocks(css, template, labels, demo))
+
     project_pages = [
         (f'work/{f["slug"]}/index.html', render_project_page(md, labels), 'work', 2)
         for md, f in zip(project_mds, project_fields)
@@ -1637,6 +1946,8 @@ def build():
     og_dir = BASE / 'assets' / 'og'
     _og_image(cache, accent, work_meta.get('heading', ''), work_meta.get('tagline', ''), domain_text, site_name, og_dir / 'work.png')
     _og_image(cache, accent, play_meta.get('heading', ''), play_meta.get('tagline', ''), domain_text, site_name, og_dir / 'play.png')
+    _og_image(cache, accent, reference_meta.get('heading', ''), reference_meta.get('tagline', ''), domain_text, site_name, og_dir / 'reference.png')
+    _og_image(cache, accent, style_meta.get('heading', ''), style_meta.get('tagline', ''), domain_text, site_name, og_dir / 'style.png')
     for f in project_fields:
         year_display = re.sub(r'\s*[-–—]\s*', ' - ', f['year']) if f['year'] else ''
         org_display = f'**{f["org"]}**' if f['org'] else ''
@@ -1660,6 +1971,15 @@ def build():
         _abs_url('assets/og/play.png', site_url), favicon,
     )
 
+    reference_meta_html = render_meta(
+        reference_meta.get('title', ''), reference_meta.get('description', ''), site_url + '/reference/',
+        _abs_url('assets/og/reference.png', site_url), favicon,
+    )
+    style_meta_html = render_meta(
+        style_meta.get('title', ''), style_meta.get('description', ''), site_url + '/style/',
+        _abs_url('assets/og/style.png', site_url), favicon,
+    )
+
     def _project_meta_html(f):
         title = f'{f["org"]} | {site_name}' if f['org'] else home_meta.get('title', '')
         return render_meta(
@@ -1672,6 +1992,8 @@ def build():
         ('index.html', home_meta_html, home_body, 'home', 0),
         ('work/index.html', work_meta_html, work_body, 'work', 1),
         ('play/index.html', play_meta_html, play_body, 'play', 1),
+        ('reference/index.html', reference_meta_html, reference_body, '', 1),
+        ('style/index.html', style_meta_html, style_body, '', 1),
         *[(path, _project_meta_html(f), body, active, depth)
           for f, (path, body, active, depth) in zip(project_fields, project_pages)],
     ]

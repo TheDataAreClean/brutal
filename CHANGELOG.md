@@ -8,6 +8,18 @@ Reverse-chronological. Versioning: **major** = redesign · **minor** = new featu
 
 ---
 
+## v4.6.0 — 2026-11-12
+
+- New `/reference` page (not linked from the site): every content element the site renders and how to write it, with generic examples
+- New `/style` page (not linked from the site): fonts, type scale, colours, seasons, spacing, icons and live components, read from `style.css` and `build.py` at build time
+- Tags consolidated into two styles: `.tag` (inside cards) and `.tag-lg` (standalone, now also used for case study header tags); replaces `project-tag`, `article-tag`, `offering-tag`, `interest-tag`
+- Case study sections now support ``` code blocks and `inline code`
+- New tokens: `--opacity-muted`, `--measure-prose`, `--measure-tagline`, `--font-sans`, `--font-mono`
+- Footer: live values (location, time, temperature, AQI) in accent; credit and licence boxes are whole-box buttons with the standard hover fill
+- Docs: tag sizes and line heights corrected; intentional hover exceptions written down
+
+---
+
 ## v4.5.0 — 2026-11-10
 
 - Rolodex: new sports (`sports_soccer` icon, 5 links) and news & information (`newspaper` icon, 8 links) categories; more comics, science and data & visualisation links; categories and links sorted alphabetically

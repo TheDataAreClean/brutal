@@ -10,6 +10,9 @@ Technical reference for the portfolio build system. See [README.md](README.md) f
 content/
   meta.md             ← site-wide url/site-name/favicon + per-page title/description/heading/tagline (see OG images)
   hero.md             ← home page heading + tagline
+  reference.md        ← /reference page (see Reference and style pages)
+  style.md            ← /style page
+  samples.md          ← generic demo content for the style page's component specimens
   footer.md           ← location, credits, license (kv-list)
   labels.md           ← all UI copy (keys fixed, values editable)
   work/
@@ -66,6 +69,9 @@ dist/            ← generated output, git-tracked, committed with source
 | `render_rolodex(md)` | ideas.md | one random link per category |
 | `render_interests(md)` | interests.md | tag cloud |
 | `render_project_page(md, labels)` | projects/*.md | case study page |
+| `render_doc_page(md, blocks)` | reference.md / style.md | page body: `#` line as intro, `##` sections, ``` code, generated blocks |
+| `style_blocks(css, template, labels, demo)` | style.css, template.html, labels, samples | the generators behind `<!-- name \| arg -->` lines in style.md |
+| `parse_samples(md)` | samples.md | demo content parsed with the real formats' parsers |
 | `render_feed(articles_md, project_mds, lately_archive_md, playground_md, site_url, site_title, site_desc, labels)` | articles + projects + lately-archive + playground | RSS 2.0 XML |
 | `render_meta(title, description, url, image_url, favicon)` | per-page values resolved in `build()` | `<title>` + OG/Twitter `<meta>` tags |
 | `render_page(template, css, js, meta_html, ...)` | all above | complete HTML file |
@@ -92,6 +98,12 @@ dist/            ← generated output, git-tracked, committed with source
 | `{{site_email}}`, `{{site_instagram}}`, `{{site_linkedin}}` | top-level keys in meta.md |
 | `{{site_data_json}}` | `_site_data_json()` — labels `script.js` needs plus the `SEASONS` colour table, in a `<script type="application/json" id="site-data">` block |
 
+## Reference and style pages
+
+Both are ordinary content files rendered by `render_doc_page()`: the `# ` line becomes the full-height intro, each `## ` heading a section with the same renderer as case studies. They add two things case studies don't have: ``` fenced code blocks, and `` `inline code` ``.
+
+`style.md` also uses generated blocks. A line like `<!-- type | sample text -->` followed by `- name: note` lines inserts a block whose values are read from `style.css` (`:root` and the dark-mode rule), `build.py` (`SEASONS`, `ICON_NAMES`) and `labels.md` at build time. Block names: `fonts`, `type`, `tracking`, `colour`, `space`, `icon-sizes`, `seasons`, `icons`, `components`. A token listed but missing from `style.css` prints a build warning. Component specimens use the real card renderers with the generic content in `content/samples.md`, so no personal content appears on either page. New tokens or components should be added to `style.md` too.
+
 ## Pages
 
 | Path | Description |
@@ -100,6 +112,8 @@ dist/            ← generated output, git-tracked, committed with source
 | `/work` | About, toolkit, project cards (3-col), articles (3-col, show-more) |
 | `/play` | Lately, playground (2-col), rolodex (1 per category), interests |
 | `/work/<slug>/` | Case study: problem as h1, meta, tags, sections, back link |
+| `/reference/` | Every content element and how to write it |
+| `/style/` | Design tokens and components, read from `style.css` and `build.py` |
 | `/feed.xml` | RSS 2.0 — articles, projects, lately archive, playground |
 
 ## Content formats
@@ -286,9 +300,28 @@ Non-obvious implementation details, each fixing a real visual bug hit along the 
 | `--text-display` | 32px | 128px | hero h1 |
 | `--text-heading` | 24px | 36px | page intros, section titles, case study h1 |
 | `--text-subhead` | 18px | 24px | hero tagline |
-| `--text-body` | 15px | 17px | body text, tags, names |
-| `--text-small` | 13px | 13px | article meta, footer, rolodex, lately |
-| `--text-ui` | 11px | 11px | nav, toast, season picker, tags |
+| `--text-body` | 15px | 17px | body text, case study prose, names |
+| `--text-small` | 13px | 13px | article meta, footer, rolodex, lately, large tags |
+| `--text-ui` | 11px | 11px | nav, toast, season picker, small tags |
+
+Line heights: 1 display, 1.05 section titles, 1.3 case study heading, 1.4 small text, 1.5 body and above, 1.6 case study prose.
+
+### Tags
+
+Two tag styles, nothing else:
+
+| Class | Look | Use |
+|---|---|---|
+| `.tag` (group: `.tags`) | `--text-ui`, `--tag-pad`, `--tag-gap` | inside project and article cards |
+| `.tag-lg` (group: `.tags-lg`, `.offerings`, `.interests`) | `--text-small`, `--box-pad`, `--box-gap` | standalone: toolkit, interests, case study header |
+
+### Opacity and measure
+
+| Token | Value | Use |
+|---|---|---|
+| `--opacity-muted` | 0.65 | secondary text (season picker footnote, style page notes) |
+| `--measure-prose` | 68ch | max width of case study and reference prose |
+| `--measure-tagline` | 700px | max width of the hero tagline |
 
 ### Spacing
 
@@ -328,7 +361,11 @@ Material Symbols `opsz` in `font-variation-settings` must match the rendered `fo
 
 ### Hover pattern
 
-All bordered interactive elements (`.bar-box`, `.project`, `.article`, `.lately-item`, `.rolodex-item`, `.playground-card`, `.nav-link-box`, `.season-option`) use: `background: var(--accent)`, `color: var(--on-accent)`, `border-color: var(--accent)`. Always inside `@media (hover: hover)`.
+All bordered interactive elements (`.bar-box`, `.project`, `.article`, `.lately-item`, `.rolodex-item`, `.playground-card`, `.nav-link-box`, `.season-option`, `.style-season`, footer buttons) use: `background: var(--accent)`, `color: var(--on-accent)`, `border-color: var(--accent)`. Always inside `@media (hover: hover)`. On touch screens the same fill shows on `:active`.
+
+Intentional exceptions: the season picker square (`.nav-logo-season`) swaps to `--white` on hover, since it sits on an accent fill; `.season-option` shows its fill for the active season as well as on hover; the footer's first row is static info (live values in accent, no hover).
+
+Footer buttons (second row): each box is one link stretched over the whole box (`a::after`), and follows the standard hover and `:active` fill.
 
 ## Build pipeline
 

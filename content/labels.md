@@ -45,3 +45,5 @@
 - feed-case-study: new case study
 - feed-lately: lately
 - feed-playground: playground
+- style-light: light
+- style-dark: dark
