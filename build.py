@@ -99,6 +99,8 @@ _NUM_LIST_RE = re.compile(r'^\d+\.\s+')
 _SECTION_HDG_RE = re.compile(r'^(#{2,4})(\s|$)')
 _IMG_RE = re.compile(r'^!\[([^\]]*)\]\(([^)]+)\)$')
 # [text](url) — url may contain one level of balanced parens, e.g. Wikipedia's Foo_(bar)
+ROLODEX_COUNT = 5   # links per flip, each from a different category
+ROLODEX_MEMORY = 3  # a link shown in this many recent flips is not shown again
 _ROLODEX_CATEGORY_RE = re.compile(r'^<!--\s*(.+?)\s*\|\s*([a-z0-9_]+)\s*-->$')
 # `<!-- name | arg -->` directive in a doc page (reference.md, style.md) that inserts a generated block
 _BLOCK_RE = re.compile(r'^<!--\s*([a-z][a-z-]*)\s*(?:\|\s*(.*?))?\s*-->$')
@@ -1008,7 +1010,8 @@ def _rolodex_item(item):
 
 
 def render_rolodex(md, labels):
-    """Parse ideas.md into a hidden list, JS picks one random link per category on each load."""
+    """Parse ideas.md into a hidden list; JS shows ROLODEX_COUNT links from different categories,
+    with no link repeated within ROLODEX_MEMORY flips."""
     title, items = parse_rolodex(md)
     title = apply_highlight(title)
     # '<' escaped so a name containing '</script>' can't close the inline script block
@@ -1024,9 +1027,19 @@ def render_rolodex(md, labels):
         '    </div>\n'
         '    <div class="rolodex" id="rolodex"></div>\n'
         f'    <script>!function(){{var items={items_json};'
+        # Each flip shows ROLODEX_COUNT links from different categories; a link shown in
+        # the last ROLODEX_MEMORY flips is skipped while another link is available.
+        f'var N={ROLODEX_COUNT},M={ROLODEX_MEMORY},hist=[];'
+        'function pick(l){return l[Math.floor(Math.random()*l.length)];}'
+        'function mix(l){for(var i=l.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=l[i];l[i]=l[j];l[j]=t;}return l;}'
         'function shuffle(){var el=document.getElementById("rolodex");el.textContent="";'
-        'var g={},a=[];items.forEach(function(it){var k=it.category;(g[k]=g[k]||(a.push(k),[])).push(it);});'
-        'a=a.map(function(k){return g[k][Math.floor(Math.random()*g[k].length)];});'
+        'var seen={};hist.forEach(function(f){f.forEach(function(u){seen[u]=1;});});'
+        'var g={},cats=[];items.forEach(function(it){var k=it.category;(g[k]=g[k]||(cats.push(k),[])).push(it);});'
+        'var fresh=[],stale=[];mix(cats).forEach(function(k){'
+        'var f=g[k].filter(function(it){return !seen[it.url];});'
+        'if(f.length)fresh.push(pick(f));else stale.push(pick(g[k]));});'
+        'var a=fresh.concat(stale).slice(0,N);'
+        'hist.push(a.map(function(it){return it.url;}));if(hist.length>M)hist.shift();'
         'a.forEach(function(item){'
         'var link=document.createElement("a");link.className="rolodex-item";'
         'link.href=item.url;link.target="_blank";link.rel="noopener";'

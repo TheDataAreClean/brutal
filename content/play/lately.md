@@ -1,15 +1,15 @@
 # **lately**, i have been
 
 - read: [The Once and Future Riot by Joe Sacco](https://www.goodreads.com/book/show/222376500-the-once-and-future-riot)
-- listened: [Inside the race to build the machine god by Decoder, The Verge](https://youtu.be/FU2wls6TOyw)
-- watched: 
+- listened: [Illuminati by Sushin Shyam & Dabzee, Aavesham](https://youtu.be/tOM-nWPcR4U)
+- watched: [Abbott Elementary](https://en.wikipedia.org/wiki/Abbott_Elementary)
 - learned: 
 - explored: 
 - wrote: [musings](https://musings.thedataareclean.com)
 - brewed: [Yeast Natural Pink Bourbon by Zarza Coffee, Moonwake Coffee Roasters](https://moonwakecoffeeroasters.com/products/zarza-coffee-jhonatan-gasca-yeast-natural-pink-bourbon-colombia)
-- photographed: [Sashitihlu Beach, Mangalore](https://maps.google.com?ftid=0x3ba34d59115c3d49:0x2535f64c3a5a28d8&entry=gps&shh=CAE&lucs=,94297699,94231188,94280568,100821559,47071704,94218641,94282134,100835694,94286869,100820247,100822504,100838877,121816461&g_st=ic)
+- photographed: my sister's [wedding](https://musings.thedataareclean.com/notes/2026-11-15-pwd-1/)
 - cycled: 
-- visited: [Mangalore](https://en.wikipedia.org/wiki/Mangalore)
+- visited: [Delhi](https://en.wikipedia.org/wiki/Delhi)
 - played: 
 - cooked: 
 - built: 

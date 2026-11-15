@@ -165,7 +165,7 @@ The keys are read, listened, watched, cooked, explored, played, built, learned, 
 
 ## rolodex
 
-`content/play/ideas.md` groups links into categories. A comment names each category and its icon, and one random link per category shows on each visit.
+`content/play/ideas.md` groups links into categories. A comment names each category and its icon, and each visit or shuffle shows 5 random links, each from a different category, with no link repeating within 3 shuffles.
 
 ```
 <!-- data & visualisation | bar_chart -->
