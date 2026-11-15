@@ -6,6 +6,9 @@ Reverse-chronological. Versioning: **major** = redesign · **minor** = new featu
 
 ## UNRELEASED
 
+- Rolodex shows 5 links from different categories per flip (was one per category), and no link repeats within 3 flips
+- Playground: [thirty six] truths links to thirtysixtruths.com with a new screenshot
+
 ---
 
 ## v4.6.1 — 2026-11-12

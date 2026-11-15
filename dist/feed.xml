@@ -5,8 +5,32 @@
     <link>https://thedataareclean.com</link>
     <description>hello, i am arpit. i am curious about everything.</description>
     <language>en</language>
-    <lastBuildDate>Thu, 29 Oct 2026 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 15 Nov 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://thedataareclean.com/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>lately listening to: Illuminati by Sushin Shyam &amp; Dabzee, Aavesham</title>
+      <link>https://youtu.be/tOM-nWPcR4U</link>
+      <pubDate>Sun, 15 Nov 2026 00:00:00 +0000</pubDate>
+      <guid isPermaLink="false">lately:2026-11-15:listened:Illuminati by Sushin Shyam &amp; Dabzee, Aavesham</guid>
+    </item>
+    <item>
+      <title>lately watching: Abbott Elementary</title>
+      <link>https://en.wikipedia.org/wiki/Abbott_Elementary</link>
+      <pubDate>Sun, 15 Nov 2026 00:00:00 +0000</pubDate>
+      <guid isPermaLink="false">lately:2026-11-15:watched:Abbott Elementary</guid>
+    </item>
+    <item>
+      <title>lately photographing: my sister&#x27;s wedding</title>
+      <link>https://musings.thedataareclean.com/notes/2026-11-15-pwd-1/</link>
+      <pubDate>Sun, 15 Nov 2026 00:00:00 +0000</pubDate>
+      <guid isPermaLink="false">lately:2026-11-15:photographed:my sister&#x27;s wedding</guid>
+    </item>
+    <item>
+      <title>lately visiting: Delhi</title>
+      <link>https://en.wikipedia.org/wiki/Delhi</link>
+      <pubDate>Sun, 15 Nov 2026 00:00:00 +0000</pubDate>
+      <guid isPermaLink="false">lately:2026-11-15:visited:Delhi</guid>
+    </item>
     <item>
       <title>lately reading: The Once and Future Riot by Joe Sacco</title>
       <link>https://www.goodreads.com/book/show/222376500-the-once-and-future-riot</link>
@@ -203,10 +227,10 @@
     </item>
     <item>
       <title>playground: [thirty six] truths:</title>
-      <link>https://www.instagram.com/36truths/</link>
+      <link>https://thirtysixtruths.com/</link>
       <description>making small data cool again.</description>
       <pubDate>Mon, 01 Jan 2024 00:00:00 +0000</pubDate>
-      <guid isPermaLink="true">https://www.instagram.com/36truths/</guid>
+      <guid isPermaLink="true">https://thirtysixtruths.com/</guid>
       <media:content url="https://thedataareclean.com/assets/playground/36t.webp" medium="image"/>
     </item>
     <item>

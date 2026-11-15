@@ -66,7 +66,7 @@ dist/            ← generated output, git-tracked, committed with source
 | `render_articles(md, labels)` | articles.md | 3-col grid + show-more |
 | `render_lately(md, labels)` | lately.md | activity list |
 | `render_playground(md)` | playground.md | 2-col linked image card grid |
-| `render_rolodex(md)` | ideas.md | one random link per category |
+| `render_rolodex(md)` | ideas.md | 5 random links from different categories, no repeats within 3 flips |
 | `render_interests(md)` | interests.md | tag cloud |
 | `render_project_page(md, labels)` | projects/*.md | case study page |
 | `render_doc_page(md, blocks)` | reference.md / style.md | page body: `#` line as intro, `##` sections, ``` code, generated blocks |
@@ -110,7 +110,7 @@ Both are ordinary content files rendered by `render_doc_page()`: the `# ` line b
 |---|---|
 | `/` | Full-viewport hero |
 | `/work` | About, toolkit, project cards (3-col), articles (3-col, show-more) |
-| `/play` | Lately, playground (2-col), rolodex (1 per category), interests |
+| `/play` | Lately, playground (2-col), rolodex (5 links, different categories), interests |
 | `/work/<slug>/` | Case study: problem as h1, meta, tags, sections, back link |
 | `/reference/` | Every content element and how to write it |
 | `/style/` | Design tokens and components, read from `style.css` and `build.py` |
@@ -186,7 +186,7 @@ Available keys: `read`, `listened`, `watched`, `cooked`, `explored`, `played`, `
 
 ### Rolodex
 
-In `content/play/ideas.md`, add `[name](url)` bullet entries. One random item per category is shown per visit, with a shuffle button.
+In `content/play/ideas.md`, add `[name](url)` bullet entries. Each visit and each shuffle shows 5 random links, each from a different category; a link shown in the last 3 flips isn't repeated while another is available (`ROLODEX_COUNT` / `ROLODEX_MEMORY` in `build.py`).
 
 Group entries under a `<!-- category name | icon_name -->` comment. Every link below it shows that Material Symbols icon on its card, with the category name as a tooltip. `icon_name` must be in `ICON_NAMES` in `build.py`. Links above the first comment have no icon.
 
